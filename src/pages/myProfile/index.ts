@@ -1,1 +1,0 @@
-export { MyProfilePage } from './MyProfilePage';

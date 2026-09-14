@@ -1,6 +1,6 @@
 import { Api } from '../../shared/api/api.class';
 import type {
-  PaginatedProjects,
+  ProjectListItem,
   ProjectCreateRequest,
   ProjectDetail,
   ProjectUpdateRequest,
@@ -20,16 +20,18 @@ export class ProjectService {
     this.api = api;
   }
 
-  list(params?: GetProjectsParams): Promise<PaginatedProjects> {
-    return this.api.get<PaginatedProjects>(PROJECTS, params);
+  // Backend отдаёт список проектов простым массивом:
+  // пагинация на /projects/ не настроена.
+  list(params?: GetProjectsParams): Promise<ProjectListItem[]> {
+    return this.api.get<ProjectListItem[]>(PROJECTS, params);
   }
 
   createProject(data: ProjectCreateRequest): Promise<ProjectDetail> {
     return this.api.post<ProjectDetail>(PROJECTS, data);
   }
 
-  getFeaturedProjects(params?: PaginationParams): Promise<PaginatedProjects> {
-    return this.api.get<PaginatedProjects>(`${PROJECTS}featured/`, params);
+  getFeaturedProjects(params?: PaginationParams): Promise<ProjectListItem[]> {
+    return this.api.get<ProjectListItem[]>(`${PROJECTS}featured/`, params);
   }
 
   getProjectDetail(projectId: number): Promise<ProjectDetail> {

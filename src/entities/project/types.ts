@@ -42,6 +42,13 @@ export interface ProjectListItem {
   updated_at: string;
 }
 
+export interface ProjectCardItem {
+  id: number;
+  name: string;
+  image?: string;
+  tags: string[];
+}
+
 export interface ProjectRole {
   id: number;
   project_id: number;

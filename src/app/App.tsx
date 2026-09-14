@@ -6,7 +6,6 @@ import {
   FavoritesPage,
   LoginPage,
   MainPage,
-  MyProfilePage,
   ParticipantsPage,
   PolicyPage,
   ProfilePage,
@@ -20,6 +19,7 @@ import { MainLayout } from '@shared/ui/layout/main/MainLayout';
 import { Route, Routes } from 'react-router-dom';
 import './App.css';
 import './styles/index.css';
+import { MyProfileRoute } from './router';
 
 export function App() {
   return (
@@ -38,7 +38,7 @@ export function App() {
         <Route element={<ProtectedRoute />}>
           <Route path="projects/:id" element={<ProjectCardPage />} />
           <Route path="profile/:id" element={<ProfilePage />} />
-          <Route path="my-profile" element={<MyProfilePage />} />
+          <Route path="my-profile" element={<MyProfileRoute />} />
           <Route path="edit-profile" element={<EditProfilePage />} />
           <Route path="edit-project" element={<EditProjectPage />} />
           <Route path="requests" element={<RequestsPage />} />

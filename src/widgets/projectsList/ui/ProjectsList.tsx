@@ -4,7 +4,7 @@ import styles from './ProjectsList.module.css';
 interface Project {
   id: number;
   name: string;
-  image: string;
+  image?: string;
   tags: string[];
 }
 
@@ -13,9 +13,12 @@ interface ProjectsListProps {
   className?: string;
 }
 
-export const ProjectsList: React.FC<ProjectsListProps> = ({ data }) => {
+export const ProjectsList: React.FC<ProjectsListProps> = ({
+  data,
+  className,
+}) => {
   return (
-    <div className={styles.container}>
+    <div className={[styles.container, className].filter(Boolean).join(' ')}>
       <ul className={styles.list}>
         {data.map((proj) => (
           <ProjectItem

@@ -4,6 +4,16 @@
   position: relative;
 }
 
+.state {
+  margin: 0;
+  border-radius: 20px;
+  padding: 40px;
+  background: var(--gradient-day);
+  color: var(--neutral-secondary-color);
+  font-size: 20px;
+  line-height: 130%;
+}
+
 .button {
   max-width: 286px;
   align-self: center;
