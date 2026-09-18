@@ -20,7 +20,13 @@ export const ProjectItem: React.FC<ProjectItemProps> = ({
   return (
     <li className={styles.item} key={id}>
       <div className={styles.left}>
-        <img src={image} alt="Проект" className={styles.image} />
+        {image ? (
+          <img src={image} alt="Проект" className={styles.image} />
+        ) : (
+          <span className={styles.imageFallback} aria-hidden="true">
+            {name.charAt(0)}
+          </span>
+        )}
         <span className={styles.name}>{name}</span>
       </div>
       <div className={styles.right}>
@@ -36,7 +42,7 @@ export const ProjectItem: React.FC<ProjectItemProps> = ({
         <Button
           variant="tertiary"
           className={styles.button}
-          onClick={() => navigate(`/project-card/${id}`)}
+          onClick={() => navigate(`/projects/${id}`)}
         >
           К проекту
         </Button>

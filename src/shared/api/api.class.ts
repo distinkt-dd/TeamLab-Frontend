@@ -20,13 +20,36 @@ export class Api {
     this.authService = authService;
   }
 
+  private getErrorMessage(data: unknown): string | null {
+    if (typeof data === 'string') return data;
+
+    if (Array.isArray(data)) {
+      for (const item of data) {
+        const message = this.getErrorMessage(item);
+        if (message) return message;
+      }
+      return null;
+    }
+
+    if (data && typeof data === 'object') {
+      const record = data as Record<string, unknown>;
+      for (const key of ['error', 'detail', ...Object.keys(record)]) {
+        if (!(key in record)) continue;
+        const message = this.getErrorMessage(record[key]);
+        if (message) return message;
+      }
+    }
+
+    return null;
+  }
+
   protected async handleResponse<T>(response: Response): Promise<T> {
     if (response.ok) {
       if (response.status === 204) return undefined as unknown as T;
       return await response.json();
     }
-    const data = await response.json().catch(() => ({}));
-    const message = data.error ?? data.detail ?? response.statusText;
+    const data: unknown = await response.json().catch(() => null);
+    const message = this.getErrorMessage(data) ?? response.statusText;
     throw new Error(
       `Request failed with status ${response.status}: ${message}`
     );

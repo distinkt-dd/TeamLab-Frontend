@@ -1,5 +1,6 @@
 import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import authReducer from '@features/auth/model/authSlice';
+import userReducer from '@entities/user/model/slice';
 
 import {
   persistReducer,
@@ -12,6 +13,7 @@ import storage from 'redux-persist/lib/storage';
 
 const rootReducer = combineReducers({
   auth: authReducer,
+  user: userReducer,
 });
 
 const persistConfig = {

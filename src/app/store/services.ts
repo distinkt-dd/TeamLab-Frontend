@@ -18,14 +18,20 @@ interface Services {
 let services: Services | null = null;
 let tokenManagerInstance: TokenManager | null = null;
 
+const normalizeApiBaseUrl = (url: string): string => {
+  const trimmedUrl = url.replace(/\/+$/, '');
+  return trimmedUrl.endsWith('/api/v1') ? trimmedUrl : `${trimmedUrl}/api/v1`;
+};
+
 export function initServices(store: Store<RootState>): Services {
   if (tokenManagerInstance) {
     tokenManagerInstance.stopAutoRefresh();
   }
 
-  const baseUrl =
+  const configuredBaseUrl =
     (import.meta.env.VITE_API_URL as string | undefined) ||
     'http://localhost:8000';
+  const baseUrl = normalizeApiBaseUrl(configuredBaseUrl);
   const api = new Api(baseUrl);
 
   const tokenManager = new TokenManager(

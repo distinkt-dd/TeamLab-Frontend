@@ -1,22 +1,26 @@
-import { EditProfilePage } from '@pages/editProfile/EditProfilePage';
-import { EditProjectPage } from '@pages/editProject/EditProjectPage';
-import { ErrorPage } from '@pages/error/ErrorPage';
-import { FavoritesPage } from '@pages/favorites/FavoritesPage';
-import { LoginPage } from '@pages/login';
-import { MainPage } from '@pages/main/MainPage';
-import { MyProfilePage } from '@pages/myProfile';
-import { ParticipantsPage } from '@pages/participants';
-import { PolicyPage } from '@pages/policy/PolicyPage';
-import { ProfilePage } from '@pages/profile';
-import { ProjectCardPage } from '@pages/projectCard/ProjectCardPage';
-import { ProjectsPage } from '@pages/projects/ProjectsPage';
-import { RegisterPage } from '@pages/register';
-import { RequestsPage } from '@pages/requests/RequestsPage';
+import { ProtectedRoute } from '@app';
+import {
+  EditProfilePage,
+  EditProjectPage,
+  ErrorPage,
+  FavoritesPage,
+  LoginPage,
+  MainPage,
+  ParticipantsPage,
+  PolicyPage,
+  ProfilePage,
+  ProjectCardPage,
+  ProjectsPage,
+  QuestionsPage,
+  RegisterPage,
+  RequestsPage,
+} from '@pages';
 import { MainLayout } from '@shared/ui/layout/main/MainLayout';
 import { Route, Routes } from 'react-router-dom';
 import './App.css';
 import { ProtectedRoute } from './providers';
 import './styles/index.css';
+import { MyProfileRoute } from './router';
 
 export function App() {
   return (
@@ -30,12 +34,13 @@ export function App() {
         <Route path="register" element={<RegisterPage />} />
         <Route path="participants" element={<ParticipantsPage />} />
         <Route path="*" element={<ErrorPage />} />
-
+        <Route path="participants" element={<ParticipantsPage />} />
+        <Route path="questions" element={<QuestionsPage />} />
         {/* Защищённые маршруты */}
         <Route element={<ProtectedRoute />}>
-          <Route path="project-card/:id" element={<ProjectCardPage />} />
+          <Route path="projects/:id" element={<ProjectCardPage />} />
           <Route path="profile/:id" element={<ProfilePage />} />
-          <Route path="my-profile" element={<MyProfilePage />} />
+          <Route path="my-profile" element={<MyProfileRoute />} />
           <Route path="edit-profile" element={<EditProfilePage />} />
           <Route path="edit-project" element={<EditProjectPage />} />
           <Route path="requests" element={<RequestsPage />} />

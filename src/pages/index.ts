@@ -1,0 +1,16 @@
+export { EditProfilePage } from './editProfile';
+export { EditProjectPage } from './editProject';
+export { ErrorPage } from './error';
+export { FavoritesPage } from './favorites';
+export { LoginPage } from './login';
+export { MainPage } from './main';
+export { MyProfileOwnerPage } from './myProfileOwner';
+export { MyProfileParticipantPage } from './myProfileParticipant';
+export { ParticipantsPage } from './participants';
+export { PolicyPage } from './policy';
+export { ProfilePage } from './profile';
+export { ProjectCardPage } from './projectCard';
+export { ProjectsPage } from './projects';
+export { QuestionsPage } from './QuestionsPage/QuestionPage';
+export { RegisterPage } from './register';
+export { RequestsPage } from './requests';

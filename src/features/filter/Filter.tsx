@@ -3,6 +3,44 @@ import { Select } from '@shared/ui/select';
 import { Button } from '@shared/ui/button';
 import styles from './Filter.module.css';
 
+export interface FilterOption {
+  value: string;
+  label: string;
+}
+
+interface FilterSelectBase {
+  key: string;
+  labelText: string;
+  options: FilterOption[];
+  disabled?: boolean;
+}
+
+interface SingleFilterSelect extends FilterSelectBase {
+  multiple?: false;
+  variant?: 'default';
+  value: string;
+  onChange: (value: string) => void;
+}
+
+interface MultiFilterSelect extends FilterSelectBase {
+  multiple: true;
+  variant?: 'default';
+  value: string[];
+  onChange: (value: string[]) => void;
+}
+
+interface TagsFilterSelect extends FilterSelectBase {
+  multiple: true;
+  variant: 'tags';
+  value: string[];
+  onChange: (value: string[]) => void;
+}
+
+export type FilterSelect =
+  | SingleFilterSelect
+  | MultiFilterSelect
+  | TagsFilterSelect;
+
 const DIRECTION_OPTIONS = [
   { value: 'design', label: 'Дизайн' },
   { value: 'sound', label: 'Звук и музыка' },
@@ -35,58 +73,118 @@ const PERIOD_OPTIONS = [
 
 interface FilterProps {
   className?: string;
+  selects?: FilterSelect[];
+  applyText?: string;
+  resetText?: string;
+  onApply?: () => void;
+  onReset?: () => void;
+  showReset?: boolean;
 }
 
-export const Filter: React.FC<FilterProps> = () => {
+export const Filter: React.FC<FilterProps> = ({
+  className,
+  selects,
+  applyText = 'Применить',
+  resetText = 'Сбросить фильтры',
+  onApply,
+  onReset,
+  showReset = true,
+}) => {
   const [directions, setDirections] = useState<string[]>([]);
   const [tags, setTags] = useState<string[]>([]);
   const [period, setPeriod] = useState('');
 
+  const defaultSelects: FilterSelect[] = [
+    {
+      key: 'directions',
+      multiple: true,
+      options: DIRECTION_OPTIONS,
+      value: directions,
+      onChange: setDirections,
+      labelText: 'Все направления',
+    },
+    {
+      key: 'tags',
+      multiple: true,
+      variant: 'tags',
+      options: TAG_OPTIONS,
+      value: tags,
+      onChange: setTags,
+      labelText: 'Теги',
+    },
+    {
+      key: 'period',
+      options: PERIOD_OPTIONS,
+      value: period,
+      onChange: setPeriod,
+      labelText: 'За месяц',
+    },
+  ];
+
+  const filterSelects = selects ?? defaultSelects;
+
+  const handleReset = () => {
+    if (!selects) {
+      setDirections([]);
+      setTags([]);
+      setPeriod('');
+    }
+    onReset?.();
+  };
+
   return (
-    <div className={styles.filter}>
+    <div className={[styles.filter, className].filter(Boolean).join(' ')}>
       <div className={styles.selectContainer}>
-        <div className={styles.selectWrap}>
-          <Select
-            multiple
-            size="S"
-            options={DIRECTION_OPTIONS}
-            value={directions}
-            onChange={setDirections}
-            labelText="Все направления"
-          />
-          {directions.length > 0 && (
-            <span className={styles.badge} aria-hidden="true">
-              {directions.length}
-            </span>
-          )}
-        </div>
-        <div className={styles.selectWrap}>
-          <Select
-            multiple
-            variant="tags"
-            size="S"
-            options={TAG_OPTIONS}
-            value={tags}
-            onChange={setTags}
-            labelText="Теги"
-          />
-          {tags.length > 0 && (
-            <span className={styles.badge} aria-hidden="true">
-              {tags.length}
-            </span>
-          )}
-        </div>
-        <Select
-          size="S"
-          options={PERIOD_OPTIONS}
-          value={period}
-          onChange={setPeriod}
-          labelText="За месяц"
-        />
+        {filterSelects.map((select) => (
+          <div className={styles.selectWrap} key={select.key}>
+            {select.multiple && select.variant === 'tags' ? (
+              <Select
+                multiple
+                variant="tags"
+                size="S"
+                options={select.options}
+                value={select.value}
+                onChange={select.onChange}
+                labelText={select.labelText}
+                disabled={select.disabled}
+              />
+            ) : select.multiple ? (
+              <Select
+                multiple
+                size="S"
+                options={select.options}
+                value={select.value}
+                onChange={select.onChange}
+                labelText={select.labelText}
+                disabled={select.disabled}
+              />
+            ) : (
+              <Select
+                size="S"
+                options={select.options}
+                value={select.value}
+                onChange={select.onChange}
+                labelText={select.labelText}
+                disabled={select.disabled}
+              />
+            )}
+            {select.multiple && select.value.length > 0 && (
+              <span className={styles.badge} aria-hidden="true">
+                {select.value.length}
+              </span>
+            )}
+          </div>
+        ))}
       </div>
       <div className={styles.buttonContainer}>
-        <Button variant="secondary">Применить</Button>
-        <button className={styles.resetButton}>Сбросить фильтры</button>
+        <Button variant="secondary" onClick={onApply}>
+          {applyText}
+        </Button>
+        {showReset && (
+          <button className={styles.resetButton} onClick={handleReset}>
+            {resetText}
+          </button>
+        )}
       </div>
     </div>
   );

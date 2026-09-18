@@ -14,6 +14,6 @@ export class FieldService {
   }
 
   featuredList(): Promise<Field[]> {
-    return this.api.get<Field[]>(`${FIELDS}/featured`);
+    return this.api.get<Field[]>(`${FIELDS}featured`);
   }
 }

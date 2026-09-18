@@ -20,6 +20,24 @@
   object-fit: cover;
 }
 
+.imageFallback {
+  display: grid;
+  place-items: center;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+  color: var(--neutral-default-color);
+  background: linear-gradient(
+    145deg,
+    var(--accent-pink-color),
+    var(--accent-purple-color)
+  );
+  font-family: var(--font-family-accent);
+  font-size: 32px;
+  text-transform: uppercase;
+}
+
 .name {
   font-size: 20px;
   font-weight: 500;

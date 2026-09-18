@@ -1,0 +1,311 @@
+.main {
+  margin: 12px 0 56px;
+  overflow-x: clip;
+}
+
+.container {
+  max-width: 1240px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.section {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.backButton {
+  position: static;
+  align-self: flex-start;
+}
+
+.title {
+  text-transform: uppercase;
+}
+
+.filter {
+  margin-top: -2px;
+  align-items: center;
+}
+
+.filter > div:first-child {
+  gap: 14px;
+}
+
+.filter > div:last-child {
+  max-width: 250px;
+}
+
+.filter [aria-haspopup='listbox'] {
+  height: 46px;
+  padding-block: 0;
+  font-size: 16px;
+}
+
+.filter > div:last-child > button {
+  height: 46px;
+  font-size: 16px;
+}
+
+.state {
+  margin: 0;
+  border-radius: 20px;
+  padding: 40px;
+  background: var(--gradient-day);
+  color: var(--neutral-secondary-color);
+  font-size: 20px;
+  line-height: 130%;
+}
+
+.list {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 8px;
+}
+
+.card {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr);
+  gap: 18px;
+  align-items: center;
+}
+
+.cardBody {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(280px, 360px) minmax(250px, 1fr) max-content;
+  gap: 32px;
+  align-items: center;
+  min-height: 128px;
+  border-radius: 20px;
+  padding: 24px 32px;
+  color: var(--neutral-secondary-color);
+}
+
+.cardBody::before {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  border-radius: 20px;
+  background: var(--gradient-day);
+  backdrop-filter: var(--bg-blur);
+  -webkit-backdrop-filter: var(--bg-blur);
+  pointer-events: none;
+}
+
+.person,
+.tags,
+.profileButton {
+  position: relative;
+  z-index: 2;
+}
+
+.date {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: var(--font-family-base);
+  font-size: 14px;
+  line-height: 150%;
+}
+
+.date time {
+  font-weight: 400;
+}
+
+.person {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  min-width: 0;
+}
+
+.avatar,
+.avatarFallback {
+  flex: 0 0 auto;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+}
+
+.avatar {
+  object-fit: cover;
+}
+
+.avatarFallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--neutral-grey-color);
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.info {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.name {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-family: var(--font-family-base);
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 132%;
+}
+
+.username {
+  margin: 0;
+  font-family: var(--font-family-base);
+  font-size: 14px;
+  line-height: 150%;
+  color: var(--neutral-secondary-color);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 34px;
+  margin: 0;
+  color: var(--neutral-secondary-color);
+  font-family: var(--font-family-base);
+  font-size: 12px;
+  line-height: 150%;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.profileButton {
+  position: relative;
+  align-self: start;
+  padding-top: 0;
+  font-size: 16px;
+  white-space: nowrap;
+}
+
+.cardDecor {
+  position: absolute;
+  z-index: 0;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+}
+
+.cardDecorPurple {
+  top: 12px;
+  right: -82px;
+  width: 190px;
+}
+
+.cardDecorBlue {
+  top: -100px;
+  left: 36%;
+  width: 150px;
+  transform: rotate(-12deg);
+}
+
+.cardDecorPink {
+  left: -230px;
+  bottom: -35px;
+  width: 230px;
+  transform: rotate(18deg);
+}
+
+@media (max-width: 1279px) {
+  .container {
+    margin-inline: 70px;
+  }
+
+  .cardDecorPurple {
+    right: -62px;
+  }
+}
+
+@media (max-width: 960px) {
+  .container {
+    margin-inline: 24px;
+  }
+
+  .filter {
+    align-items: flex-start;
+  }
+
+  .filter > div:last-child {
+    max-width: 220px;
+  }
+
+  .cardBody {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .tags,
+  .profileButton {
+    justify-self: flex-start;
+  }
+
+  .cardDecorPurple {
+    right: -40px;
+    width: 180px;
+  }
+
+  .cardDecorBlue {
+    left: 45%;
+  }
+}
+
+@media (max-width: 720px) {
+  .main {
+    margin-top: 40px;
+  }
+
+  .container {
+    margin-inline: 16px;
+  }
+
+  .section {
+    gap: 28px;
+  }
+
+  .card,
+  .state {
+    padding: 24px;
+  }
+
+  .card {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .cardBody {
+    padding: 20px;
+  }
+
+  .person {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .tags,
+  .profileButton {
+    grid-column: auto;
+  }
+
+  .cardDecor {
+    display: none;
+  }
+}

@@ -1,5 +1,4 @@
 import { Button } from '@shared/ui';
-import { Header } from '@widgets/header';
 import { useNavigate } from 'react-router-dom';
 import styles from './ErrorPage.module.css';
 
@@ -8,8 +7,7 @@ export const ErrorPage: React.FC = () => {
 
   return (
     <div className={styles.page}>
-      <Header />
-      <main className={styles.main}>
+      <div className={styles.main}>
         <div className={styles.content}>
           <h1 className={styles.title}>
             <span className={styles.titlePrimary}>Страница потерялась.</span>
@@ -44,7 +42,7 @@ export const ErrorPage: React.FC = () => {
             </p>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 };

@@ -1,0 +1,1126 @@
+.page {
+  position: relative;
+  z-index: 0;
+  isolation: isolate;
+  overflow-x: clip;
+  padding: 62px 0 0;
+  background-color: var(--neutral-default-color);
+}
+
+.container {
+  width: min(1240px, calc(100% - 80px));
+  margin: 0 auto;
+}
+
+.hero {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 710px) minmax(0, 392px);
+  justify-content: space-between;
+  align-items: start;
+  height: 527px;
+}
+
+.projectInfo {
+  width: 710px;
+  min-height: 527px;
+}
+
+.projectHeading {
+  display: grid;
+  grid-template-columns: 199px minmax(0, 498px);
+  gap: 13px;
+  align-items: start;
+  height: 180px;
+}
+
+.imageWrapper {
+  position: relative;
+  width: 199px;
+  height: 180px;
+}
+
+.projectImage,
+.imageFallback {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+}
+
+.projectImage {
+  object-fit: cover;
+}
+
+.imageFallback {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  color: var(--neutral-default-color);
+  background: linear-gradient(
+    145deg,
+    var(--accent-pink-color),
+    var(--accent-purple-color)
+  );
+  font-family: var(--font-family-accent);
+  font-size: 72px;
+  text-transform: uppercase;
+}
+
+.statusBadge {
+  position: absolute;
+  top: 18px;
+  left: 113px;
+  padding: 4px 8px;
+  border-radius: 30px;
+  color: var(--neutral-default-color);
+  background-color: var(--accent-blue-color);
+  font-size: 13px;
+  line-height: 15px;
+  white-space: nowrap;
+}
+
+.closedBadge {
+  background-color: var(--neutral-secondary-color);
+}
+
+.titleWrapper {
+  width: 498px;
+  min-width: 0;
+  padding-top: 56px;
+}
+
+.title {
+  width: 498px;
+  min-height: 64px;
+  font-family: var(--font-family-accent);
+  color: #2c2c2e;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 32px;
+  letter-spacing: 0;
+  overflow-wrap: anywhere;
+  text-transform: uppercase;
+}
+
+.published {
+  width: 498px;
+  height: 24px;
+  font-family: var(--font-family-base);
+  color: #2c2c2e;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+
+.descriptionBlocks {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  margin-top: 96px;
+}
+
+.sectionSubtitle {
+  margin-bottom: 8px;
+  font-family: var(--font-family-base);
+  color: #2c2c2e;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1.3;
+  letter-spacing: 0;
+}
+
+.copy {
+  width: 100%;
+  max-width: 710px;
+  font-family: var(--font-family-base);
+  color: #2c2c2e;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0;
+  white-space: pre-line;
+}
+
+.searchCardWrapper {
+  position: relative;
+  z-index: 0;
+  width: 392px;
+  min-width: 392px;
+  height: 527px;
+  overflow: visible;
+}
+
+.searchCard {
+  position: relative;
+  z-index: 1;
+  width: 392px;
+  min-width: 392px;
+  height: 527px;
+  padding: 48px 54px 48px 52px;
+  border-radius: 20px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.4) 0%,
+    rgba(161, 150, 197, 0.08) 100%
+  );
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  isolation: isolate;
+}
+
+.searchCardContent {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+}
+
+.searchTitle {
+  width: 157px;
+  height: 38px;
+  font-family: var(--font-family-base);
+  color: #2c2c2e;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.searchTitleMember {
+  width: 221px;
+}
+
+.favoriteButton {
+  position: absolute;
+  top: 0;
+  left: -106px;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: var(--neutral-secondary-color);
+  background: transparent;
+}
+
+.favoriteButton:hover:not(:disabled) {
+  color: var(--accent-pink-color);
+}
+
+.favoriteButton:focus-visible {
+  outline: 2px solid var(--accent-orange-color);
+}
+
+.favoriteButton:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.favoriteButton svg path {
+  fill: currentColor;
+}
+
+.favoriteButtonActive {
+  color: var(--accent-pink-color);
+}
+
+.roleList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 284px;
+  height: 290px;
+  margin-top: 16px;
+  overflow-y: auto;
+}
+
+.searchCardInvitation .roleList {
+  height: 243px;
+}
+
+.roleListButton {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 43px;
+  padding: 8px 0;
+  border: 0;
+  border-bottom: 1px solid rgba(44, 44, 46, 0.6);
+  color: #2c2c2e;
+  background: transparent;
+  font-family: var(--font-family-base);
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0;
+  text-align: left;
+}
+
+.roleName {
+  min-width: 0;
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
+}
+
+.roleListButton:hover {
+  color: var(--accent-purple-color);
+}
+
+.roleListButtonActive {
+  color: var(--accent-purple-color);
+  font-weight: 400;
+}
+
+.matchingRoleLabel {
+  flex: 0 0 auto;
+  flex-shrink: 0;
+  padding: 3px 7px;
+  border-radius: 12px;
+  color: var(--neutral-secondary-color);
+  background-color: var(--lable-pink-color);
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.applyButton,
+.acceptInvitationButton,
+.rejectInvitationButton {
+  width: 286px;
+  height: 55px;
+  padding: 16px 36px;
+  border-radius: 8px;
+  font-family: var(--font-family-base);
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.32;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.applyButton {
+  position: absolute;
+  top: 376px;
+  left: 0;
+  border: 1px solid rgba(44, 44, 46, 0.6);
+  color: #2c2c2e;
+  background: transparent;
+}
+
+.applyButton:disabled {
+  cursor: default;
+  opacity: 1;
+  pointer-events: none;
+}
+
+.applyButton:hover:not(:disabled),
+.rejectInvitationButton:hover:not(:disabled) {
+  border: 1px solid var(--accent-purple-color);
+  color: var(--accent-purple-color);
+  font-size: 20px;
+}
+
+.invitationActions {
+  position: absolute;
+  top: 309px;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 286px;
+}
+
+.acceptInvitationButton {
+  border: 1px solid #2c2c2e;
+  color: #ffffff;
+  background: #2c2c2e;
+}
+
+.acceptInvitationButton:hover:not(:disabled) {
+  border: 1px solid var(--accent-purple-color);
+  color: var(--accent-purple-color);
+  background: transparent;
+  font-size: 20px;
+}
+
+.rejectInvitationButton {
+  border: 1px solid rgba(44, 44, 46, 0.6);
+  color: #2c2c2e;
+  background: transparent;
+}
+
+.acceptInvitationButton:disabled,
+.rejectInvitationButton:disabled,
+.leaveMembershipButton:disabled {
+  cursor: default;
+  pointer-events: none;
+}
+
+.leaveMembershipButton {
+  position: absolute;
+  top: 389px;
+  left: 0;
+  justify-content: center;
+  width: 284px;
+  height: 42px;
+  gap: 4px;
+  padding: 8px 4px;
+  border: 0;
+  border-bottom: 1px solid rgba(44, 44, 46, 0.6);
+  border-radius: 0;
+  color: #2c2c2e;
+  background: transparent;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.leaveMembershipButton:hover:not(:disabled) {
+  border-bottom: 1px solid var(--accent-purple-color);
+  color: var(--accent-purple-color);
+}
+
+.actionMessages {
+  position: absolute;
+  top: 439px;
+  left: 0;
+  display: grid;
+  gap: 4px;
+  width: 286px;
+}
+
+.matchingRoleHint,
+.actionError {
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.matchingRoleHint {
+  color: var(--accent-dark-purple-color);
+}
+
+.actionError {
+  color: var(--accent-red-color);
+}
+
+.decorativeFuzz {
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.searchDecoration {
+  top: -68px;
+  left: -46px;
+  width: 584px;
+  max-width: none;
+  height: 584px;
+  object-fit: contain;
+  opacity: 1;
+  transform: rotate(0deg);
+}
+
+@media (max-width: 1224px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 48px;
+    height: auto;
+    min-height: 527px;
+  }
+
+  .searchCardWrapper {
+    justify-self: end;
+  }
+}
+
+.roleContent {
+  margin-top: 112px;
+}
+
+.roleTabs {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  height: 70px;
+}
+
+.roleTab {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 0 1 218px;
+  width: 218px;
+  height: 70px;
+  padding: 8px;
+  border: 0;
+  border-radius: 8px;
+  color: #1c1c1e;
+  background: var(--gradient-day);
+  backdrop-filter: var(--bg-blur);
+  -webkit-backdrop-filter: var(--bg-blur);
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.roleTabActive {
+  background: linear-gradient(
+    180deg,
+    rgba(87, 71, 107, 0.4) 0%,
+    rgba(161, 150, 197, 0.08) 100%
+  );
+}
+
+.roleTabMatching {
+  color: #1c1c1e;
+}
+
+.roleTabMatchLabel {
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  font-size: 9px;
+  font-weight: 400;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.rolePanel {
+  margin-top: -5px;
+}
+
+.tasksSection {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: 403px minmax(0, 816px);
+  gap: 21px;
+  align-items: start;
+  height: 456px;
+}
+
+.tasksDecoration {
+  position: relative;
+  left: -39px;
+  width: 403px;
+  height: 456px;
+  min-width: 0;
+}
+
+.tasksDecoration img {
+  width: 403px;
+  height: 456px;
+  object-fit: cover;
+  transform: rotate(-1.48deg);
+}
+
+.lineList {
+  list-style: none;
+}
+
+.lineList li {
+  border-bottom: 1px solid var(--line-color);
+}
+
+.tasksList {
+  width: 816px;
+  margin-top: 115px;
+}
+
+.tasksList .lineList {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.tasksList .lineList li {
+  min-height: 68px;
+  padding: 8px 0;
+  font-size: 20px;
+  line-height: 1.32;
+}
+
+.skillsSection {
+  margin-top: 112px;
+}
+
+.skillsHeading {
+  display: flex;
+  align-items: center;
+  gap: 71px;
+  width: 1240px;
+  min-height: 83px;
+  padding: 20px 40px;
+  border-radius: 20px;
+  background: var(--gradient-day);
+  backdrop-filter: var(--bg-blur);
+  -webkit-backdrop-filter: var(--bg-blur);
+}
+
+.blockTitle {
+  flex: 0 0 auto;
+  font-size: 32px;
+  line-height: 32px;
+  text-transform: uppercase;
+}
+
+.skillsHeading .blockTitle {
+  flex-basis: 313px;
+}
+
+.skillTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 34px;
+  align-items: center;
+  width: 776px;
+}
+
+.skillTags .skillTag {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  height: 43px;
+  padding: 8px 16px;
+  border-radius: 40px;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.skillRequirements {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 1240px;
+  margin-top: 40px;
+  list-style: none;
+}
+
+.skillRequirements li {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 778px);
+  gap: 206px;
+  align-items: center;
+  min-height: 55px;
+  padding: 8px 40px 8px 200px;
+  border-bottom: 1px solid var(--line-color);
+  font-size: 20px;
+  line-height: 1.32;
+}
+
+.skillOrder {
+  width: 16px;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.benefitsSection {
+  position: relative;
+  isolation: isolate;
+  min-height: 864px;
+  margin-top: -8px;
+  padding-top: 190px;
+}
+
+.benefitsDecoration {
+  position: absolute;
+  top: 0;
+  left: -368px;
+  width: 1184px;
+  height: 864px;
+}
+
+.benefitsDecoration img {
+  width: 1184px;
+  height: 864px;
+}
+
+.benefitsCard {
+  position: relative;
+  z-index: 2;
+  width: 816px;
+  min-height: 512px;
+  margin-left: 424px;
+  padding: 60px 60px 40px;
+  border-radius: 20px;
+  background: var(--gradient-day);
+  backdrop-filter: var(--bg-blur);
+  -webkit-backdrop-filter: var(--bg-blur);
+}
+
+.benefitsCard .lineList {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 696px;
+  margin-top: 28px;
+}
+
+.benefitsCard .lineList li {
+  min-height: 42px;
+  padding: 8px 0;
+  font-size: 20px;
+  line-height: 1.32;
+}
+
+.emptyText {
+  padding: 16px 0;
+  color: var(--accent-purple-color);
+  font-size: 16px;
+}
+
+.loading,
+.errorState {
+  min-height: 520px;
+}
+
+.loading {
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+}
+
+.errorState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.errorTitle {
+  font-size: 42px;
+  text-transform: uppercase;
+}
+
+.errorText {
+  margin-top: 16px;
+  font-size: 18px;
+}
+
+.errorActions {
+  display: flex;
+  gap: 20px;
+  width: min(100%, 592px);
+  margin-top: 32px;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 1100px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 42px;
+    height: auto;
+    min-height: 527px;
+  }
+
+  .projectInfo,
+  .titleWrapper,
+  .title,
+  .published {
+    width: 100%;
+  }
+
+  .projectHeading {
+    grid-template-columns: 140px minmax(0, 1fr);
+    gap: 24px;
+    height: 140px;
+  }
+
+  .imageWrapper {
+    width: 140px;
+    height: 140px;
+  }
+
+  .projectImage,
+  .imageFallback {
+    width: 140px;
+    height: 140px;
+  }
+
+  .titleWrapper {
+    padding-top: 28px;
+  }
+
+  .descriptionBlocks {
+    margin-top: 60px;
+  }
+
+  .favoriteButton {
+    left: -72px;
+  }
+
+  .roleTabs {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 16px;
+    height: auto;
+  }
+
+  .roleTab {
+    flex: 1 1 170px;
+    width: auto;
+  }
+
+  .tasksSection {
+    grid-template-columns: 300px minmax(0, 1fr);
+    gap: 38px;
+  }
+
+  .tasksDecoration {
+    left: 0;
+    width: 300px;
+  }
+
+  .tasksDecoration img {
+    width: 300px;
+    height: auto;
+  }
+
+  .tasksList {
+    width: 100%;
+  }
+
+  .skillsHeading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 22px;
+    width: 100%;
+  }
+
+  .skillsHeading .blockTitle {
+    flex-basis: auto;
+  }
+
+  .skillTags,
+  .skillRequirements {
+    width: 100%;
+  }
+
+  .skillRequirements li {
+    grid-template-columns: 70px minmax(0, 1fr);
+    gap: 30px;
+    padding: 8px 20px;
+  }
+
+  .benefitsCard {
+    width: calc(100% - 300px);
+    margin-left: 300px;
+  }
+
+  .benefitsCard .lineList {
+    width: 100%;
+  }
+}
+
+@media (max-width: 860px) {
+  .page {
+    padding-top: 36px;
+  }
+
+  .container {
+    width: min(100% - 48px, 680px);
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+    gap: 42px;
+    height: auto;
+    min-height: 0;
+  }
+
+  .projectHeading {
+    height: auto;
+  }
+
+  .searchCardWrapper,
+  .searchCard {
+    width: 392px;
+    min-width: 392px;
+  }
+
+  .searchCardWrapper {
+    height: auto;
+    justify-self: center;
+  }
+
+  .searchCard {
+    height: auto;
+    min-height: auto;
+  }
+
+  .favoriteButton {
+    top: 18px;
+    right: 22px;
+    left: auto;
+  }
+
+  .searchCardContent {
+    padding-right: 50px;
+  }
+
+  .roleList {
+    width: 100%;
+    height: auto;
+    max-height: none;
+  }
+
+  .searchCardInvitation .roleList {
+    height: auto;
+  }
+
+  .applyButton {
+    position: static;
+    width: 100%;
+    margin-top: 30px;
+  }
+
+  .invitationActions,
+  .leaveMembershipButton {
+    position: static;
+    width: 100%;
+    margin-top: 30px;
+  }
+
+  .acceptInvitationButton,
+  .rejectInvitationButton {
+    width: 100%;
+  }
+
+  .actionMessages {
+    position: static;
+    width: 100%;
+    margin-top: 12px;
+  }
+
+  .roleContent {
+    margin-top: 72px;
+  }
+
+  .tasksSection {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    height: auto;
+    min-height: 0;
+  }
+
+  .tasksDecoration {
+    left: 0;
+    width: 100%;
+    height: 180px;
+    opacity: 0.2;
+  }
+
+  .tasksDecoration img {
+    width: 240px;
+    height: auto;
+    margin: 0 auto;
+    object-fit: contain;
+  }
+
+  .tasksList {
+    width: 100%;
+    margin-top: 0;
+  }
+
+  .skillsSection {
+    margin-top: 60px;
+  }
+
+  .skillRequirements li {
+    grid-template-columns: 70px minmax(0, 1fr);
+  }
+
+  .benefitsSection {
+    min-height: auto;
+    margin-top: 80px;
+    padding-top: 0;
+  }
+
+  .benefitsDecoration {
+    position: relative;
+    top: auto;
+    left: 0;
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+    opacity: 0.28;
+  }
+
+  .benefitsDecoration img {
+    width: 360px;
+    height: auto;
+  }
+
+  .benefitsCard {
+    width: 100%;
+    min-height: auto;
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 560px) {
+  .page {
+    padding-bottom: 72px;
+  }
+
+  .container {
+    width: calc(100% - 32px);
+  }
+
+  .projectInfo {
+    padding-top: 0;
+  }
+
+  .projectHeading {
+    grid-template-columns: 104px minmax(0, 1fr);
+    gap: 18px;
+  }
+
+  .imageWrapper {
+    width: 104px;
+    height: 104px;
+  }
+
+  .projectImage,
+  .imageFallback {
+    width: 104px;
+    height: 104px;
+  }
+
+  .imageFallback {
+    font-size: 44px;
+  }
+
+  .statusBadge {
+    top: 4px;
+    left: 60px;
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+
+  .titleWrapper {
+    padding-top: 10px;
+  }
+
+  .title {
+    min-height: auto;
+    font-size: 28px;
+    line-height: 30px;
+  }
+
+  .published {
+    margin-top: 10px;
+    font-size: 14px;
+  }
+
+  .descriptionBlocks {
+    margin-top: 40px;
+  }
+
+  .sectionSubtitle {
+    font-size: 21px;
+  }
+
+  .copy,
+  .lineList li,
+  .skillRequirements li {
+    font-size: 16px;
+  }
+
+  .searchCard {
+    padding: 34px 24px 28px;
+  }
+
+  .searchCardContent {
+    padding-right: 0;
+  }
+
+  .searchTitle {
+    padding-right: 54px;
+    font-size: 28px;
+  }
+
+  .roleTabs {
+    gap: 12px;
+  }
+
+  .roleTab {
+    flex-basis: calc(50% - 6px);
+    min-height: 64px;
+    padding-inline: 10px;
+    font-size: 14px;
+  }
+
+  .rolePanel {
+    margin-top: 32px;
+  }
+
+  .skillsHeading {
+    padding: 24px;
+  }
+
+  .blockTitle {
+    font-size: 26px;
+  }
+
+  .skillTags {
+    gap: 10px;
+  }
+
+  .skillRequirements li {
+    grid-template-columns: 42px minmax(0, 1fr);
+    gap: 16px;
+    padding: 12px 8px;
+  }
+
+  .skillOrder {
+    font-size: 26px;
+  }
+
+  .benefitsCard {
+    padding: 34px 24px 28px;
+  }
+
+  .benefitsCard .lineList {
+    width: 100%;
+  }
+
+  .errorActions {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 424px) {
+  .searchCardWrapper,
+  .searchCard {
+    width: 100%;
+    min-width: 0;
+  }
+}

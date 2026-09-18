@@ -1,0 +1,76 @@
+.container {
+  max-width: 1240px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 0;
+}
+
+.container::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  height: 100%;
+  left: 50%;
+  transform: translateX(-50vw); /* сдвигаем к левому краю вьюпорта */
+  width: 100vw;
+  background-image: url('./assets/my-profile-bg.png');
+  background-repeat: no-repeat;
+  background-position: left center; /* прижать к левому краю */
+  background-size: auto;
+  pointer-events: none;
+}
+
+.section {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 40px;
+}
+
+.main {
+  padding: 40px 0 56px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.backButton {
+  position: static;
+  align-self: flex-start;
+  padding-bottom: 15px;
+}
+
+.title {
+  text-transform: uppercase;
+}
+
+.navItems {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+}
+
+.navButton {
+  border: none;
+  font-size: 24px;
+  line-height: 130%;
+  font-weight: 400;
+}
+
+.navButton:hover {
+  border: none;
+  font-size: 24px;
+  color: var(--accent-purple-color);
+}
+
+.projectsBlock {
+  padding: 32px 0;
+  backdrop-filter: blur(10px);
+}
+
+.profileInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
