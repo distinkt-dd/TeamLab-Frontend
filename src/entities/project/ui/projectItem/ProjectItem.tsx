@@ -1,6 +1,6 @@
 import { Button, Tag } from '@shared/ui';
-import styles from './ProjectItem.module.css';
 import { useNavigate } from 'react-router-dom';
+import styles from './ProjectItem.module.css';
 
 interface ProjectItemProps {
   id: number;
@@ -33,7 +33,9 @@ export const ProjectItem: React.FC<ProjectItemProps> = ({
         {tags && tags.length > 0 && (
           <div className={styles.tags}>
             {tags.map((tag, i) => (
-              <Tag key={i}>{tag}</Tag>
+              <Tag className={styles.tag} key={i}>
+                {tag}
+              </Tag>
             ))}
           </div>
         )}

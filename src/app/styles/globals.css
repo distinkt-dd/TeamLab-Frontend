@@ -109,6 +109,17 @@ p.text-l {
   font-weight: 500;
 }
 
+caption {
+  color: inherit;
+  font-family: var(--font-family-base);
+}
+
+caption.caption-s {
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
 ::-webkit-scrollbar {
   width: 0px;
 }

@@ -55,10 +55,36 @@ export interface UserPublic {
   city: string | null;
   contacts_visible: boolean;
   social_links: SocialLinks | null;
-  created_at: string;
-  updated_at: string;
+  created_at?: string;
+  updated_at?: string;
   skills: Skill[];
   portfolio_works: PortfolioWork[];
+}
+
+export interface UserPublicMock {
+  id: number;
+  username: string;
+  display_name: string;
+  avatar: string | null;
+  specialization_id: number | null;
+  specialization_name?: string | null; // не у всех есть, поэтому опционально
+  level: UserLevel | null; // в моках всегда null, но тип совместим с UserLevel
+  city: string;
+  workload_hours_per_week: number | null;
+  work_format: string | null; // можно заменить на WorkFormat, если знаете enum
+  employment_type: EmploymentType | null; // аналогично
+  search_status: string | null; // аналогично
+  skills: MockSkill[]; // массив с полной структурой
+}
+
+interface MockSkill {
+  id: number;
+  user_id: number;
+  skill_id: number;
+  name: string;
+  level: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface CurrentUser extends UserPublic {
