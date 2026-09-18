@@ -18,6 +18,7 @@ import {
 import { MainLayout } from '@shared/ui/layout/main/MainLayout';
 import { Route, Routes } from 'react-router-dom';
 import './App.css';
+import { ProtectedRoute } from './providers';
 import './styles/index.css';
 import { MyProfileRoute } from './router';
 
@@ -31,6 +32,7 @@ export function App() {
         <Route path="projects" element={<ProjectsPage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
+        <Route path="participants" element={<ParticipantsPage />} />
         <Route path="*" element={<ErrorPage />} />
         <Route path="participants" element={<ParticipantsPage />} />
         <Route path="questions" element={<QuestionsPage />} />

@@ -1,11 +1,11 @@
-import { Input, Button } from '@shared/ui';
-import styles from './LoginForm.module.css';
-import { Link, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
 import { EyeM, EyeMSlash } from '@shared/icons';
+import { Button, Input } from '@shared/ui';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useLoginMutation } from '@features/auth/hooks/useLoginMutation';
 import TRImg from '../assets/rainbow_fuzz.png';
 import BLImg from '../assets/violet_fuzz.png';
+import styles from './LoginForm.module.css';
 
 export const LoginForm: React.FC = () => {
   const navigate = useNavigate();

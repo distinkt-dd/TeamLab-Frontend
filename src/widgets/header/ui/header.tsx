@@ -48,7 +48,7 @@ export const Header: React.FC = () => {
     ];
   } else {
     personalNavItems = [
-      { text: 'Участники', path: '#' },
+      { text: 'Участники', path: '/participants' },
       { text: 'Профиль', path: '#' },
       { text: 'Настройки', path: '#' },
     ];

@@ -1,29 +1,51 @@
 .container {
   max-width: 1240px;
+  width: 100%;
   margin: 0 auto;
-  position: relative;
+}
+
+.section {
+  margin-block: 16px 123px;
+  display: flex;
+  flex-direction: column;
+  row-gap: 40px;
 }
 
 .title {
   text-transform: uppercase;
-  margin-bottom: 14px;
 }
 
-.section {
-  display: flex;
-  flex-direction: column;
-  gap: 40px;
-}
-
-.main {
-  padding: 40px 0 56px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.backButton {
+.buttonBack {
   position: static;
-  align-self: flex-start;
-  padding-bottom: 15px;
+}
+
+.buttonMore {
+  max-width: 286px;
+  margin: 0 auto;
+}
+
+.decorateImg {
+  position: absolute;
+}
+
+.mdPng {
+  max-width: 453px;
+  rotate: -106deg;
+  bottom: -100%;
+  left: -7%;
+  z-index: -1;
+}
+
+.wbPng {
+  max-width: 305px;
+  left: 25%;
+  top: 100%;
+  transform: translate(-25%, -50%);
+}
+
+.vfPng {
+  max-width: 299px;
+  right: 10%;
+  top: 30%;
+  z-index: -1;
 }

@@ -1,0 +1,64 @@
+.card {
+  background: var(--gradient-day);
+  backdrop-filter: blur(10px);
+  padding: 23px 40px;
+  border-radius: 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.image {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.userBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  max-width: 490px;
+  width: 100%;
+}
+
+.userInfo {
+  max-width: 100%;
+  width: 100%;
+
+  display: flex;
+  column-gap: 53px;
+  row-gap: 18px;
+
+  padding-inline: 40px;
+
+  flex-wrap: wrap;
+}
+
+.userSelf {
+  display: flex;
+  align-items: center;
+  gap: 31px;
+}
+
+.userSelfText {
+  display: flex;
+  flex-direction: column;
+}
+
+.skillsBlock {
+  display: flex;
+  gap: 9px;
+  max-width: 100%;
+  width: 100%;
+}
+
+.skillBlockTag {
+  max-height: max-content;
+}
+
+.actionsBlock {
+  max-width: max-content;
+  width: 100%;
+}
