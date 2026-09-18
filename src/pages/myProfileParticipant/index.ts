@@ -1,1 +1,1 @@
-export { MyProfileParticipantPage } from './MyProfileParticipantPage';
+export { MyProfileParticipantPage } from './ui/MyProfileParticipantPage';

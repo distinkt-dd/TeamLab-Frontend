@@ -92,6 +92,8 @@ export interface UserUpdateRequest {
   work_format?: WorkFormat;
   employment_type?: EmploymentType;
   search_status?: SearchStatus;
+  profile_visibility?: ProfileVisibility;
+  notification_enabled?: boolean;
 }
 
 export interface AvatarUpdateRequest {

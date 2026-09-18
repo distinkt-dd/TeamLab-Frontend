@@ -1,0 +1,29 @@
+.container {
+  max-width: 1240px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 0;
+}
+
+.container::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  height: 100%;
+  left: 50%;
+  transform: translateX(-50vw); /* сдвигаем к левому краю вьюпорта */
+  width: 100vw;
+  background-image: url('../assets/my-profile-bg.png');
+  background-repeat: no-repeat;
+  background-position: left center; /* прижать к левому краю */
+  background-size: auto;
+  pointer-events: none;
+}
+
+.main {
+  padding: 40px 0 56px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}

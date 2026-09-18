@@ -1,0 +1,55 @@
+.options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+}
+
+.optionBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 52px;
+  backdrop-filter: blur(30px);
+  padding: 40px 0 40px 40px;
+  border-radius: 20px;
+}
+
+.waitingBlock {
+  backdrop-filter: blur(30px);
+  padding: 40px 40px 0 40px;
+  border-radius: 20px;
+}
+
+.optionOptions {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.optionRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.buttonBlock {
+  display: flex;
+  justify-content: center;
+}
+
+/* У селектов настроек в макете нет рамки. */
+.optionRow .notificationSelect,
+.optionRow .visibilitySelect {
+  border: none;
+}
+
+/* Рамка была индикатором фокуса — оставляем вместо неё обводку. */
+.optionRow .notificationSelect:focus-visible,
+.optionRow .visibilitySelect:focus-visible {
+  outline: 1px solid var(--accent-orange-color);
+}
+
+.optionError {
+  color: var(--accent-red-color);
+}
