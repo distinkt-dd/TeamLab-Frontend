@@ -1,12 +1,15 @@
-import type { ProjectCardItem, ProjectDetail } from '@entities/project/types';
+import type { ProjectCardItem } from '@entities/project/types';
+import type { CurrentUserMembershipProjectCard } from '@entities/user/types';
 
-// Приводит проекты из API к виду, который ожидает виджет списка проектов.
-export const toProjectCards = (projects: ProjectDetail[]): ProjectCardItem[] =>
-  projects.map((project) => ({
-    id: project.id,
-    name: project.title,
-    image: project.image ?? undefined,
-    tags: project.roles
-      .map((role) => role.specialization_name)
-      .filter((name): name is string => Boolean(name)),
+// Приводит проекты участника из GET /users/me/projects/ к виду, который ожидает
+// виджет списка проектов. У участия в поле id лежит идентификатор участия,
+// поэтому для перехода на карточку проекта берём project_id.
+export const toProjectCards = (
+  memberships: CurrentUserMembershipProjectCard[]
+): ProjectCardItem[] =>
+  memberships.map((membership) => ({
+    id: membership.project_id,
+    name: membership.project_title,
+    image: membership.project_image ?? undefined,
+    tags: membership.project_role_name ? [membership.project_role_name] : [],
   }));

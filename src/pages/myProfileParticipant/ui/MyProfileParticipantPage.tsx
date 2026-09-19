@@ -1,10 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import { getServices } from '@app';
+import { ProfileSettings } from '@widgets/profileSettings';
 import { useMyProfileParticipant } from '../model/useMyProfileParticipant';
 import { CurrentProjects } from './CurrentProjects';
 import { ParticipantProfile } from './ParticipantProfile';
 import { ProfileHeader } from './ProfileHeader';
-import { ProfileSettings } from './ProfileSettings';
 import styles from './MyProfileParticipantPage.module.css';
 
 export const MyProfileParticipantPage: React.FC = () => {
@@ -16,6 +16,7 @@ export const MyProfileParticipantPage: React.FC = () => {
     projectCards,
     isProjectsPending,
     isProjectsError,
+    waitingItems,
     updateNotifications,
     isNotificationUpdating,
     isNotificationUpdateError,
@@ -53,6 +54,12 @@ export const MyProfileParticipantPage: React.FC = () => {
           onVisibilityChange={updateVisibility}
           onLogout={handleLogout}
           profileEmail={user?.email}
+          waitingItems={waitingItems}
+          isWaitingPending={isProjectsPending}
+          isWaitingError={isProjectsError}
+          waitingPendingText="Загружаем приглашения..."
+          waitingErrorText="Не удалось загрузить приглашения. Попробуйте обновить страницу."
+          waitingEmptyText="Приглашений пока нет."
         />
       </div>
     </div>

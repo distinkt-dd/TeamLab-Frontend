@@ -130,6 +130,47 @@ export interface AvatarResponse {
   avatar: string;
 }
 
+export interface CurrentUserMembershipProjectCard {
+  id: number;
+  project_id: number;
+  project_title: string;
+  project_image: string | null;
+  project_role_id: number;
+  project_role_name: string | null;
+  status: 'active' | 'left' | 'removed';
+}
+
+export interface CurrentUserInvitedProjectCard {
+  id: number;
+  project_id: number;
+  project_title: string;
+  project_image: string | null;
+  project_role_id: number;
+  project_role_name: string | null;
+  source: 'application' | 'invitation';
+  status: 'pending' | 'accepted' | 'rejected';
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CurrentUserProjects {
+  memberships: CurrentUserMembershipProjectCard[];
+  invitations: CurrentUserInvitedProjectCard[];
+}
+
+export interface CurrentUserNotification {
+  id: number;
+  source: 'application' | 'invitation';
+  status: 'pending' | 'accepted' | 'rejected';
+  user_id: number;
+  username: string;
+  project_id: number;
+  project_title: string;
+  project_role_id: number;
+  project_role_name: string | null;
+  created_at: string;
+}
+
 export interface SetPasswordRequest {
   current_password: string;
   new_password: string;

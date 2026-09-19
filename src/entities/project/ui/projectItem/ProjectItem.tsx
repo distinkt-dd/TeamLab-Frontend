@@ -7,6 +7,7 @@ interface ProjectItemProps {
   name: string;
   image?: string;
   tags?: string[];
+  showProjectActions?: boolean;
 }
 
 export const ProjectItem: React.FC<ProjectItemProps> = ({
@@ -14,6 +15,7 @@ export const ProjectItem: React.FC<ProjectItemProps> = ({
   name,
   image,
   tags,
+  showProjectActions = false,
 }: ProjectItemProps) => {
   const navigate = useNavigate();
 
@@ -39,13 +41,20 @@ export const ProjectItem: React.FC<ProjectItemProps> = ({
             ))}
           </div>
         )}
-        <Button
-          variant="tertiary"
-          className={styles.button}
-          onClick={() => navigate(`/projects/${id}`)}
-        >
-          К проекту
-        </Button>
+        {showProjectActions ? (
+          <div className={styles.actions}>
+            <Button className={styles.iconButton} iconName="trashM" />
+            <Button className={styles.iconButton} iconName="editM" />
+          </div>
+        ) : (
+          <Button
+            variant="tertiary"
+            className={styles.button}
+            onClick={() => navigate(`/projects/${id}`)}
+          >
+            К проекту
+          </Button>
+        )}
       </div>
     </li>
   );

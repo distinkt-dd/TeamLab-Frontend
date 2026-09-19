@@ -1,7 +1,6 @@
 import type { ProfileVisibility } from '@entities/user/types';
 import { Select } from '@shared/ui';
 
-// Варианты соответствуют User.ProfileVisibility на бэкенде:
 // public — профиль виден всем, matched_only — только участникам своих проектов,
 // hidden — профиль скрыт.
 const VISIBILITY_OPTIONS: { value: ProfileVisibility; label: string }[] = [

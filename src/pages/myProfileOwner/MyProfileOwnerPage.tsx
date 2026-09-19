@@ -1,64 +1,30 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
 import { getServices } from '@app';
-import { UserService } from '@entities/user';
 import { Button } from '@shared/ui/button';
-import styles from './MyProfileOwnerPage.module.css';
+import { ProfileSettings } from '@widgets/profileSettings';
 import { ProjectsList } from '@widgets/projectsList';
-import { ProjectService } from '@entities/project';
+import { useMyProfileOwner } from './model/useMyProfileOwner';
+import styles from './MyProfileOwnerPage.module.css';
 
 const PAGE_SIZE = 3;
 
 export const MyProfileOwnerPage: React.FC = () => {
   const navigate = useNavigate();
-  const { api } = getServices();
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-  const userService = useMemo(() => new UserService(api), [api]);
-  const projectService = useMemo(() => new ProjectService(api), [api]);
-
-  // Данные текущего пользователя с типом owner (GET /users/me/)
   const {
-    data: user,
-    isPending: isUserPending,
-    isError: isUserError,
-  } = useQuery({
-    queryKey: ['currentUser'],
-    queryFn: () => userService.getCurrent(),
-  });
-  const {
-    data: projects,
-    isPending: isProjectsPending,
-    isError: isProjectsError,
-  } = useQuery({
-    // ключ включает отсортированный список ID — это важно для корректного кэша
-    queryKey: [
-      'userProjects',
-      [...(user?.owned_project_ids ?? [])].sort((a, b) => a - b),
-    ],
-    queryFn: async () => {
-      const ids = user?.owned_project_ids ?? [];
-      if (ids.length === 0) return [];
+    user,
+    projectCards,
+    isProjectsPending,
+    isProjectsError,
+    waitingItems,
+    isWaitingPending,
+    isWaitingError,
+    updateNotifications,
+    isNotificationUpdating,
+    isNotificationUpdateError,
+  } = useMyProfileOwner();
 
-      // Параллельная загрузка всех проектов по ID
-      const promises = ids.map((id) => projectService.getProjectDetail(id));
-      return Promise.all(promises);
-    },
-    enabled: !!user && Array.isArray(user.owned_project_ids), // не запускаем, пока нет user
-  });
-
-  const projectCards = useMemo(
-    () =>
-      (projects ?? []).map((project) => ({
-        id: project.id,
-        name: project.title,
-        image: project.image ?? undefined,
-        tags: project.roles
-          .map((role) => role.specialization_name)
-          .filter((name): name is string => Boolean(name)),
-      })),
-    [projects]
-  );
   const visibleProjects = projectCards.slice(0, visibleCount);
   const hasMore = visibleCount < projectCards.length;
 
@@ -88,9 +54,6 @@ export const MyProfileOwnerPage: React.FC = () => {
             <Button className={styles.navButton} iconName="notifications">
               Уведомления
             </Button>
-            <Button className={styles.navButton} iconName="like">
-              Избранное
-            </Button>
           </div>
         </section>
         <section>
@@ -115,6 +78,7 @@ export const MyProfileOwnerPage: React.FC = () => {
                 <ProjectsList
                   data={visibleProjects}
                   className={styles.projectsList}
+                  showProjectActions
                 />
               )}
             {!isProjectsPending && !isProjectsError && hasMore && (
@@ -124,29 +88,20 @@ export const MyProfileOwnerPage: React.FC = () => {
             )}
           </div>
         </section>
-        <section>
-          <h3>Профиль</h3>
-          <div className={styles.projectsBlock}>
-            {isUserPending && <span>Загружаем профиль...</span>}
-            {isUserError && (
-              <span role="alert">
-                Не удалось загрузить профиль. Попробуйте обновить страницу.
-              </span>
-            )}
-            {!isUserPending && !isUserError && user && (
-              <div className={styles.profileInfo}>
-                <span>Имя: {user.display_name}</span>
-                <span>Логин: {user.username}</span>
-                <span>Email: {user.email}</span>
-              </div>
-            )}
-          </div>
-        </section>
-        <section>
-          <Button variant="tertiary" onClick={handleLogout}>
-            Выйти
-          </Button>
-        </section>
+        <ProfileSettings
+          notificationEnabled={user?.notification_enabled}
+          isNotificationUpdating={isNotificationUpdating}
+          isNotificationUpdateError={isNotificationUpdateError}
+          onNotificationChange={updateNotifications}
+          onLogout={handleLogout}
+          profileEmail={user?.email}
+          waitingItems={waitingItems}
+          isWaitingPending={isWaitingPending}
+          isWaitingError={isWaitingError}
+          waitingPendingText="Загружаем отклики..."
+          waitingErrorText="Не удалось загрузить отклики. Попробуйте обновить страницу."
+          waitingEmptyText="Откликов пока нет."
+        />
       </div>
     </div>
   );

@@ -11,11 +11,13 @@ interface Project {
 interface ProjectsListProps {
   data: Project[];
   className?: string;
+  showProjectActions?: boolean;
 }
 
 export const ProjectsList: React.FC<ProjectsListProps> = ({
   data,
   className,
+  showProjectActions,
 }) => {
   return (
     <div className={[styles.container, className].filter(Boolean).join(' ')}>
@@ -26,6 +28,7 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({
             name={proj.name}
             image={proj.image}
             tags={proj.tags}
+            showProjectActions={showProjectActions}
             key={proj.id}
           />
         ))}
