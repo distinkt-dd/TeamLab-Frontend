@@ -9,8 +9,13 @@ import type {
   AvatarResponse,
   SetPasswordRequest,
   ListUsersParams,
+  CurrentUserProjects,
+  CurrentUserNotification,
 } from './types';
 import { USERS, USERS_ME } from '../../shared/api/constants';
+
+const MY_PROJECTS_PATH = `${USERS_ME}projects/`;
+const NOTIFICATIONS_PATH = `${USERS_ME}notifications/`;
 
 export class UserService {
   private readonly api: Api;
@@ -37,6 +42,17 @@ export class UserService {
 
   updateCurrent(data: UserUpdateRequest): Promise<CurrentUser> {
     return this.api.patch<CurrentUser>(USERS_ME, data);
+  }
+
+  // Проекты текущего пользователя и приглашения, ожидающие ответа.
+  getMyProjects(): Promise<CurrentUserProjects> {
+    return this.api.get<CurrentUserProjects>(MY_PROJECTS_PATH);
+  }
+
+  // Уведомления текущего пользователя: у владельца — pending-отклики на его проекты,
+  // у участника — pending-приглашения. Только чтение.
+  getNotifications(): Promise<CurrentUserNotification[]> {
+    return this.api.get<CurrentUserNotification[]>(NOTIFICATIONS_PATH);
   }
 
   uploadAvatar(data: AvatarUpdateRequest): Promise<AvatarResponse> {
