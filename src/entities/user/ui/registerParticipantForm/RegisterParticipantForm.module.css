@@ -27,6 +27,13 @@
   color: var(--accent-blue-color);
 }
 
+.errorText {
+  color: var(--accent-red-color, rgba(251, 76, 71, 1));
+  font-size: 16px;
+  line-height: 150%;
+  letter-spacing: 0.4px;
+}
+
 .button {
   max-width: 286px;
   margin: 0 auto;

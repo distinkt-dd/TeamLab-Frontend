@@ -3,36 +3,73 @@ import styles from './RegisterParticipantForm.module.css';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { EyeM, EyeMSlash } from '@shared/icons';
+import { Select } from '@shared/ui/select';
+import { REGISTRATION_DIRECTIONS } from '../../lib/registration';
+import type { RegisterFormData } from '../../lib/registration';
 
 interface RegisterParticipantFormProps {
   role: string;
+  onSubmit: (data: RegisterFormData) => void;
+  isPending?: boolean;
+  errorText?: string;
+  onResetError?: () => void;
 }
 
 export const RegisterParticipantForm: React.FC<
   RegisterParticipantFormProps
-> = ({ role: _role }) => {
+> = ({ role: _role, onSubmit, isPending = false, errorText, onResetError }) => {
   void _role;
   const [email, setEmail] = useState<string>('');
   const [login, setLogin] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const [specialization, setSpecialization] = useState<string>('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [formError, setFormError] = useState<string | null>(null);
+
+  // Изменение полей сбрасывает ошибки прошлого запроса и локальной проверки.
+  const resetErrors = () => {
+    setFormError(null);
+    onResetError?.();
+  };
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    resetErrors();
     setEmail(e.target.value);
   };
 
   const handleloginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    resetErrors();
     setLogin(e.target.value);
   };
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    resetErrors();
     setPassword(e.target.value);
+  };
+
+  const handleSpecializationChange = (value: string) => {
+    resetErrors();
+    setSpecialization(value);
   };
 
   const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    // TODO: запрос к API регистрации
+
+    if (!specialization) {
+      setFormError('Выберите специализацию из списка.');
+      return;
+    }
+
+    setFormError(null);
+    onSubmit({
+      email,
+      username: login,
+      password,
+      direction: specialization,
+    });
   };
+
+  const visibleError = formError ?? errorText;
 
   return (
     <div className={styles.form}>
@@ -67,6 +104,13 @@ export const RegisterParticipantForm: React.FC<
           rightIcon={showPassword ? <EyeM /> : <EyeMSlash />}
           onRightIconClick={() => setShowPassword((prev) => !prev)}
         />
+        <Select
+          labelText="Специализация"
+          value={specialization}
+          onChange={handleSpecializationChange}
+          fullWidth
+          options={REGISTRATION_DIRECTIONS}
+        />
         <p className={styles.policyText}>
           Нажимая «Зарегистрироваться», я даю согласие на обработку моих
           персональных данных <br /> и принимаю условия{' '}
@@ -78,9 +122,15 @@ export const RegisterParticipantForm: React.FC<
             Политики конфиденциальности
           </Link>
         </p>
+        {visibleError && <p className={styles.errorText}>{visibleError}</p>}
       </div>
-      <Button type="submit" className={styles.button} onClick={handleSubmit}>
-        Зарегистрироваться
+      <Button
+        type="submit"
+        className={styles.button}
+        onClick={handleSubmit}
+        disabled={isPending}
+      >
+        {isPending ? 'Отправляем данные…' : 'Зарегистрироваться'}
       </Button>
     </div>
   );
