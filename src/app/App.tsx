@@ -1,4 +1,3 @@
-import { ProtectedRoute } from '@app';
 import {
   EditProfilePage,
   EditProjectPage,

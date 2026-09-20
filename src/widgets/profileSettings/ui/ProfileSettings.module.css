@@ -1,0 +1,79 @@
+.options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+}
+
+.optionBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 52px;
+  backdrop-filter: blur(30px);
+  padding: 40px 0 40px 40px;
+  border-radius: 20px;
+}
+
+.waitingBlock {
+  backdrop-filter: blur(30px);
+  padding: 40px 40px 0 40px;
+  border-radius: 20px;
+}
+
+.waitingContent {
+  padding: 32px 0 40px;
+}
+
+.waitingList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.waitingItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.waitingTitle {
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.waitingTag {
+  flex-shrink: 0;
+}
+
+.optionOptions {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.optionRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.buttonBlock {
+  display: flex;
+  justify-content: center;
+}
+
+.optionRow .notificationSelect,
+.optionRow .visibilitySelect {
+  border: none;
+}
+
+.optionRow .notificationSelect:focus-visible,
+.optionRow .visibilitySelect:focus-visible {
+  outline: 1px solid var(--accent-orange-color);
+}
+
+.optionError {
+  color: var(--accent-red-color);
+}

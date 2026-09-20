@@ -1,26 +1,39 @@
-import { useMemo } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
 import { getServices } from '@app';
-import { UserService } from '@entities/user';
 import { Button } from '@shared/ui/button';
+import { ProfileSettings } from '@widgets/profileSettings';
+import { ProjectsList } from '@widgets/projectsList';
+import { useMyProfileOwner } from './model/useMyProfileOwner';
 import styles from './MyProfileOwnerPage.module.css';
+
+const PAGE_SIZE = 3;
 
 export const MyProfileOwnerPage: React.FC = () => {
   const navigate = useNavigate();
-  const { api } = getServices();
-  const userService = useMemo(() => new UserService(api), [api]);
-
-  // Данные текущего пользователя с типом owner (GET /users/me/)
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const {
-    data: user,
-    isPending,
-    isError,
-  } = useQuery({
-    queryKey: ['currentUser'],
-    queryFn: () => userService.getCurrent(),
-  });
-  console.log(user);
+    user,
+    projectCards,
+    isProjectsPending,
+    isProjectsError,
+    waitingItems,
+    isWaitingPending,
+    isWaitingError,
+    updateNotifications,
+    isNotificationUpdating,
+    isNotificationUpdateError,
+  } = useMyProfileOwner();
+
+  const visibleProjects = projectCards.slice(0, visibleCount);
+  const hasMore = visibleCount < projectCards.length;
+
+  const handleShowMore = () => {
+    setVisibleCount((count) =>
+      Math.min(count + PAGE_SIZE, projectCards.length)
+    );
+  };
+
   const handleLogout = () => {
     getServices().auth.logout();
   };
@@ -41,40 +54,54 @@ export const MyProfileOwnerPage: React.FC = () => {
             <Button className={styles.navButton} iconName="notifications">
               Уведомления
             </Button>
-            <Button className={styles.navButton} iconName="like">
-              Избранное
-            </Button>
           </div>
         </section>
         <section>
           <h3>Текущие проекты</h3>
           <div className={styles.projectsBlock}>
-            <span>Тут блок для текущих проектов</span>
+            {isProjectsPending && (
+              <p className={styles.state}>Загружаем проекты...</p>
+            )}
+            {isProjectsError && (
+              <p className={styles.state} role="alert">
+                Не удалось загрузить проекты. Попробуйте обновить страницу.
+              </p>
+            )}
+            {!isProjectsPending &&
+              !isProjectsError &&
+              projectCards.length === 0 && (
+                <p className={styles.state}>Проектов пока нет.</p>
+              )}
+            {!isProjectsPending &&
+              !isProjectsError &&
+              projectCards.length > 0 && (
+                <ProjectsList
+                  data={visibleProjects}
+                  className={styles.projectsList}
+                  showProjectActions
+                />
+              )}
+            {!isProjectsPending && !isProjectsError && hasMore && (
+              <Button className={styles.button} onClick={handleShowMore}>
+                Показать еще
+              </Button>
+            )}
           </div>
         </section>
-        <section>
-          <h3>Профиль</h3>
-          <div className={styles.projectsBlock}>
-            {isPending && <span>Загружаем профиль...</span>}
-            {isError && (
-              <span role="alert">
-                Не удалось загрузить профиль. Попробуйте обновить страницу.
-              </span>
-            )}
-            {!isPending && !isError && user && (
-              <div className={styles.profileInfo}>
-                <span>Имя: {user.display_name}</span>
-                <span>Логин: {user.username}</span>
-                <span>Email: {user.email}</span>
-              </div>
-            )}
-          </div>
-        </section>
-        <section>
-          <Button variant="tertiary" onClick={handleLogout}>
-            Выйти
-          </Button>
-        </section>
+        <ProfileSettings
+          notificationEnabled={user?.notification_enabled}
+          isNotificationUpdating={isNotificationUpdating}
+          isNotificationUpdateError={isNotificationUpdateError}
+          onNotificationChange={updateNotifications}
+          onLogout={handleLogout}
+          profileEmail={user?.email}
+          waitingItems={waitingItems}
+          isWaitingPending={isWaitingPending}
+          isWaitingError={isWaitingError}
+          waitingPendingText="Загружаем отклики..."
+          waitingErrorText="Не удалось загрузить отклики. Попробуйте обновить страницу."
+          waitingEmptyText="Откликов пока нет."
+        />
       </div>
     </div>
   );
