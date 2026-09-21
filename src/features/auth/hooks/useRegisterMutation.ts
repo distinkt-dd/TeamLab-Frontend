@@ -7,12 +7,13 @@ import type { AccountType } from '@entities/user/types';
 import { useMutation, type UseMutationResult } from '@tanstack/react-query';
 import { resolveSpecializationId } from '../lib/resolveSpecializationId';
 
-// Данные формы регистрации: направление приходит слагом из формы.
+// Данные формы регистрации: направление приходит слагом из формы участника.
 export interface RegisterRequest {
   username: string;
   email: string;
   password: string;
-  direction: string;
+  // Владельцу специализацию не выбирают, поэтому направление необязательное.
+  direction?: string;
   accountType: AccountType;
 }
 
@@ -27,11 +28,22 @@ export const useRegisterMutation = (): UseMutationResult<
     mutationFn: async (data: RegisterRequest) => {
       const userService = new UserService(api);
 
-      // Направление и специализации — публичные справочники, токен для них не нужен.
-      const [fields, specializations] = await Promise.all([
-        new FieldService(api).list(),
-        new SpecializationService(api).list(),
-      ]);
+      // У владельца специализации нет, поэтому справочники нужны только участнику.
+      let specializationId: number | null = null;
+
+      if (data.direction) {
+        // Направление и специализации — публичные справочники, токен для них не нужен.
+        const [fields, specializations] = await Promise.all([
+          new FieldService(api).list(),
+          new SpecializationService(api).list(),
+        ]);
+
+        specializationId = resolveSpecializationId(
+          data.direction,
+          fields,
+          specializations
+        );
+      }
 
       // POST /users/: регистрация пользователя — участника или владельца.
       await userService.create({
@@ -41,11 +53,7 @@ export const useRegisterMutation = (): UseMutationResult<
         email: data.email,
         password: data.password,
         account_type: data.accountType,
-        specialization_id: resolveSpecializationId(
-          data.direction,
-          fields,
-          specializations
-        ),
+        specialization_id: specializationId,
       });
 
       // Сразу логиним созданного пользователя, чтобы открыть личный кабинет.

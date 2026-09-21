@@ -108,7 +108,8 @@ export interface UserCreateRequest {
   email: string;
   password: string;
   account_type: AccountType;
-  specialization_id: number;
+  // Специализация обязательна только для участника (проверяет бэкенд); у владельца её нет.
+  specialization_id?: number | null;
 }
 
 export interface UserUpdateRequest {

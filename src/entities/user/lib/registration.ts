@@ -16,11 +16,12 @@ export const REGISTRATION_DIRECTIONS: RegistrationDirection[] = [
   { value: 'product-management', label: 'Управление продуктом' },
 ];
 
-// Данные формы регистрации: у участника и владельца набор полей одинаковый.
+// Данные формы регистрации. Направление есть только у участника: владельцу
+// специализацию не выбирают, поэтому поле необязательное.
 // Направление приходит слагом и превращается в specialization_id уже при запросе.
 export interface RegisterFormData {
   email: string;
   username: string;
   password: string;
-  direction: string;
+  direction?: string;
 }

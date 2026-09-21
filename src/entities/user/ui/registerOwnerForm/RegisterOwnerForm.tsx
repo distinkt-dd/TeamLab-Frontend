@@ -3,8 +3,6 @@ import styles from './RegisterOwnerForm.module.css';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { EyeM, EyeMSlash } from '@shared/icons';
-import { Select } from '@shared/ui/select';
-import { REGISTRATION_DIRECTIONS } from '../../lib/registration';
 import type { RegisterFormData } from '../../lib/registration';
 
 interface RegisterOwnerFormProps {
@@ -26,7 +24,6 @@ export const RegisterOwnerForm: React.FC<RegisterOwnerFormProps> = ({
   const [email, setEmail] = useState<string>('');
   const [login, setLogin] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [specialization, setSpecialization] = useState<string>('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -51,25 +48,14 @@ export const RegisterOwnerForm: React.FC<RegisterOwnerFormProps> = ({
     setPassword(e.target.value);
   };
 
-  const handleSpecializationChange = (value: string) => {
-    resetErrors();
-    setSpecialization(value);
-  };
-
   const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-
-    if (!specialization) {
-      setFormError('Выберите специализацию из списка.');
-      return;
-    }
 
     setFormError(null);
     onSubmit({
       email,
       username: login,
       password,
-      direction: specialization,
     });
   };
 
@@ -107,13 +93,6 @@ export const RegisterOwnerForm: React.FC<RegisterOwnerFormProps> = ({
           maxLength={20}
           rightIcon={showPassword ? <EyeM /> : <EyeMSlash />}
           onRightIconClick={() => setShowPassword((prev) => !prev)}
-        />
-        <Select
-          labelText="Специализация"
-          value={specialization}
-          onChange={handleSpecializationChange}
-          fullWidth
-          options={REGISTRATION_DIRECTIONS}
         />
         <p className={styles.policyText}>
           Нажимая «Зарегистрироваться», я даю согласие на обработку моих

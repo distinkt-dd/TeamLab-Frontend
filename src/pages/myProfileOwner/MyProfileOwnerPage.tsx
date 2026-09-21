@@ -70,7 +70,16 @@ export const MyProfileOwnerPage: React.FC = () => {
             {!isProjectsPending &&
               !isProjectsError &&
               projectCards.length === 0 && (
-                <p className={styles.state}>Проектов пока нет.</p>
+                <>
+                  <p className={styles.state}>Проектов пока нет.</p>
+                  <Button
+                    className={styles.createProject}
+                    variant="secondary"
+                    onClick={() => navigate('/edit-project')}
+                  >
+                    Создать проект
+                  </Button>
+                </>
               )}
             {!isProjectsPending &&
               !isProjectsError &&
