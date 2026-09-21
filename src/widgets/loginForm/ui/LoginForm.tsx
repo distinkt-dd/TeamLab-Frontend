@@ -88,7 +88,7 @@ export const LoginForm: React.FC = () => {
             {/* TODO: Сделать страницу регистрации */}
             <span className={styles.registerText}>
               Если нет аккаунта,{' '}
-              <Link to={'/reset'} className={styles.registerLink}>
+              <Link to={'/register'} className={styles.registerLink}>
                 зарегистрируйтесь
               </Link>
             </span>

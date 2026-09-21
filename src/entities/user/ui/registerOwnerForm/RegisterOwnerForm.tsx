@@ -3,38 +3,63 @@ import styles from './RegisterOwnerForm.module.css';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { EyeM, EyeMSlash } from '@shared/icons';
-import { Select } from '@shared/ui/select';
+import type { RegisterFormData } from '../../lib/registration';
 
 interface RegisterOwnerFormProps {
   role: string;
+  onSubmit: (data: RegisterFormData) => void;
+  isPending?: boolean;
+  errorText?: string;
+  onResetError?: () => void;
 }
 
 export const RegisterOwnerForm: React.FC<RegisterOwnerFormProps> = ({
   role: _role,
+  onSubmit,
+  isPending = false,
+  errorText,
+  onResetError,
 }) => {
   void _role;
   const [email, setEmail] = useState<string>('');
   const [login, setLogin] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [specialization, setSpecialization] = useState<string>('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [formError, setFormError] = useState<string | null>(null);
+
+  // Изменение полей сбрасывает ошибки прошлого запроса и локальной проверки.
+  const resetErrors = () => {
+    setFormError(null);
+    onResetError?.();
+  };
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    resetErrors();
     setEmail(e.target.value);
   };
 
   const handleloginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    resetErrors();
     setLogin(e.target.value);
   };
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    resetErrors();
     setPassword(e.target.value);
   };
 
   const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    // TODO: запрос к API регистрации
+
+    setFormError(null);
+    onSubmit({
+      email,
+      username: login,
+      password,
+    });
   };
+
+  const visibleError = formError ?? errorText;
 
   return (
     <div className={styles.form}>
@@ -69,22 +94,6 @@ export const RegisterOwnerForm: React.FC<RegisterOwnerFormProps> = ({
           rightIcon={showPassword ? <EyeM /> : <EyeMSlash />}
           onRightIconClick={() => setShowPassword((prev) => !prev)}
         />
-        <Select
-          labelText="Специализация"
-          value={specialization}
-          onChange={setSpecialization}
-          fullWidth
-          options={[
-            { value: 'design', label: 'Дизайн' },
-            { value: 'sound', label: 'Звук и музыка' },
-            { value: 'content', label: 'Контент и тексты' },
-            { value: 'creative-management', label: 'Креативное управление' },
-            { value: 'marketing', label: 'Маркетинг и продвижение' },
-            { value: 'development', label: 'Разработка' },
-            { value: 'production', label: 'Съемки и продакшн' },
-            { value: 'product-management', label: 'Управление продуктом' },
-          ]}
-        />
         <p className={styles.policyText}>
           Нажимая «Зарегистрироваться», я даю согласие на обработку моих
           персональных данных <br /> и принимаю условия{' '}
@@ -96,9 +105,15 @@ export const RegisterOwnerForm: React.FC<RegisterOwnerFormProps> = ({
             Политики конфиденциальности
           </Link>
         </p>
+        {visibleError && <p className={styles.errorText}>{visibleError}</p>}
       </div>
-      <Button type="submit" className={styles.button} onClick={handleSubmit}>
-        Зарегистрироваться
+      <Button
+        type="submit"
+        className={styles.button}
+        onClick={handleSubmit}
+        disabled={isPending}
+      >
+        {isPending ? 'Отправляем данные…' : 'Зарегистрироваться'}
       </Button>
     </div>
   );
