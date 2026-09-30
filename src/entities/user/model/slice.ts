@@ -1,14 +1,14 @@
-import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { CurrentUser, UserPublic } from '@entities/user/types';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import {
-  fetchCurrentUser,
-  updateCurrentUser,
-  uploadUserAvatar,
   deleteUserAvatar,
-  setUserPassword,
+  fetchCurrentUser,
+  fetchUserById,
   fetchUsers,
   registerUser,
-  fetchUserById,
+  setUserPassword,
+  updateCurrentUser,
+  uploadUserAvatar,
 } from './actions';
 
 interface UserState {
@@ -55,7 +55,7 @@ export const userSlice = createSlice({
       })
       .addCase(fetchUsers.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload ?? 'Failed to fetch users';
+        state.error = action.payload ?? 'Ошибка получения пользователей!';
       })
 
       //Зарегать пользователя
@@ -69,7 +69,7 @@ export const userSlice = createSlice({
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload ?? 'Failed to register user';
+        state.error = action.payload ?? 'Ошибка регистрации!';
       })
 
       //Получить инфу у пользователе с определенным id
@@ -83,7 +83,7 @@ export const userSlice = createSlice({
       })
       .addCase(fetchUserById.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload ?? 'Failed to fetch user by id';
+        state.error = action.payload ?? 'Ошибка получения пользователя!';
       })
 
       //Получить пользователя
@@ -97,7 +97,8 @@ export const userSlice = createSlice({
       })
       .addCase(fetchCurrentUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload ?? 'Failed to fetch user';
+        state.error =
+          action.payload ?? 'Ошибка получения текущего пользователя!';
       })
 
       //Обновить пользователя
@@ -111,7 +112,7 @@ export const userSlice = createSlice({
       })
       .addCase(updateCurrentUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload ?? 'Failed to update user';
+        state.error = action.payload ?? 'Ошибка обновления пользователя!';
       })
 
       //Добавить аватарку
@@ -127,7 +128,7 @@ export const userSlice = createSlice({
       })
       .addCase(uploadUserAvatar.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload ?? 'Failed to upload avatar';
+        state.error = action.payload ?? 'Ошибка загрузки аватара!';
       })
 
       //Удалить аватарку
@@ -143,7 +144,7 @@ export const userSlice = createSlice({
       })
       .addCase(deleteUserAvatar.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload ?? 'Failed to delete avatar';
+        state.error = action.payload ?? 'Ошибка удаления аватара!';
       })
 
       //Установить пароль
@@ -156,7 +157,7 @@ export const userSlice = createSlice({
       })
       .addCase(setUserPassword.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload ?? 'Failed to set password';
+        state.error = action.payload ?? 'Ошибка изменения пароля!';
       });
   },
 });

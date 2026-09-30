@@ -18,8 +18,8 @@ import { MainLayout } from '@shared/ui/layout/main/MainLayout';
 import { Route, Routes } from 'react-router-dom';
 import './App.css';
 import { ProtectedRoute } from './providers';
-import './styles/index.css';
 import { MyProfileRoute } from './router';
+import './styles/index.css';
 
 export function App() {
   return (
@@ -35,6 +35,7 @@ export function App() {
         <Route path="*" element={<ErrorPage />} />
         <Route path="participants" element={<ParticipantsPage />} />
         <Route path="questions" element={<QuestionsPage />} />
+        <Route path="favorites" element={<FavoritesPage />} />
         {/* Защищённые маршруты */}
         <Route element={<ProtectedRoute />}>
           <Route path="projects/:id" element={<ProjectCardPage />} />
@@ -43,7 +44,6 @@ export function App() {
           <Route path="edit-profile" element={<EditProfilePage />} />
           <Route path="edit-project" element={<EditProjectPage />} />
           <Route path="requests" element={<RequestsPage />} />
-          <Route path="favorites" element={<FavoritesPage />} />
         </Route>
       </Route>
     </Routes>

@@ -12,22 +12,9 @@ import type {
   UserCreateRequest,
   UserPublic,
 } from '@entities/user/types';
+import { getErrorMessage } from '@shared/api/errors.handlers';
 
 const getUserService = () => new UserService(getServices().api);
-
-const getErrorMessage = (error: unknown): string => {
-  if (typeof error === 'string') return error;
-  if (error instanceof Error) return error.message;
-  if (
-    error &&
-    typeof error === 'object' &&
-    'message' in error &&
-    typeof (error as { message?: unknown }).message === 'string'
-  ) {
-    return (error as { message: string }).message;
-  }
-  return 'Неизвестная ошибка';
-};
 
 //Получить список пользователей
 export const fetchUsers = createAsyncThunk<

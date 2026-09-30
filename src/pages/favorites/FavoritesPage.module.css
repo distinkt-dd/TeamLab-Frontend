@@ -1,0 +1,20 @@
+.container {
+  max-width: 1240px;
+  width: 100%;
+  margin: 0 auto;
+}
+.buttonBack {
+  position: static;
+  max-width: max-content;
+}
+
+.section {
+  margin-block: 16px 123px;
+  display: flex;
+  flex-direction: column;
+  row-gap: 40px;
+}
+
+.title {
+  text-transform: uppercase;
+}

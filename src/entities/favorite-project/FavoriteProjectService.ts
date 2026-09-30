@@ -1,10 +1,10 @@
 import { Api } from '../../shared/api/api.class';
+import { USERS_ME } from '../../shared/api/constants';
 import type {
   FavoriteProject,
   FavoriteProjectCreateRequest,
   FavoriteProjectCreateResponse,
 } from './types';
-import { USERS_ME } from '../../shared/api/constants';
 
 const FAVORITE_PROJECTS_PATH = `${USERS_ME}favorite-projects/`;
 
