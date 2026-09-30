@@ -1,9 +1,9 @@
 import { ParticipantCard } from '@entities/user';
-import type { UserPublicMock } from '@entities/user/types';
+import type { UserPublic } from '@entities/user/types';
 import styles from './ParticipantsList.module.css';
 
 type ParticipantsListProps = {
-  users: UserPublicMock[];
+  users: UserPublic[];
 };
 
 export const ParticipantsList = ({ users }: ParticipantsListProps) => {
