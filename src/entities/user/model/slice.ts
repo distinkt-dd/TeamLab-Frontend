@@ -1,14 +1,14 @@
-import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { CurrentUser, UserPublic } from '@entities/user/types';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import {
-  fetchCurrentUser,
-  updateCurrentUser,
-  uploadUserAvatar,
   deleteUserAvatar,
-  setUserPassword,
+  fetchCurrentUser,
+  fetchUserById,
   fetchUsers,
   registerUser,
-  fetchUserById,
+  setUserPassword,
+  updateCurrentUser,
+  uploadUserAvatar,
 } from './actions';
 
 interface UserState {
@@ -50,7 +50,8 @@ export const userSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchUsers.fulfilled, (state, action) => {
-        state.users = action.payload.results;
+        console.log('fulfilled payload:', action.payload);
+        state.users = action.payload;
         state.loading = false;
       })
       .addCase(fetchUsers.rejected, (state, action) => {

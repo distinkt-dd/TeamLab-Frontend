@@ -31,7 +31,7 @@
 .mdPng {
   max-width: 453px;
   rotate: -106deg;
-  bottom: -100%;
+  bottom: 0;
   left: -7%;
   z-index: -1;
 }
@@ -47,5 +47,13 @@
   max-width: 299px;
   right: 10%;
   top: 30%;
+  z-index: -1;
+}
+
+.decorations {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
   z-index: -1;
 }

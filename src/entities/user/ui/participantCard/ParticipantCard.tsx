@@ -1,10 +1,10 @@
 import { EmploymentTypeMapped, UserLevelMapped } from '@entities/user/mapped';
-import { type UserPublicMock } from '@entities/user/types';
+import { type UserPublic } from '@entities/user/types';
 import { Button, Tag } from '@shared/ui';
 import styles from './ParticipantCard.module.css';
 
 type ParticipantProps = {
-  user: UserPublicMock;
+  user: UserPublic;
 };
 
 export const ParticipantCard = ({ user }: ParticipantProps) => {
@@ -13,7 +13,7 @@ export const ParticipantCard = ({ user }: ParticipantProps) => {
       <div className={styles.userBlock}>
         <div className={styles.userSelf}>
           <img
-            src={user.avatar ?? './assets/girl.png'}
+            src={user.avatar ?? '/girl.png'}
             className={styles.image}
             alt={user.display_name}
           />
@@ -24,28 +24,22 @@ export const ParticipantCard = ({ user }: ParticipantProps) => {
         </div>
         <div className={styles.userInfo}>
           {user.level ? (
-            <caption className="caption-s">
-              {UserLevelMapped[user.level]}
-            </caption>
+            <span className="caption-s">{UserLevelMapped[user.level]}</span>
           ) : (
             ''
           )}
-          {user.city ? (
-            <caption className="caption-s">{user.city}</caption>
-          ) : (
-            ''
-          )}
+          {user.city ? <span className="caption-s">{user.city}</span> : ''}
           {user.workload_hours_per_week ? (
-            <caption className="caption-s">
+            <span className="caption-s">
               {user.workload_hours_per_week} ч/нед
-            </caption>
+            </span>
           ) : (
             ''
           )}
           {user.employment_type ? (
-            <caption className="caption-s">
+            <span className="caption-s">
               {EmploymentTypeMapped[user.employment_type]}
-            </caption>
+            </span>
           ) : (
             ''
           )}
@@ -53,7 +47,9 @@ export const ParticipantCard = ({ user }: ParticipantProps) => {
       </div>
       <div className={styles.skillsBlock}>
         {user.skills.map((skill) => (
-          <Tag className={styles.skillBlockTag}>{skill.name}</Tag>
+          <Tag className={styles.skillBlockTag} key={skill.id}>
+            {skill.name}
+          </Tag>
         ))}
       </div>
       <div className={styles.actionsBlock}>

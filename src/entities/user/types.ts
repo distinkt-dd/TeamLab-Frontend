@@ -71,9 +71,9 @@ export interface UserPublicMock {
   level: UserLevel | null; // в моках всегда null, но тип совместим с UserLevel
   city: string;
   workload_hours_per_week: number | null;
-  work_format: string | null; // можно заменить на WorkFormat, если знаете enum
+  work_format: WorkFormat | null; // можно заменить на WorkFormat, если знаете enum
   employment_type: EmploymentType | null; // аналогично
-  search_status: string | null; // аналогично
+  search_status: SearchStatus | null; // аналогично
   skills: MockSkill[]; // массив с полной структурой
 }
 

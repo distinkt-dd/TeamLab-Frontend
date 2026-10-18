@@ -1,3 +1,4 @@
+import { fetchUsers } from '@entities/user/model/actions';
 import {
   EditProfilePage,
   EditProjectPage,
@@ -15,13 +16,21 @@ import {
   RequestsPage,
 } from '@pages';
 import { MainLayout } from '@shared/ui/layout/main/MainLayout';
+import { useEffect } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import './App.css';
+import { useAppDispatch } from './hooks';
 import { ProtectedRoute } from './providers';
-import './styles/index.css';
 import { MyProfileRoute } from './router';
+import './styles/index.css';
 
 export function App() {
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(fetchUsers()).then((res) => console.log('thunk result:', res));
+  }, [dispatch]);
+
   return (
     <Routes>
       <Route path="/" element={<MainLayout />}>

@@ -1,17 +1,16 @@
-import { createAsyncThunk } from '@reduxjs/toolkit';
 import { getServices } from '@app';
 import { UserService } from '@entities/user';
 import type {
-  CurrentUser,
-  UserUpdateRequest,
-  AvatarUpdateRequest,
   AvatarResponse,
-  SetPasswordRequest,
+  AvatarUpdateRequest,
+  CurrentUser,
   ListUsersParams,
-  PaginatedUsers,
+  SetPasswordRequest,
   UserCreateRequest,
   UserPublic,
+  UserUpdateRequest,
 } from '@entities/user/types';
+import { createAsyncThunk } from '@reduxjs/toolkit';
 
 const getUserService = () => new UserService(getServices().api);
 
@@ -31,12 +30,14 @@ const getErrorMessage = (error: unknown): string => {
 
 //Получить список пользователей
 export const fetchUsers = createAsyncThunk<
-  PaginatedUsers,
+  UserPublic[], // ← было PaginatedUsers
   ListUsersParams | void,
   { rejectValue: string }
 >('user/fetchUsers', async (params, { rejectWithValue }) => {
   try {
-    return await getUserService().list(params ?? undefined);
+    return (await getUserService().list(
+      params ?? undefined
+    )) as unknown as UserPublic[];
   } catch (error) {
     return rejectWithValue(getErrorMessage(error));
   }

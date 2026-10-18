@@ -1,12 +1,12 @@
-import { useMemo } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getServices } from '@app';
+import { ProjectService } from '@entities/project';
 import {
   CURRENT_USER_QUERY_KEY,
   UserService,
   useOptimisticUserUpdate,
 } from '@entities/user';
-import { ProjectService } from '@entities/project';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMemo } from 'react';
 import { toProjectCards } from '../lib/toProjectCards';
 
 // Данные личного кабинета владельца: текущий пользователь, его проекты
