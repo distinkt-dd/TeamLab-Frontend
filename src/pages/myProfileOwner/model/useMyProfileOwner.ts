@@ -62,7 +62,7 @@ export const useMyProfileOwner = () => {
     isError: isWaitingError,
   } = useQuery({
     queryKey: ['currentUserNotifications'],
-    queryFn: () => userService.getNotifications(),
+    queryFn: () => userService.getAllNotifications(),
     enabled: !!user, // не запускаем, пока нет user
   });
 

@@ -188,7 +188,7 @@ export const RequestsPage: React.FC = () => {
           currentUser.owned_project_ids.map(async (projectId) => {
             const [project, projectApplications] = await Promise.all([
               projectService.getProjectDetail(projectId),
-              projectService.getProjectApplications(projectId),
+              projectService.getAllProjectApplications(projectId),
             ]);
 
             return projectApplications.map((application) => ({

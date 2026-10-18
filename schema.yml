@@ -603,58 +603,34 @@ paths:
               example:
                 - id: 1
                   name: Python
+                  slug: python
+                  field_ids: [1]
                   created_at: '2026-02-01T09:00:00Z'
                   updated_at: '2026-02-01T09:00:00Z'
                 - id: 2
                   name: Django
+                  slug: django
+                  field_ids: [1]
                   created_at: '2026-02-01T09:05:00Z'
                   updated_at: '2026-02-01T09:05:00Z'
                 - id: 3
                   name: FastAPI
+                  slug: fastapi
+                  field_ids: [1]
                   created_at: '2026-04-24T09:30:00Z'
                   updated_at: '2026-04-24T09:30:00Z'
                 - id: 4
                   name: Figma
+                  slug: figma
+                  field_ids: [2]
                   created_at: '2026-02-01T09:15:00Z'
                   updated_at: '2026-02-01T09:15:00Z'
                 - id: 5
                   name: User Research
+                  slug: user-research
+                  field_ids: [2]
                   created_at: '2026-02-01T09:20:00Z'
                   updated_at: '2026-02-01T09:20:00Z'
-    post:
-      tags: [Skills]
-      summary: Добавление нового навыка
-      description: Доступно только администраторам.
-      operationId: createSkill
-      security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SkillCreateRequest'
-            example:
-              name: FastAPI
-      responses:
-        '201':
-          description: Навык успешно создан
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Skill'
-              example:
-                id: 3
-                name: FastAPI
-                created_at: '2026-04-24T09:30:00Z'
-                updated_at: '2026-04-24T09:30:00Z'
-        '400':
-          $ref: '#/components/responses/ValidationErrorResponse'
-        '401':
-          $ref: '#/components/responses/UnauthorizedResponse'
-        '403':
-          $ref: '#/components/responses/ForbiddenResponse'
-
   /api/v1/specializations/:
     get:
       tags: [Specializations]
@@ -835,9 +811,11 @@ paths:
                     field_id: 1
                     title: Платформа наставничества SkillBridge
                     description: Платформа для подбора наставников студентам и отслеживания учебных целей.
-                    idea: Помочь начинающим разработчикам найти структурированное наставничество в небольших проектных командах.
-                    benefits: Участники получают работу для портфолио и обратную связь от опытных наставников.
+                    problem: Начинающим разработчикам сложно найти наставничество.
+                    image: null
                     status: open
+                    is_favorited: false
+                    roles_preview: []
                     created_at: '2026-03-10T08:00:00Z'
                     updated_at: '2026-04-21T12:00:00Z'
                   - id: 2
@@ -845,9 +823,11 @@ paths:
                     field_id: 2
                     title: Карта волонтерских маршрутов CareRoute
                     description: Сервис для координации волонтерских визитов в клиники.
-                    idea: Сократить ручное планирование для координаторов медицинских НКО.
-                    benefits: Волонтеры получают опыт работы над полезным продуктом.
+                    problem: Координаторы медицинских НКО планируют маршруты вручную.
+                    image: null
                     status: open
+                    is_favorited: false
+                    roles_preview: []
                     created_at: '2026-03-16T09:30:00Z'
                     updated_at: '2026-04-19T15:45:00Z'
         '400':
@@ -869,8 +849,13 @@ paths:
               field_id: 1
               title: Планировщик учебных встреч
               description: Веб-платформа для планирования учебных групп и воркшопов.
-              idea: Дать студенческим сообществам простой способ публиковать события и искать участников.
-              benefits: Участники тренируются работать в команде и выпускают публичный проект для портфолио.
+              problem: Студенческим сообществам сложно планировать встречи.
+              image: null
+              roles:
+                - specialization_id: 1
+                  tasks: [Разработать API]
+                  benefits: [Практика в команде]
+                  skills: []
       responses:
         '201':
           description: Проект успешно создан
@@ -884,9 +869,18 @@ paths:
                 field_id: 1
                 title: Планировщик учебных встреч
                 description: Веб-платформа для планирования учебных групп и воркшопов.
-                idea: Дать студенческим сообществам простой способ публиковать события и искать участников.
-                benefits: Участники тренируются работать в команде и выпускают публичный проект для портфолио.
+                problem: Студенческим сообществам сложно планировать встречи.
+                image: null
                 status: open
+                is_favorited: false
+                roles: []
+                matching_role_id: null
+                matching_role_name: null
+                my_interest_id: null
+                my_interest_status: null
+                my_interest_source: null
+                my_membership_id: null
+                my_membership_status: null
                 created_at: '2026-04-24T11:00:00Z'
                 updated_at: '2026-04-24T11:00:00Z'
         '400':
@@ -915,9 +909,18 @@ paths:
                 field_id: 1
                 title: Платформа наставничества SkillBridge
                 description: Платформа для подбора наставников студентам и отслеживания учебных целей.
-                idea: Помочь начинающим разработчикам найти структурированное наставничество в небольших проектных командах.
-                benefits: Участники получают работу для портфолио и обратную связь от опытных наставников.
+                problem: Начинающим разработчикам сложно найти наставничество.
+                image: null
                 status: open
+                is_favorited: false
+                roles: []
+                matching_role_id: null
+                matching_role_name: null
+                my_interest_id: null
+                my_interest_status: null
+                my_interest_source: null
+                my_membership_id: null
+                my_membership_status: null
                 created_at: '2026-03-10T08:00:00Z'
                 updated_at: '2026-04-21T12:00:00Z'
         '404':
@@ -940,8 +943,8 @@ paths:
             example:
               title: Платформа наставничества SkillBridge
               description: Платформа для подбора наставников студентам и отслеживания учебных целей.
-              idea: Помочь начинающим разработчикам найти структурированное наставничество в небольших проектных командах.
-              benefits: Участники получают работу для портфолио, обратную связь наставников и опыт релиза.
+              problem: Начинающим разработчикам сложно найти наставничество.
+              image: null
               status: open
       responses:
         '200':
@@ -956,9 +959,18 @@ paths:
                 field_id: 1
                 title: Платформа наставничества SkillBridge
                 description: Платформа для подбора наставников студентам и отслеживания учебных целей.
-                idea: Помочь начинающим разработчикам найти структурированное наставничество в небольших проектных командах.
-                benefits: Участники получают работу для портфолио, обратную связь наставников и опыт релиза.
+                problem: Начинающим разработчикам сложно найти наставничество.
+                image: null
                 status: open
+                is_favorited: false
+                roles: []
+                matching_role_id: null
+                matching_role_name: null
+                my_interest_id: null
+                my_interest_status: null
+                my_interest_source: null
+                my_membership_id: null
+                my_membership_status: null
                 created_at: '2026-03-10T08:00:00Z'
                 updated_at: '2026-04-24T12:10:00Z'
         '400':
@@ -969,6 +981,67 @@ paths:
           $ref: '#/components/responses/ForbiddenResponse'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
+
+  /api/v1/projects/featured/:
+    get:
+      tags: [Projects]
+      summary: Избранные проекты недели
+      description: Возвращает публичный пагинированный список открытых featured-проектов.
+      operationId: listFeaturedProjects
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+      responses:
+        '200':
+          description: Список featured-проектов
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedProjects'
+
+  /api/v1/projects/{project_id}/applications/:
+    get:
+      tags: [Projects]
+      summary: Заявки на проект
+      description: Доступно только владельцу проекта.
+      operationId: listProjectApplications
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectIdParam'
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+      responses:
+        '200':
+          description: Пагинированный список заявок
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedProjectApplications'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+
+  /api/v1/users/me/notifications/:
+    get:
+      tags: [Me]
+      summary: Уведомления текущего пользователя
+      operationId: listCurrentUserNotifications
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+      responses:
+        '200':
+          description: Пагинированный список уведомлений
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCurrentUserNotifications'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
 
   /api/v1/project-roles/:
     get:
@@ -1001,33 +1074,26 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProjectRolesListResponse'
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProjectRole'
               example:
-                results:
-                  - id: 1
-                    project_id: 1
-                    specialization_id: 1
-                    description: Backend-разработчик для API проекта, моделей PostgreSQL и сценариев откликов.
-                    capacity: 2
-                    is_open: true
-                    created_at: '2026-03-11T09:00:00Z'
-                    updated_at: '2026-04-23T10:20:00Z'
-                  - id: 2
-                    project_id: 1
-                    specialization_id: 2
-                    description: UX-дизайнер для исследования онбординга и подготовки кликабельных прототипов в Figma.
-                    capacity: 1
-                    is_open: false
-                    created_at: '2026-03-11T09:20:00Z'
-                    updated_at: '2026-04-23T11:00:00Z'
+                - id: 1
+                  project_id: 1
+                  specialization_id: 1
+                  specialization_name: Backend-разработчик
+                  tasks: [Разработать API]
+                  benefits: [Практика]
+                  skills: []
+                  created_at: '2026-03-11T09:00:00Z'
+                  updated_at: '2026-04-23T10:20:00Z'
         '404':
           $ref: '#/components/responses/NotFoundResponse'
     post:
       tags: [Project Roles]
       summary: Добавление роли проекта
       description: |
-        Создаёт роль в открытом проекте. Доступно owner проекта и администраторам.
-        Новая роль создаётся с `is_open = true`.
+        Создаёт роль в проекте. Доступно владельцу проекта.
       operationId: createProjectRole
       security:
         - BearerAuth: []
@@ -1040,8 +1106,9 @@ paths:
             example:
               project_id: 2
               specialization_id: 3
-              description: Мобильный разработчик для экранов расписания волонтеров.
-              capacity: 2
+              tasks: [Разработать мобильный интерфейс]
+              benefits: [Практика в продуктовой команде]
+              skills: []
       responses:
         '201':
           description: Роль успешно создана
@@ -1053,9 +1120,10 @@ paths:
                 id: 3
                 project_id: 2
                 specialization_id: 3
-                description: Мобильный разработчик для экранов расписания волонтеров.
-                capacity: 2
-                is_open: true
+                specialization_name: Мобильный разработчик
+                tasks: [Разработать мобильный интерфейс]
+                benefits: [Практика в продуктовой команде]
+                skills: []
                 created_at: '2026-04-24T12:30:00Z'
                 updated_at: '2026-04-24T12:30:00Z'
         '400':
@@ -1086,9 +1154,10 @@ paths:
                 id: 1
                 project_id: 1
                 specialization_id: 1
-                description: Backend-разработчик для API проекта, моделей PostgreSQL и сценариев откликов.
-                capacity: 2
-                is_open: true
+                specialization_name: Backend-разработчик
+                tasks: [Разработать API]
+                benefits: [Практика]
+                skills: []
                 created_at: '2026-03-11T09:00:00Z'
                 updated_at: '2026-04-23T10:20:00Z'
         '404':
@@ -1109,9 +1178,7 @@ paths:
             schema:
               $ref: '#/components/schemas/ProjectRoleUpdateRequest'
             example:
-              description: Backend-разработчик для поддержки API, фоновых задач и аналитики проекта.
-              capacity: 2
-              is_open: false
+              tasks: [Поддерживать API и фоновые задачи]
       responses:
         '200':
           description: Роль успешно обновлена
@@ -1123,9 +1190,10 @@ paths:
                 id: 1
                 project_id: 1
                 specialization_id: 1
-                description: Backend-разработчик для поддержки API, фоновых задач и аналитики проекта.
-                capacity: 2
-                is_open: false
+                specialization_name: Backend-разработчик
+                tasks: [Поддерживать API и фоновые задачи]
+                benefits: [Практика]
+                skills: []
                 created_at: '2026-03-11T09:00:00Z'
                 updated_at: '2026-04-24T12:45:00Z'
         '400':
@@ -1658,7 +1726,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PortfolioWork'
+                $ref: '#/components/schemas/PortfolioWorkWriteResponse'
               example:
                 id: 5
                 user_id: 2
@@ -1708,7 +1776,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PortfolioWork'
+                $ref: '#/components/schemas/PortfolioWorkWriteResponse'
               example:
                 id: 1
                 user_id: 2
@@ -2068,6 +2136,8 @@ components:
       required:
         - id
         - name
+        - slug
+        - field_ids
         - created_at
         - updated_at
       properties:
@@ -2077,6 +2147,14 @@ components:
         name:
           type: string
           maxLength: 255
+        slug:
+          type: string
+          readOnly: true
+        field_ids:
+          type: array
+          readOnly: true
+          items:
+            type: integer
         created_at:
           type: string
           format: date-time
@@ -2085,16 +2163,6 @@ components:
           type: string
           format: date-time
           readOnly: true
-
-    SkillCreateRequest:
-      type: object
-      required:
-        - name
-      properties:
-        name:
-          type: string
-          minLength: 1
-          maxLength: 255
 
     Field:
       type: object
@@ -2312,6 +2380,17 @@ components:
           format: uri
           nullable: true
 
+    PortfolioWorkWriteResponse:
+      allOf:
+        - $ref: '#/components/schemas/PortfolioWorkCreateRequest'
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              type: integer
+              readOnly: true
+
     FavoriteProject:
       type: object
       description: Избранный проект текущего participant. Избранное участников или кандидатов в MVP отсутствует.
@@ -2319,6 +2398,7 @@ components:
         - id
         - user_id
         - project_id
+        - project
         - created_at
       properties:
         id:
@@ -2329,6 +2409,8 @@ components:
           readOnly: true
         project_id:
           type: integer
+        project:
+          $ref: '#/components/schemas/ProjectListItem'
         created_at:
           type: string
           format: date-time
@@ -2720,9 +2802,11 @@ components:
         - field_id
         - title
         - description
-        - idea
-        - benefits
+        - problem
+        - image
         - status
+        - is_favorited
+        - roles_preview
         - created_at
         - updated_at
       properties:
@@ -2738,14 +2822,22 @@ components:
           type: string
         description:
           type: string
-        idea:
+        problem:
           type: string
           nullable: true
-        benefits:
+        image:
           type: string
+          format: uri
           nullable: true
         status:
           $ref: '#/components/schemas/ProjectStatus'
+        is_favorited:
+          type: boolean
+          readOnly: true
+        roles_preview:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectRolePreview'
         created_at:
           type: string
           format: date-time
@@ -2760,15 +2852,89 @@ components:
         field_id: 1
         title: Платформа наставничества SkillBridge
         description: Платформа для подбора наставников студентам и отслеживания учебных целей.
-        idea: Помочь начинающим разработчикам найти наставничество в проектных командах.
-        benefits: Участники получают работу для портфолио и обратную связь.
+        problem: Начинающим разработчикам сложно найти наставничество.
+        image: null
         status: open
+        is_favorited: false
+        roles_preview: []
         created_at: '2026-03-10T08:00:00Z'
         updated_at: '2026-04-21T12:00:00Z'
 
     ProjectDetail:
       allOf:
         - $ref: '#/components/schemas/ProjectListItem'
+        - type: object
+          required:
+            - roles
+            - matching_role_id
+            - matching_role_name
+            - my_interest_id
+            - my_interest_status
+            - my_interest_source
+            - my_membership_id
+            - my_membership_status
+          properties:
+            roles:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProjectRole'
+            matching_role_id:
+              type: integer
+              nullable: true
+            matching_role_name:
+              type: string
+              nullable: true
+            my_interest_id:
+              type: integer
+              nullable: true
+            my_interest_status:
+              allOf:
+                - $ref: '#/components/schemas/RoleInterestStatus'
+              nullable: true
+            my_interest_source:
+              allOf:
+                - $ref: '#/components/schemas/RoleInterestSource'
+              nullable: true
+            my_membership_id:
+              type: integer
+              nullable: true
+            my_membership_status:
+              type: string
+              enum: [active, left, removed]
+              nullable: true
+
+    ProjectRoleSkill:
+      type: object
+      required: [id, skill_id, name, description, order]
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        skill_id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        order:
+          type: integer
+
+    ProjectRolePreview:
+      type: object
+      required: [id, specialization_id, specialization_name, skills]
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        specialization_id:
+          type: integer
+        specialization_name:
+          type: string
+          nullable: true
+        skills:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectRoleSkill'
 
     ProjectCreateRequest:
       type: object
@@ -2776,6 +2942,9 @@ components:
         - field_id
         - title
         - description
+        - problem
+        - image
+        - roles
       properties:
         field_id:
           type: integer
@@ -2785,12 +2954,17 @@ components:
         description:
           type: string
           minLength: 1
-        idea:
+        problem:
           type: string
           nullable: true
-        benefits:
+        image:
           type: string
           nullable: true
+        roles:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/ProjectRoleNestedInput'
 
     ProjectUpdateRequest:
       type: object
@@ -2803,10 +2977,10 @@ components:
         description:
           type: string
           minLength: 1
-        idea:
+        problem:
           type: string
           nullable: true
-        benefits:
+        image:
           type: string
           nullable: true
         status:
@@ -2818,9 +2992,10 @@ components:
         - id
         - project_id
         - specialization_id
-        - description
-        - capacity
-        - is_open
+        - specialization_name
+        - tasks
+        - benefits
+        - skills
         - created_at
         - updated_at
       properties:
@@ -2832,13 +3007,21 @@ components:
           readOnly: true
         specialization_id:
           type: integer
-        description:
+        specialization_name:
           type: string
-        capacity:
-          type: integer
-          minimum: 1
-        is_open:
-          type: boolean
+          nullable: true
+        tasks:
+          type: array
+          items:
+            type: string
+        benefits:
+          type: array
+          items:
+            type: string
+        skills:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectRoleSkill'
         created_at:
           type: string
           format: date-time
@@ -2851,9 +3034,10 @@ components:
         id: 1
         project_id: 1
         specialization_id: 1
-        description: Backend-разработчик для API проекта, моделей PostgreSQL и сценариев откликов.
-        capacity: 2
-        is_open: true
+        specialization_name: Backend-разработчик
+        tasks: [Разработать API]
+        benefits: [Практика]
+        skills: []
         created_at: '2026-03-11T09:00:00Z'
         updated_at: '2026-04-23T10:20:00Z'
 
@@ -2862,43 +3046,74 @@ components:
       required:
         - project_id
         - specialization_id
-        - description
-        - capacity
+        - tasks
+        - benefits
+        - skills
       properties:
         project_id:
           type: integer
         specialization_id:
           type: integer
-        description:
-          type: string
-          minLength: 1
-        capacity:
+        tasks:
+          type: array
+          items:
+            type: string
+        benefits:
+          type: array
+          items:
+            type: string
+        skills:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectRoleSkillInput'
+
+    ProjectRoleNestedInput:
+      type: object
+      required: [specialization_id, tasks, benefits, skills]
+      properties:
+        specialization_id:
           type: integer
-          minimum: 1
+        tasks:
+          type: array
+          items:
+            type: string
+        benefits:
+          type: array
+          items:
+            type: string
+        skills:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectRoleSkillInput'
 
     ProjectRoleUpdateRequest:
       type: object
       properties:
         specialization_id:
           type: integer
-        description:
-          type: string
-          minLength: 1
-        capacity:
-          type: integer
-          minimum: 1
-        is_open:
-          type: boolean
-
-    ProjectRolesListResponse:
-      type: object
-      required:
-        - results
-      properties:
-        results:
+        tasks:
           type: array
           items:
-            $ref: '#/components/schemas/ProjectRole'
+            type: string
+        benefits:
+          type: array
+          items:
+            type: string
+        skills:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectRoleSkillInput'
+
+    ProjectRoleSkillInput:
+      type: object
+      required: [skill_id, description, order]
+      properties:
+        skill_id:
+          type: integer
+        description:
+          type: string
+        order:
+          type: integer
 
     RoleInterest:
       type: object
@@ -2946,6 +3161,75 @@ components:
         reviewed_at: null
         created_at: '2026-04-24T13:00:00Z'
         updated_at: '2026-04-24T13:00:00Z'
+
+    ProjectApplicationCard:
+      type: object
+      required:
+        - id
+        - project_role_id
+        - project_role_name
+        - status
+        - source
+        - created_at
+        - updated_at
+        - user
+      properties:
+        id:
+          type: integer
+        project_role_id:
+          type: integer
+        project_role_name:
+          type: string
+          nullable: true
+        status:
+          $ref: '#/components/schemas/RoleInterestStatus'
+        source:
+          $ref: '#/components/schemas/RoleInterestSource'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        user:
+          $ref: '#/components/schemas/UserPublic'
+
+    CurrentUserNotification:
+      type: object
+      required:
+        - id
+        - source
+        - status
+        - user_id
+        - username
+        - project_id
+        - project_title
+        - project_role_id
+        - project_role_name
+        - created_at
+      properties:
+        id:
+          type: integer
+        source:
+          $ref: '#/components/schemas/RoleInterestSource'
+        status:
+          $ref: '#/components/schemas/RoleInterestStatus'
+        user_id:
+          type: integer
+        username:
+          type: string
+        project_id:
+          type: integer
+        project_title:
+          type: string
+        project_role_id:
+          type: integer
+        project_role_name:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
 
     RoleInterestInviteRequest:
       type: object
@@ -3074,6 +3358,44 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ProjectListItem'
+
+    PaginatedProjectApplications:
+      type: object
+      required: [count, next, previous, results]
+      properties:
+        count:
+          type: integer
+        next:
+          type: string
+          format: uri
+          nullable: true
+        previous:
+          type: string
+          format: uri
+          nullable: true
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectApplicationCard'
+
+    PaginatedCurrentUserNotifications:
+      type: object
+      required: [count, next, previous, results]
+      properties:
+        count:
+          type: integer
+        next:
+          type: string
+          format: uri
+          nullable: true
+        previous:
+          type: string
+          format: uri
+          nullable: true
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/CurrentUserNotification'
 
     PaginatedMyProjects:
       type: object

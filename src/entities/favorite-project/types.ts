@@ -1,21 +1,10 @@
-export interface RolePreview {
-  id: number;
-  specialization_id: number;
-  specialization_name: string | null;
-}
-
-export interface ProjectPreview {
-  id: number;
-  title: string;
-  image: string | null;
-  roles_preview: RolePreview[];
-}
+import type { ProjectListItem } from '@entities/project/types';
 
 export interface FavoriteProject {
   id: number;
   user_id: number;
   project_id: number;
-  project: ProjectPreview;
+  project: ProjectListItem;
   created_at: string;
 }
 

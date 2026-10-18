@@ -13,6 +13,8 @@ import type {
   CurrentUserNotification,
 } from './types';
 import { USERS, USERS_ME } from '../../shared/api/constants';
+import type { PaginatedResponse } from '@shared/api/types';
+import { collectPaginatedResults } from '@shared/api/pagination';
 
 const MY_PROJECTS_PATH = `${USERS_ME}projects/`;
 const NOTIFICATIONS_PATH = `${USERS_ME}notifications/`;
@@ -51,8 +53,17 @@ export class UserService {
 
   // Уведомления текущего пользователя: у владельца — pending-отклики на его проекты,
   // у участника — pending-приглашения. Только чтение.
-  getNotifications(): Promise<CurrentUserNotification[]> {
-    return this.api.get<CurrentUserNotification[]>(NOTIFICATIONS_PATH);
+  getNotifications(
+    params?: Pick<ListUsersParams, 'page' | 'limit'>
+  ): Promise<PaginatedResponse<CurrentUserNotification>> {
+    return this.api.get<PaginatedResponse<CurrentUserNotification>>(
+      NOTIFICATIONS_PATH,
+      params
+    );
+  }
+
+  getAllNotifications(): Promise<CurrentUserNotification[]> {
+    return collectPaginatedResults((page) => this.getNotifications({ page }));
   }
 
   uploadAvatar(data: AvatarUpdateRequest): Promise<AvatarResponse> {

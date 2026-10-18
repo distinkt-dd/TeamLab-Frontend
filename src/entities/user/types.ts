@@ -1,3 +1,5 @@
+import type { PaginatedResponse } from '@shared/api/types';
+
 export interface SocialLinks {
   instagram?: string;
   telegram?: string;
@@ -95,12 +97,7 @@ export interface CurrentUser extends UserPublic {
   owned_project_ids: number[];
 }
 
-export interface PaginatedUsers {
-  count: number;
-  next: string | null;
-  previous: string | null;
-  results: UserPublic[];
-}
+export type PaginatedUsers = PaginatedResponse<UserPublic>;
 
 export interface UserCreateRequest {
   username: string;

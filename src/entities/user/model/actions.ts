@@ -5,6 +5,7 @@ import type {
   AvatarUpdateRequest,
   CurrentUser,
   ListUsersParams,
+  PaginatedUsers,
   SetPasswordRequest,
   UserCreateRequest,
   UserPublic,
@@ -30,14 +31,12 @@ const getErrorMessage = (error: unknown): string => {
 
 //Получить список пользователей
 export const fetchUsers = createAsyncThunk<
-  UserPublic[], // ← было PaginatedUsers
+  PaginatedUsers,
   ListUsersParams | void,
   { rejectValue: string }
 >('user/fetchUsers', async (params, { rejectWithValue }) => {
   try {
-    return (await getUserService().list(
-      params ?? undefined
-    )) as unknown as UserPublic[];
+    return await getUserService().list(params ?? undefined);
   } catch (error) {
     return rejectWithValue(getErrorMessage(error));
   }

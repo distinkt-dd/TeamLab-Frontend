@@ -3,6 +3,7 @@ import type {
   PortfolioWork,
   PortfolioWorkCreateRequest,
   PortfolioWorkUpdateRequest,
+  PortfolioWorkWriteResponse,
 } from './types';
 import { USERS_ME } from '../../shared/api/constants';
 
@@ -19,16 +20,21 @@ export class PortfolioWorkService {
     return this.api.get<PortfolioWork[]>(PORTFOLIO_WORKS_PATH);
   }
 
-  create(data: PortfolioWorkCreateRequest): Promise<PortfolioWork> {
-    return this.api.post<PortfolioWork>(PORTFOLIO_WORKS_PATH, data);
+  create(
+    data: PortfolioWorkCreateRequest
+  ): Promise<PortfolioWorkWriteResponse> {
+    return this.api.post<PortfolioWorkWriteResponse>(
+      PORTFOLIO_WORKS_PATH,
+      data
+    );
   }
 
   update(
     portfolioWorkId: number,
     data: PortfolioWorkUpdateRequest
-  ): Promise<PortfolioWork> {
+  ): Promise<PortfolioWorkWriteResponse> {
     const path = `${PORTFOLIO_WORKS_PATH}${portfolioWorkId}/`;
-    return this.api.patch<PortfolioWork>(path, data);
+    return this.api.patch<PortfolioWorkWriteResponse>(path, data);
   }
 
   delete(portfolioWorkId: number): Promise<void> {

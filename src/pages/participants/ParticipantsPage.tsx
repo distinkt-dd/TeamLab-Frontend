@@ -1,10 +1,16 @@
 import { useAppSelector } from '@app';
-import { selectUsers } from '@entities/user/model/selectors';
+import { useAppDispatch } from '@app/hooks';
+import { fetchUsers } from '@entities/user/model/actions';
+import {
+  selectUserError,
+  selectUserLoading,
+  selectUsers,
+  selectUsersNextPage,
+} from '@entities/user/model/selectors';
 import { Filter } from '@features/filter';
 import { Button } from '@shared/ui';
 import { ParticipantsList } from '@widgets/participantsList';
 import clsx from 'clsx';
-import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './ParticipantsPage.module.css';
 
@@ -142,20 +148,25 @@ import styles from './ParticipantsPage.module.css';
 // ];
 
 export const ParticipantsPage: React.FC = () => {
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const participants = useAppSelector(selectUsers);
+  const nextPage = useAppSelector(selectUsersNextPage);
+  const isLoading = useAppSelector(selectUserLoading);
+  const error = useAppSelector(selectUserError);
 
   const handleBack = () => {
     navigate('/');
   };
 
-  useEffect(() => {
-    console.log(participants);
-  }, [participants]);
-
   if (!participants) {
-    return <>Загрузка</>; // Исправить на лоадер
+    return error ? <p role="alert">{error}</p> : <>Загрузка</>;
   }
+
+  const handleShowMore = () => {
+    if (nextPage === null || isLoading) return;
+    void dispatch(fetchUsers({ page: nextPage }));
+  };
 
   return (
     <>
@@ -188,10 +199,19 @@ export const ParticipantsPage: React.FC = () => {
           </Button>
           <h2 className={styles.title}>Все участники</h2>
           <Filter />
-          <ParticipantsList users={participants} />
-          <Button type="button" className={styles.buttonMore}>
-            Показать еще
-          </Button>
+          {error && <p role="alert">{error}</p>}
+          {participants.length === 0 && !error && <p>Участников пока нет.</p>}
+          {participants.length > 0 && <ParticipantsList users={participants} />}
+          {nextPage !== null && (
+            <Button
+              type="button"
+              className={styles.buttonMore}
+              onClick={handleShowMore}
+              disabled={isLoading}
+            >
+              {isLoading ? 'Загружаем...' : 'Показать еще'}
+            </Button>
+          )}
         </section>
       </div>
     </>

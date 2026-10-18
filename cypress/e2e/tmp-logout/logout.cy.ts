@@ -15,7 +15,17 @@ describe('временная проверка логаута из личного
   });
 
   it('кнопка "Выйти" переводит на /login', () => {
-    cy.intercept('GET', '**/api/v1/**', []);
+    cy.intercept('GET', '**/api/v1/**', (request) => {
+      const pathname = new URL(request.url).pathname;
+      if (
+        pathname.endsWith('/users/') ||
+        pathname.endsWith('/users/me/notifications/')
+      ) {
+        request.reply({ count: 0, next: null, previous: null, results: [] });
+        return;
+      }
+      request.reply([]);
+    });
     cy.intercept('POST', '**/api/v1/auth/token/blacklist/', {});
     cy.visit('http://localhost:5173/my-profile', {
       onBeforeLoad(win) {

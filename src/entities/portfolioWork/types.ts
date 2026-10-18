@@ -28,3 +28,13 @@ export interface PortfolioWorkUpdateRequest {
   technologies?: string[] | null;
   link?: string | null;
 }
+
+export interface PortfolioWorkWriteResponse {
+  id: number;
+  title: string;
+  task: string | null;
+  solution: string | null;
+  image: string | null;
+  technologies: string[] | null;
+  link: string | null;
+}
