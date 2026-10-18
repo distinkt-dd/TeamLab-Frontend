@@ -96,7 +96,7 @@ const replyForGet = (
     return;
   }
   if (pathname.endsWith('/users/me/notifications/')) {
-    request.reply([]);
+    request.reply({ count: 0, next: null, previous: null, results: [] });
     return;
   }
   if (pathname.endsWith('/users/me/')) {
@@ -104,7 +104,7 @@ const replyForGet = (
     return;
   }
   if (pathname.endsWith('/users/')) {
-    request.reply([]);
+    request.reply({ count: 0, next: null, previous: null, results: [] });
     return;
   }
 

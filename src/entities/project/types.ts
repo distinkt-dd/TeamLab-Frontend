@@ -1,4 +1,5 @@
 import type { UserPublic } from '@entities/user/types';
+import type { PaginatedResponse } from '@shared/api/types';
 
 export interface PaginationParams {
   page?: number;
@@ -83,12 +84,7 @@ export interface GetProjectsParams extends PaginationParams {
   ordering?: string;
 }
 
-export interface PaginatedProjects {
-  count: number;
-  next: string | null;
-  previous: string | null;
-  results: ProjectListItem[];
-}
+export type PaginatedProjects = PaginatedResponse<ProjectListItem>;
 
 export interface ProjectCreateRequest {
   field_id: number;

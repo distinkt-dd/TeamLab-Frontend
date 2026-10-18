@@ -1,5 +1,6 @@
 import type { CurrentUser, UserPublic } from '@entities/user/types';
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import { getNextPageNumber } from '@shared/api/pagination';
 import {
   deleteUserAvatar,
   fetchCurrentUser,
@@ -14,6 +15,7 @@ import {
 interface UserState {
   currentUser: CurrentUser | null;
   users: UserPublic[] | null;
+  usersNextPage: number | null;
   viewedUser: UserPublic | null;
   loading: boolean;
   error: string | null;
@@ -24,6 +26,7 @@ interface UserState {
 const initialState: UserState = {
   currentUser: null,
   users: null,
+  usersNextPage: null,
   viewedUser: null,
   loading: false,
   error: null,
@@ -77,6 +80,7 @@ export const userSlice = createSlice({
       return {
         ...initialState,
         users: state.users,
+        usersNextPage: state.usersNextPage,
         viewedUser: state.viewedUser,
         pendingRequestIds: publicRequestIds,
         privateRequestIds: [],
@@ -93,8 +97,14 @@ export const userSlice = createSlice({
       })
       .addCase(fetchUsers.fulfilled, (state, action) => {
         if (!finishRequest(state, action.meta.requestId)) return;
-        console.log('fulfilled payload:', action.payload);
-        state.users = action.payload;
+        const isNextPage = (action.meta.arg?.page ?? 1) > 1;
+        const users = isNextPage
+          ? [...(state.users ?? []), ...action.payload.results]
+          : action.payload.results;
+        state.users = Array.from(
+          new Map(users.map((user) => [user.id, user])).values()
+        );
+        state.usersNextPage = getNextPageNumber(action.payload.next);
         state.loading = false;
       })
       .addCase(fetchUsers.rejected, (state, action) => {

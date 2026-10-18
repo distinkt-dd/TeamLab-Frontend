@@ -4,7 +4,6 @@ import type {
   ProjectRole,
   ProjectRoleCreateRequest,
   ProjectRoleUpdateRequest,
-  ProjectRolesListResponse,
 } from './types';
 
 export class ProjectRoleService {
@@ -17,8 +16,8 @@ export class ProjectRoleService {
   list(params?: {
     project_id?: number;
     specialization_id?: number;
-  }): Promise<ProjectRolesListResponse> {
-    return this.api.get<ProjectRolesListResponse>(PROJECTS_ROLES, params);
+  }): Promise<ProjectRole[]> {
+    return this.api.get<ProjectRole[]>(PROJECTS_ROLES, params);
   }
 
   create(data: ProjectRoleCreateRequest): Promise<ProjectRole> {

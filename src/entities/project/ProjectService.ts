@@ -1,6 +1,5 @@
 import { Api } from '../../shared/api/api.class';
 import type {
-  ProjectListItem,
   ProjectCreateRequest,
   ProjectDetail,
   ProjectUpdateRequest,
@@ -10,8 +9,11 @@ import type {
   ProjectApplicationCard,
   ProjectInvitationCreateRequest,
   PaginationParams,
+  PaginatedProjects,
 } from './types';
 import { PROJECTS } from '../../shared/api/constants';
+import type { PaginatedResponse } from '@shared/api/types';
+import { collectPaginatedResults } from '@shared/api/pagination';
 
 export class ProjectService {
   private readonly api: Api;
@@ -20,18 +22,16 @@ export class ProjectService {
     this.api = api;
   }
 
-  // Backend отдаёт список проектов простым массивом:
-  // пагинация на /projects/ не настроена.
-  list(params?: GetProjectsParams): Promise<ProjectListItem[]> {
-    return this.api.get<ProjectListItem[]>(PROJECTS, params);
+  list(params?: GetProjectsParams): Promise<PaginatedProjects> {
+    return this.api.get<PaginatedProjects>(PROJECTS, params);
   }
 
   createProject(data: ProjectCreateRequest): Promise<ProjectDetail> {
     return this.api.post<ProjectDetail>(PROJECTS, data);
   }
 
-  getFeaturedProjects(params?: PaginationParams): Promise<ProjectListItem[]> {
-    return this.api.get<ProjectListItem[]>(`${PROJECTS}featured/`, params);
+  getFeaturedProjects(params?: PaginationParams): Promise<PaginatedProjects> {
+    return this.api.get<PaginatedProjects>(`${PROJECTS}featured/`, params);
   }
 
   getProjectDetail(projectId: number): Promise<ProjectDetail> {
@@ -48,10 +48,18 @@ export class ProjectService {
   getProjectApplications(
     projectId: number,
     params?: PaginationParams
-  ): Promise<ProjectApplicationCard[]> {
-    return this.api.get<ProjectApplicationCard[]>(
+  ): Promise<PaginatedResponse<ProjectApplicationCard>> {
+    return this.api.get<PaginatedResponse<ProjectApplicationCard>>(
       `${PROJECTS}${projectId}/applications/`,
       params
+    );
+  }
+
+  getAllProjectApplications(
+    projectId: number
+  ): Promise<ProjectApplicationCard[]> {
+    return collectPaginatedResults((page) =>
+      this.getProjectApplications(projectId, { page })
     );
   }
 
@@ -66,8 +74,8 @@ export class ProjectService {
   getProjectInvitations(
     projectId: number,
     params?: PaginationParams
-  ): Promise<ProjectInvitationCard[]> {
-    return this.api.get<ProjectInvitationCard[]>(
+  ): Promise<PaginatedResponse<ProjectInvitationCard>> {
+    return this.api.get<PaginatedResponse<ProjectInvitationCard>>(
       `${PROJECTS}${projectId}/invitations/`,
       params
     );

@@ -52,7 +52,3 @@ export interface ProjectRoleUpdateRequest {
   benefits?: string[];
   skills?: ProjectRoleSkillInput[];
 }
-
-export interface ProjectRolesListResponse {
-  results: ProjectRole[];
-}

@@ -28,7 +28,7 @@ export function App() {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    dispatch(fetchUsers()).then((res) => console.log('thunk result:', res));
+    void dispatch(fetchUsers());
   }, [dispatch]);
 
   return (
@@ -41,12 +41,11 @@ export function App() {
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
         <Route path="participants" element={<ParticipantsPage />} />
+        <Route path="projects/:id" element={<ProjectCardPage />} />
         <Route path="*" element={<ErrorPage />} />
-        <Route path="participants" element={<ParticipantsPage />} />
         <Route path="questions" element={<QuestionsPage />} />
         {/* Защищённые маршруты */}
         <Route element={<ProtectedRoute />}>
-          <Route path="projects/:id" element={<ProjectCardPage />} />
           <Route path="profile/:id" element={<ProfilePage />} />
           <Route path="my-profile" element={<MyProfileRoute />} />
           <Route path="edit-profile" element={<EditProfilePage />} />
