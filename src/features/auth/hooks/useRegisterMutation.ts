@@ -1,4 +1,5 @@
 import { getServices } from '@app';
+import { StaleLoginError } from '@entities/auth/AuthService';
 import type { TokenPairResponse } from '@entities/auth/types';
 import { FieldService } from '@entities/field';
 import { SpecializationService } from '@entities/specialization';
@@ -17,6 +18,17 @@ export interface RegisterRequest {
   accountType: AccountType;
 }
 
+class RegistrationAutoLoginCancelledError extends Error {
+  constructor(accountCreated: boolean) {
+    super(
+      accountCreated
+        ? 'Аккаунт создан, но автоматический вход отменён из-за изменения сессии. Войдите вручную.'
+        : 'Регистрация отменена из-за изменения сессии. Повторите попытку.'
+    );
+    this.name = 'RegistrationAutoLoginCancelledError';
+  }
+}
+
 export const useRegisterMutation = (): UseMutationResult<
   TokenPairResponse,
   Error,
@@ -26,7 +38,14 @@ export const useRegisterMutation = (): UseMutationResult<
 
   return useMutation({
     mutationFn: async (data: RegisterRequest) => {
+      const operation = auth.beginAuthOperation();
       const userService = new UserService(api);
+
+      const assertRegistrationIsCurrent = (accountCreated: boolean): void => {
+        if (!auth.isAuthOperationCurrent(operation)) {
+          throw new RegistrationAutoLoginCancelledError(accountCreated);
+        }
+      };
 
       // У владельца специализации нет, поэтому справочники нужны только участнику.
       let specializationId: number | null = null;
@@ -45,6 +64,8 @@ export const useRegisterMutation = (): UseMutationResult<
         );
       }
 
+      assertRegistrationIsCurrent(false);
+
       // POST /users/: регистрация пользователя — участника или владельца.
       await userService.create({
         username: data.username,
@@ -56,8 +77,20 @@ export const useRegisterMutation = (): UseMutationResult<
         specialization_id: specializationId,
       });
 
+      assertRegistrationIsCurrent(true);
+
       // Сразу логиним созданного пользователя, чтобы открыть личный кабинет.
-      return auth.login({ username: data.username, password: data.password });
+      try {
+        return await auth.login(
+          { username: data.username, password: data.password },
+          operation
+        );
+      } catch (error) {
+        if (error instanceof StaleLoginError) {
+          throw new RegistrationAutoLoginCancelledError(true);
+        }
+        throw error;
+      }
     },
   });
 };

@@ -35,7 +35,7 @@ export const MyProfileOwnerPage: React.FC = () => {
   };
 
   const handleLogout = () => {
-    getServices().auth.logout();
+    void getServices().auth.logout();
   };
 
   return (

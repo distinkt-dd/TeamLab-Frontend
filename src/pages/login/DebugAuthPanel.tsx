@@ -6,7 +6,7 @@ import {
   selectRefreshToken,
 } from '@features/auth/model/selectors';
 
-import { logout, setAuthData } from '@features/auth/model/authSlice';
+import { setAuthData } from '@features/auth/model/authSlice';
 
 import React, { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
@@ -49,13 +49,10 @@ export const DebugAuthPanel: React.FC = () => {
     alert('Токены установлены! Теперь проверь роуты.');
   };
 
-  /**
-   * LOGOUT (Test Route)
-   * Вызывает существующий экшен logout(), который ставит null во все поля.
-   */
+  /** LOGOUT (Test Route) — использует тот же безопасный flow, что и профиль. */
   const handleTestLogout = () => {
-    dispatch(logout());
-    console.log('[DebugAuth] Вызван logout()');
+    void services.auth.logout();
+    console.log('[DebugAuth] Запущен безопасный logout()');
     alert(
       'Пользователь разлогинен. Перейди на /projects — должен быть редирект на /login.'
     );
@@ -198,8 +195,8 @@ export const DebugAuthPanel: React.FC = () => {
             🚪 LOGOUT (Test Route Protection)
           </button>
           <div style={{ fontSize: '12px', color: '#555' }}>
-            Вызывает dispatch(logout()). Очищает всю сессию. Проверяет,
-            сработает ли редирект в ProtectedRoute при переходе на /projects.
+            Останавливает refresh, отзывает текущий refresh-токен и очищает
+            сессию. Проверяет редирект защищённого маршрута.
           </div>
 
           <button

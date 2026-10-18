@@ -5,10 +5,8 @@ describe('временная проверка логаута из личного
     user: {
       id: 1,
       username: 'test',
-      email: 'test@test.test',
-      first_name: 'Test',
-      last_name: 'Test',
-      role: 'owner',
+      display_name: 'Test',
+      account_type: 'owner',
     },
     accessToken: 'fake-access',
     refreshToken: 'fake-refresh',
@@ -17,18 +15,19 @@ describe('временная проверка логаута из личного
   });
 
   it('кнопка "Выйти" переводит на /login', () => {
-    cy.visit('http://localhost:5174/login');
-    cy.window().then((win) => {
-      win.localStorage.setItem(
-        persistKey,
-        JSON.stringify({
-          auth: authState,
-          _persist: JSON.stringify({ version: -1, rehydrated: true }),
-        })
-      );
+    cy.intercept('GET', '**/api/v1/**', []);
+    cy.intercept('POST', '**/api/v1/auth/token/blacklist/', {});
+    cy.visit('http://localhost:5173/my-profile', {
+      onBeforeLoad(win) {
+        win.localStorage.setItem(
+          persistKey,
+          JSON.stringify({
+            auth: authState,
+            _persist: JSON.stringify({ version: -1, rehydrated: true }),
+          })
+        );
+      },
     });
-
-    cy.visit('http://localhost:5173/my-profile');
     cy.contains('button', 'Выйти').should('be.visible');
     cy.contains('button', 'Выйти').click();
 

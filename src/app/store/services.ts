@@ -2,7 +2,7 @@ import type { RootState } from '@app';
 import { AuthService } from '@entities/auth/AuthService';
 import { TokenManager } from '@entities/auth/TokenManager';
 import type { AuthUser } from '@entities/auth/types';
-import { logout, setAuthData } from '@features/auth/model/authSlice';
+import { setAuthData } from '@features/auth/model/authSlice';
 import {
   selectAccessToken,
   selectRefreshToken,
@@ -23,7 +23,10 @@ const normalizeApiBaseUrl = (url: string): string => {
   return trimmedUrl.endsWith('/api/v1') ? trimmedUrl : `${trimmedUrl}/api/v1`;
 };
 
-export function initServices(store: Store<RootState>): Services {
+export function initServices(
+  store: Store<RootState>,
+  clearCachedState: () => void = () => undefined
+): Services {
   if (tokenManagerInstance) {
     tokenManagerInstance.stopAutoRefresh();
   }
@@ -34,11 +37,10 @@ export function initServices(store: Store<RootState>): Services {
   const baseUrl = normalizeApiBaseUrl(configuredBaseUrl);
   const api = new Api(baseUrl);
 
+  let auth: AuthService | null = null;
   const tokenManager = new TokenManager(
     () => {
-      tokenManager.stopAutoRefresh();
-      store.dispatch(logout());
-      window.location.href = '/login';
+      void auth?.logout();
     },
     7_200_000,
     5 * 60 * 1000,
@@ -51,7 +53,7 @@ export function initServices(store: Store<RootState>): Services {
 
   tokenManagerInstance = tokenManager;
 
-  const auth = new AuthService(api, tokenManager);
+  auth = new AuthService(api, tokenManager, clearCachedState);
   api.setAuthService(auth);
 
   services = { api, auth };
