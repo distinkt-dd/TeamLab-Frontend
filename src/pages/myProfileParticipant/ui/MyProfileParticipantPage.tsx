@@ -26,7 +26,7 @@ export const MyProfileParticipantPage: React.FC = () => {
   } = useMyProfileParticipant();
 
   const handleLogout = () => {
-    getServices().auth.logout();
+    void getServices().auth.logout();
   };
 
   return (

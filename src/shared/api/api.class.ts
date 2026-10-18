@@ -1,4 +1,5 @@
 import type { AuthService } from '@entities/auth';
+import { AUTH } from './constants';
 
 export class Api {
   readonly baseUrl: string;
@@ -81,16 +82,49 @@ export class Api {
     };
 
     let token: string | null = null;
-    if (this.authService) {
+    const isAuthRequest = uri.startsWith(AUTH);
+    const sessionGeneration = this.authService?.getSessionGeneration() ?? null;
+    if (this.authService && !isAuthRequest) {
       token = this.authService.getAccessToken();
     }
 
     let response = await doFetch(token);
 
-    if (response.status === 401 && this.authService) {
-      await this.authService.forceRefresh();
-      token = this.authService.getAccessToken();
+    if (
+      response.status === 401 &&
+      this.authService &&
+      token &&
+      !isAuthRequest &&
+      !this.authService.isSessionEnding()
+    ) {
+      if (this.authService.getSessionGeneration() !== sessionGeneration) {
+        return this.handleResponse<T>(response);
+      }
+
+      const currentToken = this.authService.getAccessToken();
+
+      if (currentToken && currentToken !== token) {
+        token = currentToken;
+      } else {
+        await this.authService.forceRefresh();
+        token = this.authService.getAccessToken();
+      }
+
+      if (
+        !token ||
+        this.authService.getSessionGeneration() !== sessionGeneration
+      ) {
+        return this.handleResponse<T>(response);
+      }
+
       response = await doFetch(token);
+
+      if (
+        response.status === 401 &&
+        this.authService.getSessionGeneration() === sessionGeneration
+      ) {
+        await this.authService.logout();
+      }
     }
 
     return this.handleResponse<T>(response);

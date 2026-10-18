@@ -1,4 +1,5 @@
 import { useMutation, type QueryClient } from '@tanstack/react-query';
+import { getServices } from '@app';
 import type { UserService } from '../UserService';
 import type { CurrentUser, UserUpdateRequest } from '../types';
 
@@ -13,6 +14,7 @@ export const useOptimisticUserUpdate = <TValue>(
   useMutation({
     mutationFn: (value: TValue) => userService.updateCurrent(toPatch(value)),
     onMutate: async (value) => {
+      const sessionGeneration = getServices().auth.getSessionGeneration();
       await queryClient.cancelQueries({ queryKey: CURRENT_USER_QUERY_KEY });
 
       const previousUser = queryClient.getQueryData<CurrentUser>(
@@ -24,14 +26,21 @@ export const useOptimisticUserUpdate = <TValue>(
         (current) => (current ? { ...current, ...toPatch(value) } : current)
       );
 
-      return { previousUser };
+      return { previousUser, sessionGeneration };
     },
     onError: (_error, _value, context) => {
-      if (context) {
+      if (
+        context &&
+        context.sessionGeneration === getServices().auth.getSessionGeneration()
+      ) {
         queryClient.setQueryData(CURRENT_USER_QUERY_KEY, context.previousUser);
       }
     },
-    onSuccess: (updatedUser) => {
-      queryClient.setQueryData(CURRENT_USER_QUERY_KEY, updatedUser);
+    onSuccess: (updatedUser, _value, context) => {
+      if (
+        context.sessionGeneration === getServices().auth.getSessionGeneration()
+      ) {
+        queryClient.setQueryData(CURRENT_USER_QUERY_KEY, updatedUser);
+      }
     },
   });
