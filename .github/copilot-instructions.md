@@ -1,6 +1,6 @@
 # Copilot code review instructions
 
-TeamLab frontend: React 19, TypeScript, Vite, Feature-Sliced Design (`app → pages → widgets → features → entities → shared`, enforced by `steiger.config.ts`). Redux Toolkit + `redux-persist` (persists the `auth` slice to `localStorage`) for client state, TanStack Query/RTK Query for server state, CSS Modules for styling.
+TeamLab frontend: React 19, TypeScript, Vite, Feature-Sliced Design (`app → pages → widgets → features → entities → shared`, enforced by `steiger.config.ts`). Redux Toolkit + `redux-persist` (persists the `auth` slice to `localStorage`) for client state, TanStack Query 5 (`useQuery`/`useInfiniteQuery`/`useMutation`) for server state, CSS Modules for styling. The HTTP client is a hand-written `fetch` wrapper in `src/shared/api/api.class.ts` (`axios` is a declared but unused dependency).
 
 Review in this priority order. Spend most effort on 1-3.
 
