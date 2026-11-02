@@ -1,24 +1,31 @@
-.container {
-  width: 100%;
-  margin: 0 auto;
+.page {
   position: relative;
-  overflow: hidden;
-  padding: 64px 100px;
+  overflow: hidden; /* режет heroBg */
 }
 
-.container::before {
-  content: '';
+.heroBg {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 600px; /* реальная высота картинки при 100% ширины */
   background-image: url(./assets/78926410116964ca76324e7756826f4385279e22.png);
-  background-size: 100% auto; /* растянуть по ширине */
+  background-size: 100% auto;
   background-repeat: no-repeat;
-  /* Картинка прижата к хэдеру: перевёрнутый фон крепится к верхней границе
-     контейнера и больше не смещается при изменении высоты страницы. */
   background-position: center top;
+  transform: rotate(180deg);
 
-  transform: translateY(-30%) rotate(180deg);
-  z-index: -1;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.container {
+  position: relative;
+  z-index: 1; /* контент выше фона */
+  padding: 64px 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 100px;
 }
 
 .headSection {
@@ -88,8 +95,9 @@
   min-width: 0;
 }
 
-/* Круглая кнопка добавления соцсети: 44x44, градиент с блюром, радиус 40px. */
-.addSocialButton {
+/* Круглая кнопка добавления: 44x44, градиент с блюром, радиус 40px.
+   Используется для добавления соцсети и работы. */
+.roundButton {
   flex-shrink: 0;
   width: 44px;
   height: 44px;
@@ -102,7 +110,7 @@
   color: var(--neutral-secondary-color);
 }
 
-.addSocialButton:hover {
+.roundButton:hover {
   border: none;
   background: var(--gradient-day);
 }
@@ -207,4 +215,197 @@
   outline: none;
   border-color: rgba(44, 44, 46, 1);
   box-shadow: 0 0 0 3px rgba(161, 150, 197, 0.25);
+}
+
+.skilsSection {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  min-height: 916px;
+}
+
+.skillsLogo {
+  min-height: 916px;
+  background-image: url(./assets/f521b1c6dbe3aedac4bbe45c0955b2cabb293a48.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  /* Картинка тянется по всей высоте контейнера, лишнее по бокам обрезается */
+  background-size: auto 100%;
+}
+
+.skills {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: rgba(44, 44, 46, 0.6);
+  text-align: center;
+  gap: 66px;
+}
+
+.letsGo {
+  width: 20vw;
+  align-self: center;
+}
+
+.myWorks {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+/* Шапка секции: H2 слева, переключатель вида справа (в макете 1240x64). */
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 10px;
+  padding: 10px;
+}
+
+.worksTitle {
+  text-transform: uppercase;
+}
+
+.viewSwitcher {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Кнопка переключения вида: 44x44, у активной — подложка Acent/Lable pink. */
+.viewButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--neutral-secondary-color);
+  cursor: pointer;
+}
+
+.viewButtonActive {
+  background: var(--lable-pink-color);
+}
+
+/* Карточка работы: 604x318, поля 360x60 и ссылка «Вставить ссылку». */
+.workCard {
+  box-sizing: border-box;
+  display: flex;
+  align-items: flex-start;
+  gap: 32px;
+  flex: none;
+  width: 604px;
+  max-width: 100%;
+  height: 318px;
+  background: var(--gradient-day);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border-radius: 20px;
+}
+
+/* Изображение работы: 180x318 со скруглением; пока файл не загружен —
+   ассет DefaultImage из макета. */
+.workImage {
+  flex: none;
+  width: 180px;
+  height: 100%;
+  border-radius: 20px;
+  background-image: url(./assets/workImagePlaceholder.svg);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+}
+
+.workForm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  flex-grow: 1;
+  min-width: 0;
+  padding: 32px 32px 32px 0;
+}
+
+/* В полях карточки нет плавающей подписи, поэтому текст центрируем
+   по вертикали (в компоненте Input он смещён вниз под подпись). */
+.workForm input {
+  padding-top: 16px;
+}
+
+.workForm input::placeholder {
+  color: rgba(44, 44, 46, 0.6);
+}
+
+/* Ссылка вставки ссылки: Caption 16px с нижней линией, по центру формы. */
+.workLink {
+  padding: 0;
+  border: none;
+  border-bottom: 1px solid rgba(44, 44, 46, 0.6);
+  background: none;
+  font-family: var(--font-family-base);
+  font-size: 16px;
+  line-height: 150%;
+  color: rgba(44, 44, 46, 0.6);
+  cursor: pointer;
+}
+
+.workLink:hover {
+  border-bottom-color: var(--neutral-secondary-color);
+  color: var(--neutral-secondary-color);
+}
+
+/* Подсказка: 347px, Acent/Lable purple, блюр 15px, скругление 20px,
+   прижата к правому краю строки. */
+.worksHint {
+  box-sizing: border-box;
+  position: relative;
+  flex: none;
+  align-self: flex-start;
+  margin-left: auto;
+  width: 347px;
+  padding: 28px;
+  background: var(--lable-purple-color);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border-radius: 20px;
+}
+
+.hintText {
+  margin: 0;
+  font-size: 18px;
+  line-height: 150%;
+  text-align: center;
+}
+
+/* Кнопка закрытия подсказки: 24x24 в правом верхнем углу карточки. */
+.hintClose {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 1.5px solid rgba(44, 44, 46, 0.6);
+  border-radius: 20px;
+  background: transparent;
+  color: var(--neutral-secondary-color);
+  cursor: pointer;
+}
+
+/* Нижний ряд кнопок страницы: по центру, каждая 260px. */
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+}
+
+.actionButton {
+  width: 100%;
+  max-width: 260px;
 }
