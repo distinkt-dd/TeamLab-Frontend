@@ -18,6 +18,7 @@ interface ParticipantProfileProps {
   user?: CurrentUser;
   isPending: boolean;
   isError: boolean;
+  onEdit: () => void;
 }
 
 // Каркас секции: заголовок и обёртка контента одинаковы для всех состояний запроса.
@@ -36,6 +37,7 @@ export const ParticipantProfile: React.FC<ParticipantProfileProps> = ({
   user,
   isPending,
   isError,
+  onEdit,
 }) => {
   if (isPending) {
     return (
@@ -88,7 +90,11 @@ export const ParticipantProfile: React.FC<ParticipantProfileProps> = ({
         </div>
         <div className={styles.buttonsSection}>
           <Button className={styles.iconButton} iconName="trashM"></Button>
-          <Button className={styles.iconButton} iconName="editM"></Button>
+          <Button
+            className={styles.iconButton}
+            iconName="editM"
+            onClick={onEdit}
+          ></Button>
         </div>
       </div>
     </ParticipantProfileSection>

@@ -42,6 +42,7 @@ export const MyProfileParticipantPage: React.FC = () => {
           user={user}
           isPending={isUserPending}
           isError={isUserError}
+          onEdit={() => navigate('/edit-profile')}
         />
         <ProfileSettings
           notificationEnabled={user?.notification_enabled}
