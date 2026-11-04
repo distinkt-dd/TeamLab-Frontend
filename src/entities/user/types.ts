@@ -110,14 +110,19 @@ export interface UserCreateRequest {
 }
 
 export interface UserUpdateRequest {
+  username?: string;
   display_name?: string;
+  bio?: string;
+  specialization_id?: number | null;
+  level?: UserLevel | null;
   city?: string;
-  workload_hours_per_week?: number;
-  work_format?: WorkFormat;
-  employment_type?: EmploymentType;
-  search_status?: SearchStatus;
+  workload_hours_per_week?: number | null;
+  work_format?: WorkFormat | null;
+  employment_type?: EmploymentType | null;
+  search_status?: SearchStatus | null;
   profile_visibility?: ProfileVisibility;
   notification_enabled?: boolean;
+  social_links?: SocialLinks;
 }
 
 export interface AvatarUpdateRequest {
