@@ -8,3 +8,4 @@ export const PROJECTS = '/projects/';
 export const PROJECTS_ROLES = '/project-roles/';
 export const ROLE_INTERESTS = '/role-interests/';
 export const MEMBERSHIPS = '/project-memberships/';
+export const IMAGE_UPLOADS = '/image-uploads/';
