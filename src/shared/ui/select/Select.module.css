@@ -194,3 +194,19 @@
 .highlighted {
   color: var(--accent-purple-color, #72559b);
 }
+
+@media (max-width: 600px) {
+  .dropdown {
+    max-width: calc(100vw - 40px);
+  }
+
+  .option {
+    white-space: normal;
+  }
+
+  .tagsDropdown {
+    width: min(364px, calc(100vw - 40px)) !important;
+    min-width: 0 !important;
+    max-width: calc(100vw - 40px) !important;
+  }
+}
