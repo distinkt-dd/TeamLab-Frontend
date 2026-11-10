@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styles from './Footer.module.css';
 import { List } from '@shared/ui/list';
 import { Icon } from '@shared/icons';
+import logoDark from '/logo-dark.svg';
 
 const footerData = {
   forSpecialists: [
@@ -37,7 +38,7 @@ export const Footer: React.FC = () => {
       <div className={styles.container}>
         <div className={styles.logoSection}>
           <div className={styles.logo}>
-            <img src="../../../../public/logo-dark.svg" alt="ТИМЛАБ" />
+            <img src={logoDark} alt="ТИМЛАБ" />
           </div>
           <span className={styles.copyright}>© 2026«ТИМЛАБ»</span>
         </div>

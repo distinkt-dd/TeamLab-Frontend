@@ -45,6 +45,10 @@ export class ProjectService {
     return this.api.patch<ProjectDetail>(`${PROJECTS}${projectId}/`, data);
   }
 
+  deleteImage(projectId: number): Promise<void> {
+    return this.api.delete<void>(`${PROJECTS}${projectId}/image/`);
+  }
+
   getProjectApplications(
     projectId: number,
     params?: PaginationParams

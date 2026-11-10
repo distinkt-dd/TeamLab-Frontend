@@ -50,6 +50,7 @@ export function App() {
           <Route path="my-profile" element={<MyProfileRoute />} />
           <Route path="edit-profile" element={<EditProfilePage />} />
           <Route path="edit-project" element={<EditProjectPage />} />
+          <Route path="edit-project/:id" element={<EditProjectPage />} />
           <Route path="requests" element={<RequestsPage />} />
           <Route path="favorites" element={<FavoritesPage />} />
         </Route>

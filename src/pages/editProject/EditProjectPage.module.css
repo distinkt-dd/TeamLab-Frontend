@@ -1,0 +1,965 @@
+.page {
+  position: relative;
+  z-index: 0;
+  isolation: isolate;
+  min-height: 60vh;
+  overflow-x: clip;
+  padding: 64px 90px 120px;
+}
+
+.backButton {
+  top: 20px;
+  left: 90px;
+}
+
+.content {
+  width: min(100%, 1260px);
+  margin: 0 auto;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.topSection {
+  display: grid;
+  grid-template-columns: minmax(0, 2.08fr) minmax(300px, 1fr);
+  gap: 30px;
+  align-items: stretch;
+}
+
+.projectCard,
+.settingsCard,
+.stateCard {
+  border-radius: 20px;
+  background: var(--gradient-day);
+  backdrop-filter: var(--bg-blur);
+  -webkit-backdrop-filter: var(--bg-blur);
+}
+
+.projectCard {
+  display: grid;
+  grid-template-columns: 210px minmax(0, 1fr);
+  gap: 34px;
+  min-height: 410px;
+  padding: 40px 42px 36px;
+}
+
+.imageColumn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 14px;
+  padding-top: 2px;
+}
+
+.projectImage,
+.imagePlaceholder {
+  width: 172px;
+  height: 172px;
+  flex: none;
+  border: 6px solid rgba(44, 44, 46, 0.68);
+  border-radius: 50%;
+}
+
+.projectImage {
+  display: block;
+  object-fit: cover;
+  background-color: var(--neutral-grey-color);
+}
+
+.imagePlaceholder {
+  position: relative;
+  overflow: hidden;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.placeholderHead,
+.placeholderBody {
+  position: absolute;
+  left: 50%;
+  display: block;
+  background-color: rgba(44, 44, 46, 0.68);
+  transform: translateX(-50%);
+}
+
+.placeholderHead {
+  top: 34px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+}
+
+.placeholderBody {
+  bottom: -22px;
+  width: 132px;
+  height: 86px;
+  border-radius: 66px 66px 0 0;
+}
+
+.imageState {
+  width: 100%;
+  margin: 0;
+  padding: 0 4px 8px;
+  border-bottom: 1px solid var(--line-color);
+  color: var(--neutral-secondary-color);
+  font-size: 15px;
+  line-height: 1.3;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.imageInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.imageChooseButton {
+  font-size: 14px;
+}
+
+.imageChooseButton:disabled,
+.imageActionButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.imageActionButton {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border: 0;
+  border-bottom: 1px solid var(--line-color);
+  padding: 2px 4px;
+  background: transparent;
+  color: var(--neutral-secondary-color);
+  font-family: var(--font-family-base);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.imageActionButton:hover:not(:disabled),
+.imageActionButton:focus-visible {
+  border-color: var(--accent-purple-color);
+  color: var(--accent-purple-color);
+  outline: none;
+}
+
+.imageOperationStatus,
+.imageOperationError {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.3;
+  text-align: center;
+}
+
+.imageOperationStatus {
+  color: rgba(44, 44, 46, 0.7);
+}
+
+.imageOperationError {
+  color: var(--accent-red-color);
+}
+
+.mainFields {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.titleField input {
+  height: 54px;
+  padding: 0 20px;
+  background-color: transparent;
+  font-size: 18px;
+}
+
+.textareaField {
+  position: relative;
+  display: block;
+  min-width: 0;
+}
+
+.textareaField textarea {
+  display: block;
+  width: 100%;
+  height: 126px;
+  resize: none;
+  border: 1px solid var(--line-color);
+  border-radius: 8px;
+  padding: 14px 16px 36px;
+  background-color: transparent;
+  color: var(--neutral-secondary-color);
+  font-family: var(--font-family-base);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.35;
+}
+
+.textareaField textarea::placeholder {
+  color: var(--line-color);
+  opacity: 1;
+}
+
+.textareaField textarea:focus {
+  border-color: var(--accent-orange-color);
+  outline: none;
+}
+
+.counter {
+  position: absolute;
+  right: 14px;
+  bottom: 12px;
+  color: rgba(44, 44, 46, 0.55);
+  font-size: 14px;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.fieldError {
+  display: block;
+  margin-top: 5px;
+  color: var(--accent-red-color);
+  font-size: 13px;
+}
+
+.textareaField:has(.fieldError) .counter {
+  bottom: 34px;
+}
+
+.settingsCard {
+  position: relative;
+  isolation: isolate;
+  min-height: 410px;
+  overflow: visible;
+  padding: 0;
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.settingsCard::before,
+.settingsCard::after {
+  content: none;
+}
+
+.settingsContent {
+  position: relative;
+  z-index: 1;
+  min-height: 410px;
+  overflow: hidden;
+  border-radius: 20px;
+  padding: 42px 40px;
+  background: var(--gradient-day);
+  backdrop-filter: var(--bg-blur);
+  -webkit-backdrop-filter: var(--bg-blur);
+}
+
+.rolesDecoration {
+  position: absolute;
+  top: -68px;
+  left: -46px;
+  z-index: 0;
+  width: 584px;
+  height: 584px;
+  max-width: none;
+  object-fit: contain;
+  opacity: 1;
+  transform: rotate(0deg);
+  pointer-events: none;
+}
+
+.settingsCard h2 {
+  margin: 0 0 20px;
+  font-size: 28px;
+}
+
+.roleSelector {
+  display: flex;
+  max-height: 118px;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.roleSelectorItem {
+  position: relative;
+}
+
+.roleSelectorButton,
+.roleSelectorButtonActive,
+.roleSelectorButtonError {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--line-color);
+  border-radius: 8px;
+  padding: 8px 42px 8px 16px;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: var(--neutral-secondary-color);
+  font-family: var(--font-family-base);
+  font-size: 15px;
+  line-height: 1.25;
+  text-align: left;
+  cursor: pointer;
+}
+
+.roleSelectorButtonActive {
+  border-color: var(--accent-orange-color);
+  background-color: rgba(255, 255, 255, 0.52);
+}
+
+.roleSelectorButtonError {
+  border-color: var(--accent-red-color);
+  background-color: rgba(251, 76, 71, 0.08);
+}
+
+.roleSelectorButton:hover,
+.roleSelectorButtonActive:hover,
+.roleSelectorButtonError:hover {
+  border-color: var(--accent-purple-color);
+}
+
+.removeRoleButton {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  padding: 0;
+  background: transparent;
+  color: var(--neutral-secondary-color);
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.removeRoleButton:hover,
+.removeRoleButton:focus-visible {
+  background-color: rgba(251, 76, 71, 0.12);
+  color: var(--accent-red-color);
+  outline: none;
+}
+
+.emptyRoles {
+  margin: 0;
+  padding: 8px 0;
+  font-size: 14px;
+}
+
+.addRoleSelect {
+  margin-top: 10px;
+}
+
+.addRoleSelect button,
+.projectMetaControls button {
+  background-color: rgba(255, 255, 255, 0.3);
+  font-size: 14px;
+}
+
+.projectMetaControls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line-color);
+}
+
+.selectField {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.projectMetaControls .selectField {
+  margin-top: 0;
+}
+
+.selectField > label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.selectField button {
+  background-color: rgba(255, 255, 255, 0.18);
+  font-size: 16px;
+}
+
+.roleEditor {
+  margin-top: 86px;
+}
+
+.roleEditorHeader {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.8fr) minmax(320px, 1.2fr);
+  gap: 8px 32px;
+  align-items: end;
+}
+
+.roleEditorHeader > p {
+  grid-column: 1;
+  margin: 0;
+  color: rgba(44, 44, 46, 0.6);
+  font-size: 14px;
+  text-transform: uppercase;
+}
+
+.roleEditorHeader h2 {
+  grid-column: 1;
+  margin: 0;
+  padding: 16px 22px;
+  border-radius: 8px;
+  background: var(--gradient-day);
+  font-family: var(--font-family-base);
+  font-size: 18px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.roleSpecializationSelect {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.roleSpecializationSelect > label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.tasksSection {
+  position: relative;
+  display: grid;
+  grid-template-columns: 310px minmax(0, 1fr);
+  gap: 58px;
+  min-height: 310px;
+  margin-top: 38px;
+}
+
+.tasksDecoration {
+  align-self: start;
+  width: 280px;
+  max-height: 280px;
+  margin: 10px auto 0;
+  object-fit: contain;
+}
+
+.tasksContent {
+  min-width: 0;
+}
+
+.tasksContent h3,
+.skillsHeader h3,
+.benefitsContent h3 {
+  margin: 0 0 20px;
+  text-transform: uppercase;
+}
+
+.repeatableList {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.repeatableItem textarea {
+  display: block;
+  width: 100%;
+  min-height: 82px;
+  resize: vertical;
+  border: 1px solid var(--line-color);
+  border-radius: 8px;
+  padding: 14px 16px 30px;
+  background-color: transparent;
+  color: var(--neutral-secondary-color);
+  font-family: var(--font-family-base);
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+.repeatableItem textarea:focus {
+  border-color: var(--accent-orange-color);
+  outline: none;
+}
+
+.repeatableItem textarea::placeholder,
+.skillDescriptions textarea::placeholder {
+  color: var(--line-color);
+  opacity: 1;
+}
+
+.repeatableMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 5px;
+  color: rgba(44, 44, 46, 0.58);
+  font-size: 12px;
+}
+
+.repeatableMeta button {
+  border: 0;
+  border-bottom: 1px solid var(--line-color);
+  padding: 0 2px 2px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.repeatableMeta button:hover,
+.repeatableMeta button:focus-visible {
+  border-color: var(--accent-red-color);
+  color: var(--accent-red-color);
+  outline: none;
+}
+
+.addItemButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 20px auto 0;
+  border: 0;
+  padding: 6px 12px;
+  background: transparent;
+  color: var(--neutral-secondary-color);
+  font-family: var(--font-family-base);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.addItemButton svg {
+  border-radius: 50%;
+  background-color: rgba(161, 150, 197, 0.12);
+}
+
+.addItemButton:hover,
+.addItemButton:focus-visible {
+  color: var(--accent-purple-color);
+  outline: none;
+}
+
+.validationHint {
+  margin: 10px 0 0;
+  color: var(--accent-red-color);
+  font-size: 13px;
+}
+
+.skillsSection {
+  margin-top: 72px;
+}
+
+.skillsHeader {
+  display: grid;
+  grid-template-columns: 310px minmax(0, 1fr);
+  gap: 58px;
+  align-items: center;
+  min-height: 76px;
+  border-radius: 16px;
+  padding: 12px 34px;
+  background: var(--gradient-day);
+}
+
+.skillsHeader h3 {
+  margin: 0;
+}
+
+.skillTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.skillTagButton {
+  border: 0;
+  border-radius: 20px;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.skillTagButton:hover,
+.skillTagButton:focus-visible {
+  outline: 2px solid var(--accent-purple-color);
+  outline-offset: 2px;
+}
+
+.skillDescriptions {
+  margin: 34px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.skillDescriptions li {
+  display: grid;
+  grid-template-columns: 310px minmax(0, 1fr);
+  gap: 58px;
+  align-items: center;
+  min-height: 68px;
+  border-bottom: 1px solid var(--line-color);
+}
+
+.skillOrder {
+  font-size: 28px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.skillDescriptions label {
+  width: 100%;
+}
+
+.skillDescriptions textarea {
+  display: block;
+  width: 100%;
+  min-height: 58px;
+  resize: vertical;
+  border: 0;
+  padding: 14px 0;
+  background: transparent;
+  color: var(--neutral-secondary-color);
+  font-family: var(--font-family-base);
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+.skillDescriptions textarea:focus {
+  outline: 0;
+  box-shadow: inset 0 -2px var(--accent-orange-color);
+}
+
+.benefitsSection {
+  position: relative;
+  isolation: isolate;
+  min-height: 560px;
+  margin-top: 92px;
+  padding-top: 100px;
+}
+
+.benefitsDecoration {
+  position: absolute;
+  top: 0;
+  left: -280px;
+  z-index: 0;
+  width: 900px;
+  max-width: none;
+  height: 657px;
+  object-fit: contain;
+  transform: rotate(0deg);
+  pointer-events: none;
+}
+
+.benefitsContent {
+  position: relative;
+  z-index: 2;
+  width: min(816px, calc(100% - 424px));
+  min-width: 0;
+  margin-left: 424px;
+  border-radius: 20px;
+  padding: 34px 38px 30px;
+  background: var(--gradient-day);
+  backdrop-filter: var(--bg-blur);
+  -webkit-backdrop-filter: var(--bg-blur);
+}
+
+.emptyRoleEditor {
+  margin-top: 86px;
+  border-radius: 20px;
+  padding: 48px;
+  background: var(--gradient-day);
+  text-align: center;
+}
+
+.emptyRoleEditor h2,
+.emptyRoleEditor p {
+  margin-top: 0;
+}
+
+.saveSection {
+  display: flex;
+  width: min(100%, 560px);
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin: 90px auto 0;
+}
+
+.saveButton {
+  max-width: 360px;
+}
+
+.saveButton:disabled {
+  cursor: wait;
+  opacity: 0.62;
+}
+
+.saveMessage,
+.saveMessageError {
+  margin: 0;
+  font-size: 15px;
+  text-align: center;
+}
+
+.saveMessage {
+  color: var(--neutral-secondary-color);
+}
+
+.saveMessageError,
+.saveErrorList {
+  color: var(--accent-red-color);
+}
+
+.saveErrorList {
+  width: 100%;
+  margin: 0;
+  padding-left: 24px;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.stateCard {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: min(100%, 640px);
+  margin: 0 auto;
+  padding: 32px;
+}
+
+.stateCard p {
+  margin: 0;
+}
+
+.state,
+.error {
+  width: min(100%, 720px);
+  margin: 80px auto;
+  padding: 24px;
+  border-radius: 12px;
+  background: var(--gradient-day);
+  text-align: center;
+}
+
+.error {
+  color: var(--accent-red-color);
+}
+
+@media (max-width: 1100px) {
+  .page {
+    padding-inline: 48px;
+  }
+
+  .backButton {
+    left: 48px;
+  }
+
+  .topSection {
+    grid-template-columns: 1fr;
+  }
+
+  .settingsCard {
+    min-height: 0;
+  }
+
+  .settingsContent {
+    min-height: 410px;
+    display: block;
+  }
+
+  .roleEditorHeader,
+  .tasksSection,
+  .skillsHeader,
+  .skillDescriptions li {
+    grid-template-columns: 240px minmax(0, 1fr);
+    gap: 32px;
+  }
+
+  .tasksDecoration {
+    width: 230px;
+  }
+
+  .benefitsDecoration {
+    left: -360px;
+  }
+
+  .benefitsContent {
+    width: calc(100% - 300px);
+    margin-left: 300px;
+  }
+}
+
+@media (max-width: 720px) {
+  .page {
+    padding: 64px 20px 72px;
+  }
+
+  .backButton {
+    left: 20px;
+  }
+
+  .projectCard {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    padding: 28px 20px 24px;
+  }
+
+  .imageColumn {
+    padding-top: 0;
+  }
+
+  .projectImage,
+  .imagePlaceholder {
+    width: 144px;
+    height: 144px;
+  }
+
+  .placeholderHead {
+    top: 28px;
+    width: 48px;
+    height: 48px;
+  }
+
+  .placeholderBody {
+    width: 112px;
+    height: 74px;
+  }
+
+  .imageState {
+    width: min(100%, 230px);
+  }
+
+  .textareaField textarea {
+    height: 138px;
+  }
+
+  .settingsCard {
+    min-height: 0;
+  }
+
+  .rolesDecoration {
+    display: none;
+  }
+
+  .settingsContent {
+    min-height: 0;
+    display: block;
+    padding: 30px 20px;
+  }
+
+  .settingsCard h2 {
+    font-size: 24px;
+  }
+
+  .projectMetaControls {
+    grid-template-columns: 1fr;
+  }
+
+  .roleEditor {
+    margin-top: 60px;
+  }
+
+  .roleEditorHeader {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .roleEditorHeader > p {
+    order: 0;
+  }
+
+  .roleEditorHeader h2 {
+    order: 1;
+  }
+
+  .roleSpecializationSelect {
+    order: 2;
+    margin-top: 14px;
+  }
+
+  .tasksSection,
+  .benefitsSection {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    min-height: 0;
+    margin-top: 44px;
+  }
+
+  .benefitsSection {
+    padding-top: 0;
+  }
+
+  .tasksDecoration,
+  .benefitsDecoration {
+    display: none;
+  }
+
+  .skillsSection {
+    margin-top: 56px;
+  }
+
+  .skillsHeader {
+    display: flex;
+    min-height: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 18px;
+    padding: 24px 20px;
+  }
+
+  .skillDescriptions li {
+    grid-template-columns: 42px minmax(0, 1fr);
+    gap: 14px;
+    align-items: start;
+    padding-block: 8px;
+  }
+
+  .skillOrder {
+    font-size: 22px;
+  }
+
+  .benefitsContent {
+    width: 100%;
+    margin-left: 0;
+    padding: 28px 20px 24px;
+  }
+
+  .skillDescriptions textarea {
+    min-height: 72px;
+    padding: 8px 0 12px;
+  }
+
+  .emptyRoleEditor {
+    margin-top: 60px;
+    padding: 32px 20px;
+  }
+
+  .saveSection {
+    margin-top: 64px;
+  }
+}

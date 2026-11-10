@@ -43,8 +43,17 @@ export const ProjectItem: React.FC<ProjectItemProps> = ({
         )}
         {showProjectActions ? (
           <div className={styles.actions}>
-            <Button className={styles.iconButton} iconName="trashM" />
-            <Button className={styles.iconButton} iconName="editM" />
+            <Button
+              className={styles.iconButton}
+              iconName="trashM"
+              aria-label={`Удалить проект «${name}»`}
+            />
+            <Button
+              className={styles.iconButton}
+              iconName="editM"
+              aria-label={`Редактировать проект «${name}»`}
+              onClick={() => navigate(`/edit-project/${id}`)}
+            />
           </div>
         ) : (
           <Button
