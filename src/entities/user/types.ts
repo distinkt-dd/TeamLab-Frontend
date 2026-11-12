@@ -21,14 +21,23 @@ export interface PortfolioWork {
   updated_at: string;
 }
 
+export type SkillLevel = 'basic' | 'middle' | 'advanced';
+
 export interface Skill {
+  // id записи пользователя и id самого навыка из справочника /skills/.
   id: number;
   user_id: number;
   skill_id: number;
   name: string;
-  level: string;
+  level: SkillLevel;
   created_at: string;
   updated_at: string;
+}
+
+// Элемент полной замены списка навыков в PATCH /users/me/: уровень обязателен.
+export interface UserSkillUpdate {
+  skill_id: number;
+  level: SkillLevel;
 }
 
 export type WorkFormat = 'remote' | 'hybrid';
@@ -123,6 +132,8 @@ export interface UserUpdateRequest {
   profile_visibility?: ProfileVisibility;
   notification_enabled?: boolean;
   social_links?: SocialLinks;
+  // Список навыков заменяется целиком; пустой массив бэкенд отклоняет (allow_empty=False).
+  skills?: UserSkillUpdate[];
 }
 
 export interface AvatarUpdateRequest {

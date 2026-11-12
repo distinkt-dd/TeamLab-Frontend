@@ -1,0 +1,69 @@
+/* Оболочка модалок редактора профиля из макета SKILLS (1440x779):
+   полноэкранная белая панель с блюром, заголовок сверху, кнопки — внизу. */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: auto;
+  padding: 112px 100px 58px;
+  background: var(--neutral-default-color);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 auto;
+  max-width: 100%;
+}
+
+/* «Мои навыки» — контент 816px, «Уровни навыков» — 1240px (как в макетах). */
+.contentNarrow {
+  width: 816px;
+}
+
+.contentWide {
+  width: 1240px;
+}
+
+.title {
+  margin-bottom: 20px;
+  text-transform: uppercase;
+}
+
+.error {
+  margin: 20px 0 0;
+  font-size: 16px;
+  line-height: 130%;
+  text-align: center;
+  color: var(--accent-red-color);
+}
+
+/* Кнопки из макета: 286x55, контурная слева, тёмная справа, зазор 138px. */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 138px;
+  margin-top: auto;
+  padding-top: 64px;
+}
+
+.actionButton {
+  width: 286px;
+  max-width: 100%;
+}
+
+@media (max-width: 1023px) {
+  .overlay {
+    padding: 64px 24px 40px;
+  }
+
+  .actions {
+    gap: 32px;
+  }
+}

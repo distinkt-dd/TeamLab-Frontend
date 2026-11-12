@@ -1,0 +1,158 @@
+/* Подпись пула. В макете подписи нет, но группа «Не распределённые» —
+   четвёртый вид навыков, поэтому она названа явно. */
+.poolTitle {
+  margin: 0 0 8px;
+  font-size: 20px;
+  line-height: 132%;
+  color: var(--neutral-secondary-color);
+}
+
+/* Пул нераспределённых навыков из макета: 1028x198, padding 20, gap 16,
+   градиент. Выше 396px (шесть строк) список скроллится. */
+.pool {
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 16px;
+  width: 1028px;
+  max-width: 100%;
+  min-height: 198px;
+  max-height: 396px;
+  margin: 0 auto;
+  padding: 20px;
+  overflow-y: auto;
+  background: var(--gradient-day);
+  border-radius: 20px;
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+}
+
+.poolEmpty,
+.cardEmpty {
+  margin: 0;
+  font-size: 20px;
+  line-height: 132%;
+  color: rgba(44, 44, 46, 0.6);
+}
+
+/* Карточки уровней: 3x392px с зазором 32px, padding 20, gap 21. */
+.levels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  margin-top: 40px;
+}
+
+.card {
+  box-sizing: border-box;
+  display: flex;
+  flex: 1 1 392px;
+  flex-direction: column;
+  gap: 21px;
+  min-width: 0;
+  min-height: 200px;
+  padding: 20px;
+  border: 2px dashed rgba(44, 44, 46, 0.6);
+  border-radius: 20px;
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+}
+
+.cardBasic {
+  background: var(--lable-green-color);
+}
+
+.cardMiddle {
+  background: var(--lable-blue-color);
+}
+
+.cardAdvanced {
+  background: var(--lable-purple-color);
+}
+
+/* Карточка под курсором при перетаскивании — оранжевая рамка 4px,
+   как «Базовый» в макете. */
+.cardActive {
+  border: 4px dashed var(--accent-orange-color);
+}
+
+/* Заголовок карточки — H3 Inter Bold 32px из макета (не Gropled). */
+.cardTitle {
+  margin: 0;
+  font-family: var(--font-family-base);
+  font-weight: 700;
+  font-size: 32px;
+  line-height: 120%;
+  color: var(--neutral-secondary-color);
+}
+
+.cardTags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Плашка навыка — кнопка: у Tag нет обработчиков, перетаскивание и клик
+   задаёт обёртка. */
+.tagButton {
+  display: inline-flex;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  cursor: grab;
+}
+
+.tagButton:disabled {
+  cursor: default;
+}
+
+.dragging {
+  opacity: 0.5;
+}
+
+/* Плашка в пуле: 42px, обводка без заливки (Tag01 из макета). */
+.pool .poolTag {
+  gap: 0;
+  height: 42px;
+  padding: 8px 12px;
+  background: none;
+  border: 1px solid rgba(44, 44, 46, 0.6);
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 132%;
+  color: #000000;
+}
+
+.tagButton:hover .poolTag {
+  background: var(--gradient-day);
+}
+
+/* Плашка в карточке уровня: 42px, градиент, крестик 24px. */
+.card .cardTag {
+  gap: 0;
+  height: 42px;
+  padding: 8px 12px;
+  background: var(--gradient-day);
+  border: 1px solid rgba(44, 44, 46, 0.6);
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 132%;
+  color: #000000;
+}
+
+.tagButton:hover .cardTag {
+  border-color: var(--accent-purple-color);
+  color: var(--accent-purple-color);
+}
+
+/* Подсказка, почему «Сохранить» недоступна. */
+.hint {
+  margin: 20px 0 0;
+  font-size: 16px;
+  line-height: 130%;
+  text-align: center;
+  color: var(--accent-purple-color);
+}

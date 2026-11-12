@@ -1,0 +1,107 @@
+/* Верхнее поле: выбранные навыки. 148px — три строки плашек из макета. */
+.selectedField {
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 12px;
+  min-height: 148px;
+  max-height: 236px;
+  padding: 20px;
+  overflow-y: auto;
+  background: var(--gradient-day);
+  border: 1px solid var(--neutral-grey-color);
+  border-radius: 20px;
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+}
+
+.selectedEmpty {
+  margin: 0;
+  font-size: 20px;
+  line-height: 132%;
+  color: rgba(44, 44, 46, 0.6);
+}
+
+/* Подпись нижнего поля: 26px от края верхнего поля, 8px до списка. */
+.recommendationTitle {
+  margin: 20px 0 8px;
+  font-size: 20px;
+  line-height: 132%;
+  color: var(--neutral-secondary-color);
+}
+
+/* Нижнее поле: доступные навыки из справочника. 212px — четыре строки
+   плашек из макета, дальше список скроллится. */
+.availableField {
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 12px;
+  min-height: 212px;
+  max-height: 212px;
+  padding: 20px;
+  overflow-y: auto;
+  background: var(--gradient-day);
+  border-radius: 20px;
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+}
+
+.availableStatus {
+  margin: 0;
+  font-size: 20px;
+  line-height: 132%;
+  color: rgba(44, 44, 46, 0.6);
+}
+
+/* Плашка навыка — кнопка: у Tag нет обработчиков, клик даёт обёртка. */
+.tagButton {
+  display: inline-flex;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+.tagButton:disabled {
+  cursor: default;
+}
+
+/* Выбранный навык: 28px, обводка, крестик 24px (Tag01 из макета). */
+.selectedField .selectedTag {
+  gap: 0;
+  height: 28px;
+  padding: 2px 8px;
+  background: none;
+  border: 1px solid rgba(44, 44, 46, 0.6);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 150%;
+  color: #000000;
+}
+
+.tagButton:hover .selectedTag {
+  border-color: var(--accent-purple-color);
+  color: var(--accent-purple-color);
+}
+
+/* Доступный навык: 34px, градиент, плюс 24px; при наведении плашка
+   становится тёмной, как в макете. */
+.availableField .availableTag {
+  gap: 0;
+  height: 34px;
+  padding: 4px 12px;
+  background: var(--gradient-day);
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 132%;
+  color: var(--neutral-secondary-color);
+}
+
+.tagButton:hover .availableTag,
+.tagButton:focus-visible .availableTag {
+  background: var(--neutral-secondary-color);
+  color: var(--neutral-default-color);
+}
