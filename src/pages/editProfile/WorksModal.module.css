@@ -1,0 +1,215 @@
+/* Карточки работ из макета WORK: 1240x438, рамка 1px, скругление 20px,
+   внутренние отступы 40px и 28px между блоками. */
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.card {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding: 40px;
+  border: 1px solid rgba(44, 44, 46, 0.6);
+  border-radius: 20px;
+}
+
+/* Логотип работы: превью 120x120 (как аватар в профиле) и кнопки рядом. */
+.logo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}
+
+.logoPreview {
+  display: block;
+  flex: none;
+  width: 120px;
+  height: 120px;
+  border-radius: 20px;
+  object-fit: cover;
+}
+
+.logoInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.logoRemove {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  border: none;
+  border-bottom: 1px solid var(--line-color);
+  background: transparent;
+  font-family: var(--font-family-base);
+  font-size: 14px;
+  line-height: 1.3;
+  color: var(--neutral-secondary-color);
+  cursor: pointer;
+}
+
+.logoRemove:hover:not(:disabled) {
+  color: var(--accent-purple-color);
+  border-bottom-color: var(--accent-purple-color);
+}
+
+.logoRemove:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* В полях карточки нет плавающей подписи, поэтому текст центрируем
+   по вертикали (в компоненте Input он смещён вниз под подпись). */
+.fields input,
+.linkField input {
+  padding-top: 16px;
+  border-color: rgba(44, 44, 46, 0.6);
+}
+
+.fields input::placeholder,
+.linkField input::placeholder {
+  color: rgba(44, 44, 46, 0.6);
+}
+
+.technologies {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+/* Подпись блока технологий: Caption 16px из макета. */
+.technologiesTitle {
+  margin: 0;
+  font-family: var(--font-family-base);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 150%;
+  color: rgba(44, 44, 46, 0.6);
+}
+
+.technologiesList {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 21px;
+}
+
+/* Плашка технологии — кнопка: у Tag нет обработчиков, клик даёт обёртка. */
+.tagButton {
+  display: inline-flex;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+.tagButton:disabled {
+  cursor: default;
+}
+
+/* Добавленная технология: Tag03 из макета — белая плашка 34px с обводкой. */
+.technologyTag {
+  gap: 0;
+  height: 34px;
+  padding: 4px 12px;
+  background: var(--neutral-default-color);
+  border: 1px solid rgba(44, 44, 46, 0.6);
+  font-family: var(--font-family-base);
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 132%;
+  color: var(--neutral-secondary-color);
+}
+
+.tagButton:hover .technologyTag {
+  border-color: var(--accent-purple-color);
+  color: var(--accent-purple-color);
+}
+
+/* Поле новой технологии: плашка с оранжевой обводкой (активный Tag03). */
+.technologyInput {
+  box-sizing: border-box;
+  width: 144px;
+  height: 34px;
+  padding: 4px 12px;
+  background: var(--neutral-default-color);
+  border: 1.5px solid var(--accent-orange-color);
+  border-radius: 20px;
+  font-family: var(--font-family-base);
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 132%;
+  color: var(--neutral-secondary-color);
+}
+
+.technologyInput::placeholder {
+  color: rgba(44, 44, 46, 0.6);
+}
+
+.technologyInput:focus {
+  outline: none;
+}
+
+/* Поле ссылки из макета (Frame 207) — обычный Input на всю ширину карточки. */
+.linkField {
+  width: 100%;
+}
+
+/* Круглая кнопка добавления работы: 44x44, градиент с блюром, под карточками. */
+.addCard {
+  flex-shrink: 0;
+  align-self: flex-start;
+  width: 44px;
+  height: 44px;
+  margin-top: 40px;
+  padding: 0;
+  border: none;
+  border-radius: 40px;
+  background: var(--gradient-day);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  color: var(--neutral-secondary-color);
+}
+
+.addCard:hover {
+  border: none;
+  background: var(--gradient-day);
+}
+
+/* Подсказка, почему «Сохранить» недоступна. */
+.hint {
+  margin: 20px 0 0;
+  font-size: 16px;
+  line-height: 130%;
+  text-align: center;
+  color: var(--accent-purple-color);
+}
+
+@media (max-width: 1023px) {
+  .card {
+    padding: 20px;
+  }
+
+  .technologyInput {
+    width: 100%;
+  }
+}

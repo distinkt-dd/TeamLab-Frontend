@@ -80,6 +80,9 @@ const interceptAvatarApi = ({
     previous: null,
     results: [],
   });
+  // Блок «Мои работы» тоже запрашивает список: без мока живой бэкенд
+  // отвечает 401 и приложение сбрасывает сессию.
+  cy.intercept('GET', '**/api/v1/users/me/portfolio-works/', []);
   cy.intercept('GET', '**/api/v1/users/me/', (request) => {
     request.alias = 'currentUser';
     request.reply(currentUser(avatar));

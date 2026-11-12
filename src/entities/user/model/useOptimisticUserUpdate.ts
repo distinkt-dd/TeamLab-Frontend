@@ -21,9 +21,15 @@ export const useOptimisticUserUpdate = <TValue>(
         CURRENT_USER_QUERY_KEY
       );
 
+      // skills в PATCH — это полная замена списка навыков ([{ skill_id, level }]),
+      // форма не совпадает с CurrentUser.skills, поэтому в оптимистичный кэш
+      // поле не подмешиваем и оставляем прежний список.
       queryClient.setQueryData<CurrentUser>(
         CURRENT_USER_QUERY_KEY,
-        (current) => (current ? { ...current, ...toPatch(value) } : current)
+        (current) =>
+          current
+            ? { ...current, ...toPatch(value), skills: current.skills }
+            : current
       );
 
       return { previousUser, sessionGeneration };

@@ -316,10 +316,126 @@
   align-self: center;
 }
 
+/* Блок навыков из макета: две колонки 392px с зазором 32px, строка 40px
+   с линией снизу и 21px между строками. */
+.skillsBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 21px;
+  width: 816px;
+  max-width: 100%;
+  margin-top: 20px;
+}
+
+/* Группа навыков одного уровня: подпись в левой колонке встаёт на уровень
+   первой строки навыков этой группы. */
+.skillsGroup {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 32px;
+  align-items: start;
+}
+
+/* Строка навыка и подпись уровня: 40px в одну строку, текст сверху, линия снизу. */
+.skillsLevel,
+.skillsItem {
+  box-sizing: border-box;
+  min-height: 40px;
+  margin: 0;
+  border-bottom: 1px solid rgba(44, 44, 46, 0.6);
+  font-family: var(--font-family-base);
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 1.32;
+  color: var(--neutral-secondary-color);
+}
+
+.skillsList {
+  display: flex;
+  flex-direction: column;
+  gap: 21px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Кнопки блока: 46px от последней строки, из них 21px даёт gap блока. */
+.skillsActions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 32px;
+  margin-top: 25px;
+}
+
+/* Кнопки 286x55: контурная под левой колонкой, тёмная — под правой. */
+.skillsButton {
+  width: 100%;
+  max-width: 286px;
+}
+
 .myWorks {
   display: flex;
   align-items: center;
   gap: 32px;
+}
+
+/* Область работ: карточки, заглушка или статус загрузки. */
+.worksArea {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Заглушка, когда у пользователя ещё нет работ: рамка карточки из макета. */
+.worksEmpty {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  width: 100%;
+  padding: 40px;
+  border: 1px solid rgba(44, 44, 46, 0.6);
+  border-radius: 20px;
+}
+
+.worksEmptyText {
+  margin: 0;
+  font-size: 20px;
+  line-height: 132%;
+  text-align: center;
+  color: rgba(44, 44, 46, 0.6);
+}
+
+.worksEmptyButton {
+  width: 100%;
+  max-width: 286px;
+}
+
+.worksStatus {
+  margin: 0;
+  font-size: 20px;
+  line-height: 132%;
+  color: rgba(44, 44, 46, 0.6);
+}
+
+/* Сетка работ (по умолчанию) и список — карточки 604px в две колонки
+   с зазором 32px либо одна колонка на всю ширину. */
+.worksGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 32px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.worksList {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 /* Шапка секции: H2 слева, переключатель вида справа (в макете 1240x64). */
@@ -360,57 +476,91 @@
   background: var(--lable-pink-color);
 }
 
-/* Карточка работы: 604x318, поля 360x60 и ссылка «Вставить ссылку». */
+/* Карточка работы: логотип 180px слева, текст и ссылка справа. */
 .workCard {
   box-sizing: border-box;
   display: flex;
-  align-items: flex-start;
+  align-items: stretch;
   gap: 32px;
-  flex: none;
-  width: 604px;
-  max-width: 100%;
-  height: 318px;
+  width: 100%;
+  min-height: 318px;
   background: var(--gradient-day);
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
   border-radius: 20px;
 }
 
-/* Изображение работы: 180x318 со скруглением; пока файл не загружен —
+/* Логотип работы: 180px со скруглением; пока файл не загружен —
    ассет DefaultImage из макета. */
 .workImage {
   flex: none;
+  align-self: stretch;
   width: 180px;
-  height: 100%;
+  min-height: 318px;
   border-radius: 20px;
+  object-fit: cover;
+}
+
+.workImageDefault {
   background-image: url(./assets/workImagePlaceholder.svg);
   background-repeat: no-repeat;
   background-position: center;
   background-size: 100% 100%;
 }
 
-.workForm {
+.workContent {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 20px;
+  align-items: flex-start;
+  gap: 12px;
   flex-grow: 1;
   min-width: 0;
   padding: 32px 32px 32px 0;
 }
 
-/* В полях карточки нет плавающей подписи, поэтому текст центрируем
-   по вертикали (в компоненте Input он смещён вниз под подпись). */
-.workForm input {
-  padding-top: 16px;
+.workTitle {
+  margin: 0;
+  font-family: var(--font-family-base);
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 130%;
+  color: var(--neutral-secondary-color);
 }
 
-.workForm input::placeholder {
-  color: rgba(44, 44, 46, 0.6);
+.workText {
+  margin: 0;
+  font-family: var(--font-family-base);
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 150%;
+  color: var(--neutral-secondary-color);
+  overflow-wrap: anywhere;
 }
 
-/* Ссылка вставки ссылки: Caption 16px с нижней линией, по центру формы. */
+.workTechnologies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Плашка технологии в карточке: белая 34px с обводкой, как Tag03 из макета. */
+.workTag {
+  gap: 0;
+  height: 34px;
+  padding: 4px 12px;
+  background: var(--neutral-default-color);
+  border: 1px solid rgba(44, 44, 46, 0.6);
+  font-family: var(--font-family-base);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 150%;
+  color: var(--neutral-secondary-color);
+}
+
+/* Ссылка работы: Caption 16px с нижней линией. */
 .workLink {
+  margin-top: auto;
+  max-width: 100%;
   padding: 0;
   border: none;
   border-bottom: 1px solid rgba(44, 44, 46, 0.6);
@@ -419,6 +569,8 @@
   font-size: 16px;
   line-height: 150%;
   color: rgba(44, 44, 46, 0.6);
+  text-decoration: none;
+  overflow-wrap: anywhere;
   cursor: pointer;
 }
 
@@ -496,4 +648,28 @@
 
 .profileError {
   color: var(--accent-red-color);
+}
+
+@media (max-width: 1023px) {
+  .myWorks {
+    flex-wrap: wrap;
+  }
+
+  .worksGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .workCard {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .workImage {
+    width: 100%;
+    min-height: 180px;
+  }
+
+  .workContent {
+    padding: 24px;
+  }
 }
