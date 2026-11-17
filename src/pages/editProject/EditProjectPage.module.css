@@ -244,8 +244,13 @@
   bottom: 34px;
 }
 
+/* У карточки собственный контекст наложения, поэтому z-index нужен именно здесь:
+   без него раскрытый список селекта («Область»/«Статус») уходит под секцию
+   редактора участника — её панель ниже по DOM тоже создаёт контекст наложения
+   (backdrop-filter) и перекрывает список */
 .settingsCard {
   position: relative;
+  z-index: 2;
   isolation: isolate;
   min-height: 410px;
   overflow: visible;
@@ -264,7 +269,6 @@
   position: relative;
   z-index: 1;
   min-height: 410px;
-  overflow: hidden;
   border-radius: 20px;
   padding: 42px 40px;
   background: var(--gradient-day);
@@ -291,59 +295,76 @@
   font-size: 28px;
 }
 
-.roleSelector {
+/* Список добавленных участников в карточке «Мы ищем» (добавление/удаление): палитра
+   и скругления как у остальных контролов карточки
+   (.addParticipantSelect / .projectMetaControls / .selectField) */
+.participantList {
   display: flex;
-  max-height: 118px;
-  flex-direction: column;
+  flex-wrap: wrap;
   gap: 8px;
-  overflow-y: auto;
-  padding-right: 4px;
+  margin: 0 0 14px;
+  padding: 0;
+  list-style: none;
 }
 
-.roleSelectorItem {
+.participantListItem {
   position: relative;
+  flex: 0 1 auto;
+  min-width: 118px;
+  max-width: 100%;
 }
 
-.roleSelectorButton,
-.roleSelectorButtonActive,
-.roleSelectorButtonError {
+.participantListItemButton,
+.participantListItemButtonActive,
+.participantListItemButtonError {
+  display: block;
   width: 100%;
   min-height: 44px;
   border: 1px solid var(--line-color);
   border-radius: 8px;
-  padding: 8px 42px 8px 16px;
+  padding: 12px 32px 12px 14px;
   background-color: rgba(255, 255, 255, 0.2);
   color: var(--neutral-secondary-color);
   font-family: var(--font-family-base);
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1.25;
-  text-align: left;
+  text-align: center;
   cursor: pointer;
 }
 
-.roleSelectorButtonActive {
+.participantListItemButtonActive {
   border-color: var(--accent-orange-color);
   background-color: rgba(255, 255, 255, 0.52);
 }
 
-.roleSelectorButtonError {
+.participantListItemButtonError {
   border-color: var(--accent-red-color);
   background-color: rgba(251, 76, 71, 0.08);
 }
 
-.roleSelectorButton:hover,
-.roleSelectorButtonActive:hover,
-.roleSelectorButtonError:hover {
+.participantListItemButton:hover,
+.participantListItemButtonActive:hover,
+.participantListItemButtonError:hover,
+.participantListItemButton:focus-visible,
+.participantListItemButtonActive:focus-visible,
+.participantListItemButtonError:focus-visible {
   border-color: var(--accent-purple-color);
 }
 
-.removeRoleButton {
+.participantListItemLabel {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.participantListItemClose {
   position: absolute;
   top: 50%;
-  right: 10px;
+  right: 4px;
   display: grid;
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   place-items: center;
   border: 0;
   border-radius: 50%;
@@ -354,32 +375,38 @@
   cursor: pointer;
 }
 
-.removeRoleButton:hover,
-.removeRoleButton:focus-visible {
+.participantListItemClose:hover,
+.participantListItemClose:focus-visible {
   background-color: rgba(251, 76, 71, 0.12);
   color: var(--accent-red-color);
   outline: none;
 }
 
-.emptyRoles {
-  margin: 0;
-  padding: 8px 0;
+.emptyParticipants {
+  margin: 0 0 14px;
+  color: rgba(44, 44, 46, 0.6);
   font-size: 14px;
+  line-height: 1.35;
 }
 
-.addRoleSelect {
+.addParticipantSelect {
   margin-top: 10px;
 }
 
-.addRoleSelect button,
+.addParticipantSelect button,
 .projectMetaControls button {
   background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Размер шрифта задаём с большей специфичностью, чем у size S в shared/ui/select,
+   иначе значения в узких селектах обрезаются многоточием */
+.settingsContent .addParticipantSelect button {
   font-size: 14px;
 }
 
 .projectMetaControls {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 12px;
   margin-top: 18px;
   padding-top: 14px;
@@ -404,51 +431,125 @@
 
 .selectField button {
   background-color: rgba(255, 255, 255, 0.18);
+}
+
+.settingsContent .selectField button {
   font-size: 16px;
 }
 
-.roleEditor {
+/* Редактор участника: вкладки участников («папки», активная сливается с панелью ниже)
+   и панель с полями выбранного участника */
+.participantEditor {
   margin-top: 86px;
 }
 
-.roleEditorHeader {
-  display: grid;
-  grid-template-columns: minmax(220px, 0.8fr) minmax(320px, 1.2fr);
-  gap: 8px 32px;
-  align-items: end;
+/* Полоса вкладок: подложка той же тональности, что и низ --gradient-day, чтобы
+   белая активная вкладка читалась и сливалась с панелью ниже */
+.participantTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: flex-end;
+  margin-bottom: -1px;
+  padding: 16px 30px 0;
+  border-radius: 24px 24px 0 0;
 }
 
-.roleEditorHeader > p {
-  grid-column: 1;
+.participantTab,
+.participantTabActive,
+.participantTabError {
+  min-width: 148px;
+  max-width: 100%;
+  min-height: 54px;
+  border: 0;
+  border-radius: 14px 14px 0 0;
+  padding: 14px 28px;
+  /*   background-color: rgba(114, 85, 155, 0.6); */
+  color: var(--neutral-secondary-color);
+  font-family: var(--font-family-base);
+  font-size: 16px;
+  line-height: 1.25;
+  text-align: center;
+  transform: skewX(-10deg);
+  cursor: pointer;
+}
+
+/* Активная вкладка */
+.participantTabActive {
+  background-color: var(--neutral-default-color);
+  font-weight: 500;
+  border: 1px solid var(--line-color);
+}
+
+.participantTabError {
+  box-shadow: inset 0 0 0 2px var(--accent-red-color);
+}
+
+.participantTabLabel {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transform: skewX(10deg);
+}
+
+.participantTab:hover,
+.participantTabError:hover {
+  outline: 1px solid rgba(114, 85, 155, 0.72);
+}
+
+.participantTab:focus-visible,
+.participantTabActive:focus-visible,
+.participantTabError:focus-visible {
+  outline: 2px solid var(--accent-purple-color);
+  outline-offset: 2px;
+}
+
+.participantPanel {
+  border-radius: 0 0 24px 24px;
+  padding: 34px 40px 44px;
+  background: var(--gradient-day);
+  backdrop-filter: var(--bg-blur);
+  -webkit-backdrop-filter: var(--bg-blur);
+}
+
+.participantEditorHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.participantEditorHeader > p {
   margin: 0;
   color: rgba(44, 44, 46, 0.6);
   font-size: 14px;
   text-transform: uppercase;
 }
 
-.roleEditorHeader h2 {
-  grid-column: 1;
+.participantEditorHeader h2 {
   margin: 0;
-  padding: 16px 22px;
-  border-radius: 8px;
-  background: var(--gradient-day);
   font-family: var(--font-family-base);
-  font-size: 18px;
+  font-size: 28px;
   font-weight: 500;
-  text-align: center;
+  line-height: 1.2;
 }
 
-.roleSpecializationSelect {
-  grid-column: 2;
-  grid-row: 1 / span 2;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+.participantPlaceholder {
+  padding: 24px 0 12px;
 }
 
-.roleSpecializationSelect > label {
-  font-size: 14px;
+.participantPlaceholder h2 {
+  margin: 0 0 12px;
+  font-family: var(--font-family-base);
+  font-size: 24px;
   font-weight: 500;
+  line-height: 1.2;
+}
+
+.participantPlaceholder p {
+  margin: 0;
+  color: rgba(44, 44, 46, 0.6);
+  font-size: 16px;
 }
 
 .tasksSection {
@@ -489,7 +590,7 @@
   display: block;
   width: 100%;
   min-height: 82px;
-  resize: vertical;
+  resize: none; /* запрет ручного изменения размера */
   border: 1px solid var(--line-color);
   border-radius: 8px;
   padding: 14px 16px 30px;
@@ -621,10 +722,34 @@
   gap: 58px;
   align-items: center;
   min-height: 68px;
+  /* Тот же горизонтальный отступ, что у шапки секции (.skillsHeader): названия
+     стоят под заголовком, описания — под тегами навыков */
+  padding-inline: 34px;
   border-bottom: 1px solid var(--line-color);
 }
 
+/* Строка навыка: название навыка слева от его порядкового номера. Название
+   прижато к левому краю колонки, номер — к правому, поэтому названия, номера
+   и описания выстроены по вертикали друг под другом */
+.skillMeta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-around;
+  gap: 16px;
+  min-width: 0;
+}
+
+.skillName {
+  min-width: 0;
+  color: var(--neutral-secondary-color);
+  font-family: var(--font-family-base);
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
 .skillOrder {
+  flex: 0 0 auto;
   font-size: 28px;
   font-weight: 700;
   text-align: center;
@@ -638,7 +763,7 @@
   display: block;
   width: 100%;
   min-height: 58px;
-  resize: vertical;
+  resize: none; /* запрет ручного изменения размера */
   border: 0;
   padding: 14px 0;
   background: transparent;
@@ -687,7 +812,7 @@
   -webkit-backdrop-filter: var(--bg-blur);
 }
 
-.emptyRoleEditor {
+.emptyParticipantEditor {
   margin-top: 86px;
   border-radius: 20px;
   padding: 48px;
@@ -695,8 +820,8 @@
   text-align: center;
 }
 
-.emptyRoleEditor h2,
-.emptyRoleEditor p {
+.emptyParticipantEditor h2,
+.emptyParticipantEditor p {
   margin-top: 0;
 }
 
@@ -731,13 +856,10 @@
 
 .saveMessageError,
 .saveErrorList {
-  color: var(--accent-red-color);
-}
-
-.saveErrorList {
   width: 100%;
   margin: 0;
   padding-left: 24px;
+  color: var(--accent-red-color);
   font-size: 14px;
   line-height: 1.45;
 }
@@ -791,7 +913,6 @@
     display: block;
   }
 
-  .roleEditorHeader,
   .tasksSection,
   .skillsHeader,
   .skillDescriptions li {
@@ -879,27 +1000,44 @@
     grid-template-columns: 1fr;
   }
 
-  .roleEditor {
+  .participantEditor {
     margin-top: 60px;
   }
 
-  .roleEditorHeader {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
+  .participantListItem {
+    min-width: 104px;
   }
 
-  .roleEditorHeader > p {
-    order: 0;
+  .participantListItemButton,
+  .participantListItemButtonActive,
+  .participantListItemButtonError {
+    min-height: 40px;
+    padding: 10px 30px 10px 12px;
+    font-size: 13px;
   }
 
-  .roleEditorHeader h2 {
-    order: 1;
+  .participantTabs {
+    gap: 6px;
+    padding: 12px 12px 0;
   }
 
-  .roleSpecializationSelect {
-    order: 2;
-    margin-top: 14px;
+  .participantTab,
+  .participantTabActive,
+  .participantTabError {
+    min-width: 112px;
+    min-height: 46px;
+    border-radius: 12px 12px 0 0;
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+
+  .participantPanel {
+    border-radius: 0 0 18px 18px;
+    padding: 26px 20px 32px;
+  }
+
+  .participantEditorHeader h2 {
+    font-size: 22px;
   }
 
   .tasksSection,
@@ -933,10 +1071,19 @@
   }
 
   .skillDescriptions li {
-    grid-template-columns: 42px minmax(0, 1fr);
-    gap: 14px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
     align-items: start;
-    padding-block: 8px;
+    padding-inline: 0;
+    padding-block: 12px;
+  }
+
+  .skillMeta {
+    gap: 10px;
+  }
+
+  .skillName {
+    font-size: 16px;
   }
 
   .skillOrder {
@@ -954,7 +1101,7 @@
     padding: 8px 0 12px;
   }
 
-  .emptyRoleEditor {
+  .emptyParticipantEditor {
     margin-top: 60px;
     padding: 32px 20px;
   }

@@ -83,7 +83,7 @@ export const validateProjectDraft = (
   }
 
   if (draft.roles.length === 0) {
-    errors.roles = 'Добавьте хотя бы одну роль.';
+    errors.roles = 'Добавьте хотя бы одного участника.';
   }
 
   const specializationCounts = new Map<number, number>();
@@ -102,7 +102,8 @@ export const validateProjectDraft = (
     ) {
       roleErrors.specialization = 'Выберите специализацию.';
     } else if ((specializationCounts.get(role.specializationId) ?? 0) > 1) {
-      roleErrors.specialization = 'Специализации ролей не должны повторяться.';
+      roleErrors.specialization =
+        'Специализации участников не должны повторяться.';
     }
 
     if (!hasValues(role.tasks)) {
@@ -142,7 +143,7 @@ export const validateProjectDraft = (
   });
 
   if (Object.keys(errors.roleErrors).length > 0 && !errors.roles) {
-    errors.roles = 'Исправьте ошибки в ролях проекта.';
+    errors.roles = 'Исправьте ошибки в участниках проекта.';
   }
 
   return errors;
@@ -319,7 +320,7 @@ export const saveProjectDraft = async (
             operation: 'update',
             roleClientId: role.clientId,
             roleName: role.specializationName,
-            message: `Роль «${role.specializationName}»: ${errorMessage(error)}`,
+            message: `Участник «${role.specializationName}»: ${errorMessage(error)}`,
           });
         }
         progressed = true;
@@ -340,7 +341,7 @@ export const saveProjectDraft = async (
       failures.push({
         operation: 'delete',
         roleName: serverRole?.specialization_name ?? `#${roleId}`,
-        message: `Удаление роли «${serverRole?.specialization_name ?? roleId}»: ${errorMessage(error)}`,
+        message: `Удаление участника «${serverRole?.specialization_name ?? roleId}»: ${errorMessage(error)}`,
       });
     }
   }
@@ -352,7 +353,7 @@ export const saveProjectDraft = async (
       operation: 'conflict',
       roleClientId: role.clientId,
       roleName: role.specializationName,
-      message: `Роль «${role.specializationName}» не сохранена: выбранная специализация занята другой ролью.`,
+      message: `Участник «${role.specializationName}» не сохранён: выбранная специализация занята другим участником.`,
     });
   });
 
@@ -362,7 +363,7 @@ export const saveProjectDraft = async (
         operation: 'conflict',
         roleClientId: role.clientId,
         roleName: role.specializationName,
-        message: `Роль «${role.specializationName}» не создана: специализация уже занята.`,
+        message: `Участник «${role.specializationName}» не создан: специализация уже занята.`,
       });
       continue;
     }
@@ -378,7 +379,7 @@ export const saveProjectDraft = async (
         operation: 'create',
         roleClientId: role.clientId,
         roleName: role.specializationName,
-        message: `Создание роли «${role.specializationName}»: ${errorMessage(error)}`,
+        message: `Создание участника «${role.specializationName}»: ${errorMessage(error)}`,
       });
     }
   }

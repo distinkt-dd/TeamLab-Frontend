@@ -40,9 +40,23 @@
 
 ## Validation
 
-- Run the existing frontend lint command.
-- Run the existing frontend build command.
-- Run relevant tests if they exist.
+Default checks for every code change (fast, run before finishing):
+
+- `npm run lint` (ESLint).
+- `npm run build` (`tsc -b && vite build`).
+
+Do not run these on every change — they are not routine per-change checks:
+
+- Cypress e2e (`npm run test:e2e` = `cypress run`, needs a running `npm run dev`).
+  E2E is a commit gate, not a per-change check: run it when the user asks to commit or
+  prepare a commit, or when the task itself is about the Cypress suite (`cypress/`,
+  `cypress.config.ts`) or about behaviour already covered by it.
+- `npx steiger ./src` and `npm run format:check` — the current code base fails both
+  (inherited debt). Run them only when the task touches FSD boundaries or formatting,
+  and compare against the baseline instead of expecting a clean run.
+- Backend `pytest` — only for backend tasks.
+
+- Run other relevant tests only if they exist and the change touches them.
 - Do not claim that a command passed unless it was actually executed.
 
 ## Final response

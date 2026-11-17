@@ -13,6 +13,7 @@
     "format:check": "prettier --check .",
     "prepare": "husky install",
     "commit": "standard-version & git add -A & cz",
+    "test:e2e": "cypress run",
     "cypress:open": "cypress open",
     "steiger": "npx steiger ./src --watch",
     "mock": "prism mock ./schema.yml"
