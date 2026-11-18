@@ -18,7 +18,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import searchDecoration from '../projectCard/assets/Vibrant Gradient Cloud-no-bg-preview (carve.photos) 1.png';
 import styles from './EditProjectPage.module.css';
-import { RoleEditor } from './RoleEditor';
+import { ParticipantEditor } from './ParticipantEditor';
 import {
   type EditProjectDraft,
   type ProjectRoleDraft,
@@ -164,18 +164,6 @@ const EditProjectContent: React.FC<EditProjectContentProps> = ({
       specialization.field_id === draft.fieldId &&
       !usedSpecializationIds.has(specialization.id)
   );
-  const selectedRoleSpecializations = selectedRole
-    ? dictionaries.specializations.filter(
-        (specialization) =>
-          specialization.id === selectedRole.specializationId ||
-          (specialization.field_id === draft.fieldId &&
-            !draft.roles.some(
-              (role) =>
-                role.clientId !== selectedRole.clientId &&
-                role.specializationId === specialization.id
-            ))
-      )
-    : [];
   const selectedSkillIds = new Set(
     selectedRole?.skills.map(({ skillId }) => skillId) ?? []
   );
@@ -217,7 +205,6 @@ const EditProjectContent: React.FC<EditProjectContentProps> = ({
       ...current,
       roles: [...current.roles, role],
     }));
-    setSelectedRoleClientId(role.clientId);
   };
 
   const updateRole = (updatedRole: ProjectRoleDraft) => {
@@ -582,55 +569,67 @@ const EditProjectContent: React.FC<EditProjectContentProps> = ({
             <div className={styles.settingsContent}>
               <h2 id="roles-title">Мы ищем</h2>
 
-              <div
-                className={styles.roleSelector}
-                role="tablist"
-                aria-label="Роли проекта"
-              >
-                {draft.roles.map((role) => (
-                  <div className={styles.roleSelectorItem} key={role.clientId}>
-                    <button
-                      type="button"
-                      role="tab"
-                      aria-selected={selectedRoleClientId === role.clientId}
-                      className={
-                        validationErrors.roleErrors[role.clientId]
-                          ? styles.roleSelectorButtonError
-                          : selectedRoleClientId === role.clientId
-                            ? styles.roleSelectorButtonActive
-                            : styles.roleSelectorButton
-                      }
-                      onClick={() => setSelectedRoleClientId(role.clientId)}
-                    >
-                      {role.specializationName || 'Новая роль'}
-                    </button>
-                    <button
-                      type="button"
-                      className={styles.removeRoleButton}
-                      aria-label={`Удалить роль «${role.specializationName}»`}
-                      onClick={() => removeRole(role.clientId)}
-                    >
-                      <Icon name="close" size={14} aria-hidden="true" />
-                    </button>
-                  </div>
-                ))}
-                {draft.roles.length === 0 && (
-                  <p className={styles.emptyRoles}>
-                    Добавьте хотя бы одну роль.
-                  </p>
-                )}
-              </div>
+              {draft.roles.length > 0 && (
+                <ul
+                  className={styles.participantList}
+                  aria-label="Добавленные участники"
+                >
+                  {draft.roles.map((role) => {
+                    const isSelected = selectedRoleClientId === role.clientId;
+                    const participantLabel =
+                      role.specializationName || 'Новый участник';
+
+                    return (
+                      <li
+                        className={styles.participantListItem}
+                        key={role.clientId}
+                      >
+                        <button
+                          type="button"
+                          title={participantLabel}
+                          aria-current={isSelected ? 'true' : undefined}
+                          className={
+                            validationErrors.roleErrors[role.clientId]
+                              ? styles.participantListItemButtonError
+                              : isSelected
+                                ? styles.participantListItemButtonActive
+                                : styles.participantListItemButton
+                          }
+                          onClick={() => setSelectedRoleClientId(role.clientId)}
+                        >
+                          <span className={styles.participantListItemLabel}>
+                            {participantLabel}
+                          </span>
+                        </button>
+                        <button
+                          type="button"
+                          className={styles.participantListItemClose}
+                          aria-label={`Удалить участника «${participantLabel}»`}
+                          onClick={() => removeRole(role.clientId)}
+                        >
+                          <Icon name="close" size={14} aria-hidden="true" />
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+              {draft.roles.length === 0 && (
+                <p className={styles.emptyParticipants}>
+                  Добавьте хотя бы одного участника.
+                </p>
+              )}
               {validationErrors.roles && (
                 <p className={styles.validationHint} role="alert">
                   {validationErrors.roles}
                 </p>
               )}
 
-              <div className={styles.addRoleSelect}>
+              <div className={styles.addParticipantSelect}>
                 <Select
                   fullWidth
                   size="S"
-                  labelText="Добавить роль"
+                  labelText="Добавить участника"
                   options={availableSpecializations.map((specialization) => ({
                     value: String(specialization.id),
                     label: specialization.name,
@@ -679,24 +678,15 @@ const EditProjectContent: React.FC<EditProjectContentProps> = ({
           </aside>
         </section>
 
-        {selectedRole ? (
-          <RoleEditor
-            role={selectedRole}
-            specializationOptions={selectedRoleSpecializations}
-            availableSkills={availableSkills}
-            createSkillClientId={createSkillClientId}
-            onChange={updateRole}
-            errors={validationErrors.roleErrors[selectedRole.clientId]}
-          />
-        ) : (
-          <section className={styles.emptyRoleEditor}>
-            <h2>Добавьте роль проекта</h2>
-            <p>
-              После выбора специализации здесь появятся задачи, навыки и
-              преимущества роли.
-            </p>
-          </section>
-        )}
+        <ParticipantEditor
+          participants={draft.roles}
+          selectedParticipantId={selectedRoleClientId}
+          onSelect={setSelectedRoleClientId}
+          availableSkills={availableSkills}
+          createSkillClientId={createSkillClientId}
+          onChange={updateRole}
+          errorsByParticipantId={validationErrors.roleErrors}
+        />
 
         <section className={styles.saveSection} aria-live="polite">
           {saveMessage && (
