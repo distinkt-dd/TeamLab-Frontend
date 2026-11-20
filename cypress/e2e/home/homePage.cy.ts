@@ -43,8 +43,36 @@ const paginated = <T>(results: T[]) => ({
   results,
 });
 
+const fields = [
+  { id: 17, name: 'Дизайн' },
+  { id: 29, name: 'Звук и музыка' },
+  { id: 43, name: 'Контент' },
+  { id: 58, name: 'Маркетинг и продвижение' },
+  { id: 71, name: 'Разработка' },
+  { id: 86, name: 'Съёмки и продакшн' },
+  { id: 103, name: 'Продукт' },
+].map((field) => ({
+  ...field,
+  created_at: '2026-01-01T00:00:00Z',
+  updated_at: '2026-01-01T00:00:00Z',
+}));
+
 const interceptCommonRequests = () => {
   cy.intercept('GET', '**/api/v1/users/**', paginated([]));
+  cy.intercept('GET', '**/api/v1/fields/**', fields).as('fields');
+};
+
+const interceptCatalogDictionaries = () => {
+  cy.intercept('GET', '**/api/v1/specializations/**', [
+    {
+      id: 501,
+      field_id: fields[0].id,
+      name: 'Графический дизайнер',
+      created_at: '2026-01-01T00:00:00Z',
+      updated_at: '2026-01-01T00:00:00Z',
+    },
+  ]).as('specializations');
+  cy.intercept('GET', '**/api/v1/skills/**', []).as('skills');
 };
 
 describe('главная страница', () => {
@@ -86,6 +114,101 @@ describe('главная страница', () => {
     );
     cy.contains('button', 'Дизайн').click();
     cy.location('pathname').should('eq', '/projects');
+    cy.location('search').should('eq', `?field_ids=${fields[0].id}`);
+  });
+
+  for (const field of fields) {
+    it(`открывает каталог с направлением «${field.name}»`, () => {
+      cy.intercept('GET', '**/api/v1/projects/featured/**', paginated([]));
+      interceptCatalogDictionaries();
+      cy.intercept(
+        { method: 'GET', pathname: '/api/v1/projects/' },
+        paginated([])
+      ).as('catalogProjects');
+
+      cy.visit('http://localhost:5173/');
+      cy.wait('@fields');
+      cy.contains('button', field.name).click();
+
+      cy.location('pathname').should('eq', '/projects');
+      cy.location('search').should('eq', `?field_ids=${field.id}`);
+      cy.wait('@catalogProjects').its('request.url').then((url) => {
+        expect(new URL(url).searchParams.get('field_ids')).to.equal(
+          String(field.id)
+        );
+      });
+      cy.get('button[aria-label="Все направления, выбрано 1"]').should(
+        'be.visible'
+      );
+    });
+  }
+
+  it('сохраняет направление, добавляет другой фильтр и сбрасывает их', () => {
+    cy.intercept('GET', '**/api/v1/projects/featured/**', paginated([]));
+    interceptCatalogDictionaries();
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/projects/' },
+      paginated([])
+    ).as('catalogProjects');
+
+    cy.visit('http://localhost:5173/');
+    cy.wait('@fields');
+    cy.contains('button', 'Дизайн').click();
+    cy.wait('@catalogProjects');
+
+    cy.reload();
+    cy.wait('@catalogProjects');
+    cy.get('button[aria-label="Все направления, выбрано 1"]').should(
+      'be.visible'
+    );
+
+    cy.contains('button', 'Специализации').click();
+    cy.contains('[role="option"]', 'Графический дизайнер').trigger(
+      'mousedown'
+    );
+    cy.get('body').click(0, 0);
+    cy.contains('button', 'Применить').click();
+    cy.wait('@catalogProjects').its('request.url').then((url) => {
+      const params = new URL(url).searchParams;
+      expect(params.get('field_ids')).to.equal(String(fields[0].id));
+      expect(params.get('specialization_ids')).to.equal('501');
+    });
+
+    cy.contains('button', 'Сбросить фильтры').click();
+    cy.wait('@catalogProjects').its('request.url').then((url) => {
+      const params = new URL(url).searchParams;
+      expect(params.has('field_ids')).to.equal(false);
+      expect(params.has('specialization_ids')).to.equal(false);
+    });
+    cy.location('search').should('eq', '');
+    cy.contains('button', 'Все направления').should('be.visible');
+  });
+
+  it('открывает полный каталог без field_ids при обычном переходе', () => {
+    interceptCatalogDictionaries();
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/projects/' },
+      paginated([])
+    ).as('catalogProjects');
+
+    cy.visit('http://localhost:5173/projects');
+    cy.wait('@catalogProjects').its('request.url').then((url) => {
+      expect(new URL(url).searchParams.has('field_ids')).to.equal(false);
+    });
+    cy.location('search').should('eq', '');
+  });
+
+  it('не создаёт фильтр для отсутствующего направления', () => {
+    cy.intercept('GET', '**/api/v1/projects/featured/**', paginated([]));
+    cy.intercept('GET', '**/api/v1/fields/**', fields.slice(0, -1)).as(
+      'partialFields'
+    );
+
+    cy.visit('http://localhost:5173/');
+    cy.wait('@partialFields');
+    cy.contains('button', 'Продукт').should('be.disabled');
+    cy.location('pathname').should('eq', '/');
+    cy.location('search').should('eq', '');
   });
 
   it('не создаёт горизонтальную прокрутку на мобильном экране', () => {

@@ -4,13 +4,14 @@ import topLeftImg from '../../assets/pink_fuzz.png';
 import rightBottomImg from '../../assets/blue_fuzz.png';
 
 interface Specialization {
-  id: number;
+  id: number | string;
   name: string;
+  disabled?: boolean;
 }
 
 interface SpecializationCardsProps {
   data: Specialization[];
-  onSelect?: (id: number) => void;
+  onSelect?: (id: number | string) => void;
 }
 
 export const SpecializationCards: React.FC<SpecializationCardsProps> = ({
@@ -25,6 +26,7 @@ export const SpecializationCards: React.FC<SpecializationCardsProps> = ({
           <li key={item.id}>
             <SpecializationCard
               name={item.name}
+              disabled={item.disabled}
               onClick={onSelect ? () => onSelect(item.id) : undefined}
             />
           </li>
