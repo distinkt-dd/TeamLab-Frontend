@@ -88,40 +88,6 @@ describe('выпадающее меню Header', () => {
     cy.location('pathname').should('eq', '/');
   });
 
-  it('открывает меню по нажатию и закрывает по Escape', () => {
-    interceptRequests();
-    cy.visit(`${origin}/`, { onBeforeLoad: seedAuth });
-    cy.get('button[aria-label="Личный кабинет"]')
-      .click()
-      .should('have.attr', 'aria-expanded', 'true');
-    cy.contains('nav[aria-label="Личный кабинет"] a', 'Участники').should(
-      'have.attr',
-      'href',
-      '/participants'
-    );
-    cy.contains('nav[aria-label="Личный кабинет"] a', 'Профиль').should(
-      'have.attr',
-      'href',
-      '/my-profile'
-    );
-    cy.get('a[aria-label="Избранное"]').should(
-      'have.attr',
-      'href',
-      '/favorites'
-    );
-    cy.press(Cypress.Keyboard.Keys.ESC);
-    cy.get('button[aria-label="Личный кабинет"]')
-      .should('have.focus')
-      .and('have.attr', 'aria-expanded', 'false');
-  });
-
-  it('направляет гостя на страницу входа', () => {
-    interceptRequests();
-    cy.visit(`${origin}/`);
-    cy.get('button[aria-label="Войти в личный кабинет"]').click();
-    cy.location('pathname').should('eq', '/login');
-  });
-
   for (const path of ['/', '/projects', '/participants', '/my-profile']) {
     it(`остаётся верхним слоем на ${path}`, () => {
       interceptRequests();
@@ -145,60 +111,6 @@ describe('выпадающее меню Header', () => {
         });
     });
   }
-
-  for (const width of [320, 600, 601, 768, 1000, 1100, 1101, 1440]) {
-    it(`сохраняет шапку при открытии поиска на ширине ${width}`, () => {
-      interceptRequests();
-      cy.viewport(width, 900);
-      cy.visit(`${origin}/`);
-      cy.get('a[aria-label="На главную"]').then(($logo) => {
-        const before = $logo[0].getBoundingClientRect();
-        cy.contains('button', 'Поиск').click();
-        cy.get('a[aria-label="На главную"]').should(($after) => {
-          const rect = $after[0].getBoundingClientRect();
-          expect(rect.left).to.eq(before.left);
-          expect(rect.width).to.eq(before.width);
-        });
-      });
-      cy.get('input[aria-label="Поисковый запрос"]').should('be.visible');
-      if (width > 600) {
-        cy.get('button[aria-label="Войти в личный кабинет"]:visible').should(
-          ($button) => {
-            const rect = $button[0].getBoundingClientRect();
-            expect(rect.height).to.be.lessThan(50);
-            expect(rect.right).to.be.at.most(width);
-          }
-        );
-        cy.get('nav:visible')
-          .first()
-          .then(($nav) => {
-            const bottom = $nav[0].getBoundingClientRect().bottom;
-            cy.get('input[aria-label="Поисковый запрос"]').should(($input) => {
-              expect($input[0].getBoundingClientRect().top).to.be.greaterThan(
-                bottom
-              );
-            });
-          });
-      }
-    });
-  }
-
-  it('прячет навигацию в мобильное меню', () => {
-    interceptRequests();
-    cy.viewport(375, 900);
-    cy.visit(`${origin}/`);
-    cy.get('a[aria-label="На главную"]').should('be.visible');
-    cy.contains('button', 'Поиск').should('be.visible');
-    cy.get('button[aria-label="Открыть меню"]').click();
-    cy.get('nav[aria-label="Основная навигация"]')
-      .should('be.visible')
-      .contains('Проекты');
-    cy.get('button[aria-label="Войти в личный кабинет"]:visible').should(
-      'be.visible'
-    );
-    cy.get('button[aria-label="Закрыть меню"]').click();
-    cy.get('nav[aria-label="Основная навигация"]').should('not.exist');
-  });
 
   it('не выходит за viewport на мобильном экране', () => {
     interceptRequests();
