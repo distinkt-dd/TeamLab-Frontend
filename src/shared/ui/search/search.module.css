@@ -14,7 +14,7 @@
   align-items: center;
   gap: 4px;
   padding: 6px 4px;
-  border: 1px solid var(--accent-orange-color);
+  border-bottom: 1px solid var(--neutral-secondary-color, #2c2c2e);
 }
 
 .iconWrapper {
@@ -127,7 +127,7 @@
 
   .searchWrapper {
     position: absolute;
-    top: calc(100%);
+    top: calc(100% + 8px);
     right: 0;
     left: 0;
     z-index: 20;
@@ -149,54 +149,5 @@
   .button {
     min-width: 70px;
     font-size: 14px;
-  }
-}
-
-/* В шапке раскрытая форма не влияет на ширину соседних элементов. */
-.overlay {
-  position: static;
-  flex: 0 0 110px;
-  min-height: 44px;
-  align-items: center;
-}
-
-.overlay .searchWrapper {
-  position: absolute;
-  top: calc(100%);
-  right: 20px;
-  z-index: 20;
-  width: min(420px, calc(100vw - 40px));
-  padding: 6px 8px;
-  background-color: var(--neutral-default-color, #fff);
-}
-
-.overlay .searchWrapper > :nth-child(2) {
-  flex: 1;
-  min-width: 0;
-}
-
-@media (max-width: 600px) {
-  .overlay {
-    position: static;
-    flex-basis: 110px;
-  }
-
-  .overlay .searchWrapper {
-    top: calc(100%);
-    right: 20px;
-    left: 20px;
-    width: auto;
-  }
-}
-
-.overlay .button {
-  flex: 0 0 95px;
-  width: 95px;
-}
-
-@media (max-width: 600px) {
-  .overlay .button {
-    flex-basis: 70px;
-    width: 70px;
   }
 }

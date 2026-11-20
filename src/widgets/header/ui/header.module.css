@@ -10,11 +10,9 @@
 }
 
 .container {
-  position: relative;
   max-width: 1240px;
   margin: 0 auto;
   padding-block: 18px;
-  padding-inline: 15px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -23,7 +21,6 @@
 
 .logoWrapper {
   width: 73px;
-  flex-shrink: 0;
   height: 36px;
   display: flex;
   align-items: start;
@@ -70,16 +67,6 @@
   height: 46px;
 }
 
-.desktopControls {
-  display: flex;
-  align-items: end;
-  gap: 12px;
-}
-
-.mobileMenu {
-  display: none;
-}
-
 .personalWrapper {
   position: relative;
   width: 258px;
@@ -91,7 +78,6 @@
 .personalWrapper .personalButton {
   width: 100%;
   justify-content: center;
-  white-space: nowrap;
 }
 
 .dropdown {
@@ -117,12 +103,44 @@
   z-index: 2;
 }
 
+/* Невидимая перемычка в зазоре между кнопкой и дропдауном: без неё курсор при
+   переходе вниз выходит за пределы обёртки, hover слетает и дропдаун закрывается */
+.dropdown::before {
+  content: '';
+  position: absolute;
+  top: -16px;
+  right: 0;
+  left: 0;
+  height: 16px;
+}
+
 .actionIcons {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   border-bottom: 1px solid rgba(44, 44, 46, 0.6);
   padding: 0 10.5px 12px;
+}
+
+.notificationsWrapper {
+  position: relative;
+}
+
+.counter {
+  position: absolute;
+  top: 3px;
+  right: 0;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: var(--accent-pink-color, #ff89ed);
+  font-family: Inter;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 150%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .iconWrapper {
@@ -184,27 +202,25 @@
   .personalWrapper {
     width: 220px;
   }
-
-  .personalWrapper .personalButton {
-    font-size: 18px;
-  }
 }
 
 @media (max-width: 600px) {
   .header {
-    font-size: 16px;
+    font-size: 14px;
   }
 
   .container {
-    position: relative;
-    display: flex;
+    grid-template-columns: minmax(0, 1fr);
     gap: 12px;
-    padding: 12px 20px;
+    padding: 12px 20px 16px;
   }
 
   .logoWrapper {
     width: 64px;
     height: 32px;
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: center;
   }
 
   .logoWrapper img {
@@ -212,102 +228,44 @@
     max-height: 100%;
   }
 
-  .nav,
-  .desktopControls {
-    display: none;
+  .nav {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .list {
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 12px;
   }
 
   .controlsWrapper {
-    position: static;
-    height: auto;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .mobileMenu {
-    display: block;
-  }
-
-  .mobileMenuButton {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    color: inherit;
-    cursor: pointer;
-  }
-
-  .mobileMenuButton:focus-visible {
-    outline: 2px solid var(--accent-purple-color, #72559b);
-    outline-offset: 2px;
-    border-radius: 4px;
-  }
-
-  .mobilePanel {
-    position: absolute;
-    top: calc(100% + 8px);
-    right: 20px;
-    z-index: 21;
-    width: min(300px, calc(100vw - 40px));
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    border-radius: 20px;
-    background: var(--neutral-default-color, #fff);
-    box-shadow: 0 8px 24px rgba(44, 44, 46, 0.16);
-  }
-
-  .mobileList {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    text-transform: uppercase;
-  }
-
-  .mobilePanel .personalWrapper {
+    position: relative;
     width: 100%;
+    height: auto;
+    grid-column: 1;
+    grid-row: 3;
+    justify-content: center;
+    justify-self: stretch;
+    align-items: center;
+    gap: 8px;
   }
 
-  .mobilePanel .personalButton {
-    font-size: 16px;
+  .personalWrapper {
+    width: auto;
+    min-width: 0;
+    height: 44px;
+    flex: 1;
+    max-width: 190px;
   }
 
-  .mobilePanel .dropdown {
+  .personalWrapper .personalButton {
+    font-size: 14px;
+  }
+
+  .dropdown {
     right: 0;
     left: auto;
-    width: min(253px, calc(100vw - 88px));
-    background-color: var(--neutral-default-color, #fff);
-    box-shadow: 0 8px 24px rgba(44, 44, 46, 0.16);
+    width: min(253px, calc(100vw - 40px));
   }
-
-  .mobileTheme {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-}
-
-.notificationsWrapper {
-  position: relative;
-}
-
-.counter {
-  position: absolute;
-  top: 3px;
-  right: 0;
-  width: 16px;
-  height: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background-color: var(--accent-pink-color, #ff89ed);
-  font-size: 12px;
-  font-weight: 700;
-  line-height: 1;
 }

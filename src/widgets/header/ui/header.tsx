@@ -1,8 +1,9 @@
+import { useAppSelector } from '@app';
+import { selectIsAuthenticated } from '@features/auth';
 import { Icon } from '@shared/icons';
-import { Search, Toggler } from '@shared/ui';
-import { useEffect, useId, useRef, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { PersonalMenu } from './PersonalMenu';
+import { Button, Search, Toggler } from '@shared/ui';
+import { useEffect, useRef, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import styles from './header.module.css';
 import logoDark from '/logo-dark.svg';
 import logoLight from '/logo-light.svg';
@@ -14,39 +15,17 @@ export const Header: React.FC = () => {
   //TODO: доработать при готовности логики переключения темы
   // и хранения состояния выбраной
   const [isLiteTheme, setIsLiteTheme] = useState(true);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const mobileMenuRef = useRef<HTMLDivElement>(null);
-  const mobileMenuId = useId();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => {
-    if (!isMobileMenuOpen) return;
-    const handleOutsideClick = (event: MouseEvent) => {
-      if (!mobileMenuRef.current?.contains(event.target as Node))
-        setIsMobileMenuOpen(false);
-    };
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        const personalMenu = mobileMenuRef.current?.querySelector(
-          `.${styles.personalWrapper}`
-        );
-        if (
-          personalMenu?.contains(event.target as Node) &&
-          personalMenu.querySelector('[aria-expanded="true"]')
-        )
-          return;
-        setIsMobileMenuOpen(false);
-        mobileMenuRef.current?.querySelector('button')?.focus();
-      }
-    };
-    document.addEventListener('mousedown', handleOutsideClick);
-    document.addEventListener('keydown', handleEscape);
-    return () => {
-      document.removeEventListener('mousedown', handleOutsideClick);
-      document.removeEventListener('keydown', handleEscape);
-    };
-  }, [isMobileMenuOpen]);
+  //TODO: получить значение количества уведомлений
+  const counterNotifications = 0;
+  //TODO: получить тип пользователя
+  const userType = 'participant';
 
   const location = useLocation();
+  const navigate = useNavigate();
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
 
   const shouldHidePersonalWrapper = hiddenOnRoutes.includes(location.pathname);
 
@@ -56,6 +35,24 @@ export const Header: React.FC = () => {
     { text: 'Участники', path: '/participants' },
     { text: 'Вопросы', path: '/questions' },
   ];
+
+  //TODO: актуализировать роутинг, проверить соответствие типам
+  //общие маршруты вынести в базу
+  let personalNavItems;
+
+  if (userType === 'participant') {
+    personalNavItems = [
+      { text: 'Проекты', path: '#' },
+      { text: 'Профиль', path: '#' },
+      { text: 'Настройки', path: '#' },
+    ];
+  } else {
+    personalNavItems = [
+      { text: 'Участники', path: '/participants' },
+      { text: 'Профиль', path: '#' },
+      { text: 'Настройки', path: '#' },
+    ];
+  }
 
   // TODO: получить данные из хранилища
   const suggestions: string[] = [
@@ -80,6 +77,55 @@ export const Header: React.FC = () => {
     'звук и музыка',
     'контент и тексты',
   ];
+
+  const closeDropdown = () => {
+    setIsDropdownOpen(false);
+    if (dropdownTimeout.current) {
+      clearTimeout(dropdownTimeout.current);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (dropdownTimeout.current) {
+        clearTimeout(dropdownTimeout.current);
+      }
+    };
+  }, []);
+
+  const handlePersonalMouseEnter = () => {
+    if (!isAuthenticated) {
+      return;
+    }
+    if (dropdownTimeout.current) {
+      clearTimeout(dropdownTimeout.current);
+    }
+    setIsDropdownOpen(true);
+  };
+
+  const handlePersonalMouseLeave = () => {
+    dropdownTimeout.current = setTimeout(() => {
+      setIsDropdownOpen(false);
+    }, 300);
+  };
+
+  // Авторизованный пользователь переходит в личный кабинет (/my-profile),
+  // гость — на страницу входа
+  const handlePersonalButtonClick = () => {
+    closeDropdown();
+    navigate(isAuthenticated ? '/my-profile' : '/login');
+  };
+
+  // TODO: доработать логику клика по иконкам в дропдауне личного кабинета
+  const handleNotificationsClick = () => {
+    closeDropdown();
+  };
+  const handleFavoritesClick = () => {
+    closeDropdown();
+  };
+  const handleMenuClick = () => {
+    closeDropdown();
+  };
 
   // TODO: доработать обработку запроса на поиск
   const handleSearchClick = (value: string) => {
@@ -111,63 +157,95 @@ export const Header: React.FC = () => {
         </nav>
         <div className={styles.controlsWrapper}>
           <Search
-            overlay
             onSearch={handleSearchClick}
             suggestions={suggestions}
             searchHistory={searchHistory}
             maxSuggestions={7}
           />
-          <div className={styles.desktopControls}>
-            {!shouldHidePersonalWrapper && <PersonalMenu />}
-            <Toggler
-              type="theme"
-              checked={isLiteTheme}
-              onChange={setIsLiteTheme}
-            />
-          </div>
-          <div className={styles.mobileMenu} ref={mobileMenuRef}>
-            <button
-              type="button"
-              className={styles.mobileMenuButton}
-              aria-label={isMobileMenuOpen ? 'Закрыть меню' : 'Открыть меню'}
-              aria-expanded={isMobileMenuOpen}
-              aria-controls={isMobileMenuOpen ? mobileMenuId : undefined}
-              onClick={() => setIsMobileMenuOpen((open) => !open)}
+          {!shouldHidePersonalWrapper && (
+            <div
+              className={styles.personalWrapper}
+              onMouseEnter={handlePersonalMouseEnter}
+              onMouseLeave={handlePersonalMouseLeave}
+              onFocus={handlePersonalMouseEnter}
+              onBlur={handlePersonalMouseLeave}
+              aria-haspopup="true"
+              aria-expanded={isDropdownOpen && isAuthenticated}
             >
-              <Icon name={isMobileMenuOpen ? 'close' : 'burgerM'} size={32} />
-            </button>
-            {isMobileMenuOpen && (
-              <div className={styles.mobilePanel} id={mobileMenuId}>
-                <nav aria-label="Основная навигация">
-                  <ul className={styles.mobileList}>
-                    {navItems.map((item) => (
-                      <li key={item.path}>
-                        <Link
-                          to={item.path}
-                          className={styles.link}
-                          aria-current={
-                            location.pathname === item.path ? 'page' : undefined
-                          }
-                          onClick={() => setIsMobileMenuOpen(false)}
-                        >
-                          {item.text}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </nav>
-                {!shouldHidePersonalWrapper && <PersonalMenu />}
-                <div className={styles.mobileTheme}>
-                  <span>Тема</span>
-                  <Toggler
-                    type="theme"
-                    checked={isLiteTheme}
-                    onChange={setIsLiteTheme}
-                  />
+              <Button
+                variant="tertiary"
+                className={styles.personalButton}
+                onClick={handlePersonalButtonClick}
+                aria-label={
+                  isAuthenticated
+                    ? 'перейти в личный кабинет'
+                    : 'войти в личный кабинет'
+                }
+              >
+                Личный кабинет
+              </Button>
+              {isDropdownOpen && isAuthenticated && (
+                <div className={styles.dropdown}>
+                  <div className={styles.actionIcons}>
+                    <button
+                      type="button"
+                      aria-label="меню"
+                      className={styles.iconWrapper}
+                      onClick={handleMenuClick}
+                    >
+                      <Icon name="burgerM" size={44} />
+                    </button>
+                    <div className={styles.notificationsWrapper}>
+                      <button
+                        type="button"
+                        aria-label="уведомления"
+                        className={styles.iconWrapper}
+                        onClick={handleNotificationsClick}
+                      >
+                        <Icon name="notifications" size={44} />
+                      </button>
+                      <span className={styles.counter}>
+                        {counterNotifications}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      aria-label="избранное"
+                      className={styles.iconWrapper}
+                      onClick={handleFavoritesClick}
+                    >
+                      <Icon name="like" size={44} />
+                    </button>
+                  </div>
+                  <nav>
+                    <ul className={styles.personalList}>
+                      {personalNavItems.map((item) => (
+                        <li key={item.path}>
+                          <Link
+                            to={item.path}
+                            className={styles.link}
+                            onClick={closeDropdown}
+                            aria-current={
+                              location.pathname === item.path
+                                ? 'page'
+                                : undefined
+                            }
+                          >
+                            {item.text}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </nav>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
+          <Toggler
+            type="theme"
+            checked={isLiteTheme}
+            onChange={setIsLiteTheme}
+          />
         </div>
       </div>
     </div>

@@ -11,7 +11,6 @@ interface SearchProps {
   maxSuggestions?: number;
   className?: string;
   id?: string;
-  overlay?: boolean;
 }
 
 export const Search = ({
@@ -21,7 +20,6 @@ export const Search = ({
   maxSuggestions = 5,
   className,
   id,
-  overlay = false,
 }: SearchProps) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
@@ -52,13 +50,12 @@ export const Search = ({
         !containerRef.current.contains(event.target as Node)
       ) {
         setShowDropdown(false);
-        if (overlay) setIsSearchOpen(false);
       }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [overlay]);
+  }, []);
 
   useEffect(() => {
     if (highlightedIndex >= 0 && dropdownRef.current) {
@@ -86,7 +83,7 @@ export const Search = ({
     }
   };
 
-  const handleOpenSearch = () => setIsSearchOpen((open) => !open);
+  const handleOpenSearch = () => setIsSearchOpen(true);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -149,25 +146,19 @@ export const Search = ({
     <div
       id={id}
       ref={containerRef}
-      className={`${styles.container} ${overlay ? styles.overlay : ''} ${className || ''}`}
+      className={`${styles.container} ${className || ''}`}
     >
-      {(!isSearchOpen || overlay) && (
-        <Button
-          variant="search"
-          onClick={handleOpenSearch}
-          aria-expanded={isSearchOpen}
-        >
+      {!isSearchOpen ? (
+        <Button variant="search" onClick={handleOpenSearch}>
           Поиск
         </Button>
-      )}
-      {isSearchOpen && (
+      ) : (
         <div className={styles.searchWrapper}>
           <div className={styles.iconWrapper}>
             <Icon name="search" />
           </div>
           <Input
             ref={inputRef}
-            aria-label="Поисковый запрос"
             className={styles.input}
             value={inputValue}
             onChange={handleInputChange}
