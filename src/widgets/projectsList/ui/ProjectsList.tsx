@@ -1,15 +1,9 @@
 import { ProjectItem } from '@entities/project';
+import type { ProjectCardItem } from '@entities/project/types';
 import styles from './ProjectsList.module.css';
 
-interface Project {
-  id: number;
-  name: string;
-  image?: string;
-  tags: string[];
-}
-
 interface ProjectsListProps {
-  data: Project[];
+  data: ProjectCardItem[];
   className?: string;
   showProjectActions?: boolean;
 }

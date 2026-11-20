@@ -195,6 +195,8 @@ export interface ListUsersParams {
   limit?: number;
   search?: string;
   field_id?: number;
+  field_ids?: string;
+  account_type?: AccountType;
   specialization_ids?: string;
   skill_ids?: string;
   level?: UserLevel;

@@ -11,5 +11,7 @@ export const toProjectCards = (
     id: membership.project_id,
     name: membership.project_title,
     image: membership.project_image ?? undefined,
-    tags: membership.project_role_name ? [membership.project_role_name] : [],
+    tags: membership.project_role_name
+      ? [{ label: membership.project_role_name }]
+      : [],
   }));

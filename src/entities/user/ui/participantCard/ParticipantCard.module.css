@@ -62,3 +62,57 @@
   max-width: max-content;
   width: 100%;
 }
+
+@media (max-width: 900px) {
+  .card {
+    flex-wrap: wrap;
+    gap: 24px;
+  }
+
+  .userBlock {
+    max-width: calc(100% - 190px);
+  }
+
+  .skillsBlock {
+    order: 3;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 600px) {
+  .card {
+    padding: 20px;
+    flex-direction: column;
+  }
+
+  .userBlock {
+    max-width: none;
+  }
+
+  .userSelf {
+    gap: 16px;
+    min-width: 0;
+  }
+
+  .userSelfText {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .image {
+    width: 64px;
+    height: 64px;
+    flex: 0 0 64px;
+  }
+
+  .userInfo {
+    padding-inline: 0;
+    column-gap: 24px;
+  }
+
+  .actionsBlock,
+  .actionsBlock > button {
+    max-width: none;
+    width: 100%;
+  }
+}

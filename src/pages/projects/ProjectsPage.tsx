@@ -1,9 +1,15 @@
 import { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { getServices } from '@app';
 import { ProjectService, toProjectCardItems } from '@entities/project';
-import { Filter } from '@features/filter';
+import type { ProjectStatus } from '@entities/project/types';
+import {
+  Filter,
+  type FilterSelect,
+  useCatalogFilterOptions,
+  useCatalogFilters,
+} from '@features/filter';
 import { Button } from '@shared/ui/button';
 import { ProjectsList } from '@widgets/projectsList';
 import { getNextPageNumber } from '@shared/api/pagination';
@@ -15,6 +21,37 @@ export const ProjectsPage: React.FC = () => {
   const navigate = useNavigate();
   const { api } = getServices();
   const projectService = useMemo(() => new ProjectService(api), [api]);
+  const [searchParams] = useSearchParams();
+  const {
+    appliedFilters,
+    draftFilters,
+    setDraftFilters,
+    applyFilters,
+    resetFilters,
+    passthroughParams,
+  } = useCatalogFilters();
+  const {
+    fieldOptions,
+    specializationOptions,
+    specializationColors,
+    skillOptions,
+    isPending: areOptionsPending,
+    isError: areOptionsError,
+  } = useCatalogFilterOptions(api);
+  const statusParam = searchParams.get('status');
+  const status: ProjectStatus | undefined =
+    statusParam === 'open' || statusParam === 'closed'
+      ? statusParam
+      : undefined;
+  const requestFilters = {
+    field_ids: appliedFilters.fieldIds.join(',') || undefined,
+    specialization_ids:
+      appliedFilters.specializationIds.join(',') || undefined,
+    skill_ids: appliedFilters.skillIds.join(',') || undefined,
+    search: passthroughParams.search,
+    ordering: passthroughParams.ordering,
+    status,
+  };
 
   const {
     data,
@@ -24,9 +61,13 @@ export const ProjectsPage: React.FC = () => {
     fetchNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: ['projects'],
+    queryKey: ['projects', 'catalog', requestFilters],
     queryFn: ({ pageParam }) =>
-      projectService.list({ page: pageParam, limit: PAGE_SIZE }),
+      projectService.list({
+        page: pageParam,
+        limit: PAGE_SIZE,
+        ...requestFilters,
+      }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => getNextPageNumber(lastPage.next),
   });
@@ -38,8 +79,46 @@ export const ProjectsPage: React.FC = () => {
         .map((project) => [project.id, project])
     );
 
-    return toProjectCardItems(Array.from(uniqueProjects.values()));
-  }, [data]);
+    return toProjectCardItems(
+      Array.from(uniqueProjects.values()),
+      specializationColors
+    );
+  }, [data, specializationColors]);
+
+  const filterSelects: FilterSelect[] = [
+    {
+      key: 'fields',
+      multiple: true,
+      options: fieldOptions,
+      value: draftFilters.fieldIds,
+      onChange: (fieldIds) =>
+        setDraftFilters((filters) => ({ ...filters, fieldIds })),
+      labelText: 'Все направления',
+      disabled: areOptionsPending || fieldOptions.length === 0,
+    },
+    {
+      key: 'specializations',
+      multiple: true,
+      variant: 'tags',
+      options: specializationOptions,
+      value: draftFilters.specializationIds,
+      onChange: (specializationIds) =>
+        setDraftFilters((filters) => ({ ...filters, specializationIds })),
+      labelText: 'Специализации',
+      disabled: areOptionsPending || specializationOptions.length === 0,
+    },
+    {
+      key: 'skills',
+      multiple: true,
+      variant: 'tags',
+      options: skillOptions,
+      value: draftFilters.skillIds,
+      onChange: (skillIds) =>
+        setDraftFilters((filters) => ({ ...filters, skillIds })),
+      labelText: 'Навыки',
+      disabled: areOptionsPending || skillOptions.length === 0,
+    },
+  ];
 
   return (
     <div className={styles.container}>
@@ -53,7 +132,17 @@ export const ProjectsPage: React.FC = () => {
         </Button>
         <section className={styles.section}>
           <h2 className={styles.title}>Все проекты </h2>
-          <Filter className={styles.filter} />
+          <Filter
+            className={styles.filter}
+            selects={filterSelects}
+            onApply={applyFilters}
+            onReset={resetFilters}
+          />
+          {areOptionsError && (
+            <p className={styles.optionsError} role="alert">
+              Не удалось загрузить справочники фильтров.
+            </p>
+          )}
           {isPending && <p className={styles.state}>Загружаем проекты...</p>}
           {isError && (
             <p className={styles.state} role="alert">

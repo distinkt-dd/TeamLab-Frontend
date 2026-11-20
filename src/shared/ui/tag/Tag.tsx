@@ -3,7 +3,15 @@ import type { IconName } from '@shared/icons';
 import type React from 'react';
 import styles from './Tag.module.css';
 
-type tagBgColor = 'blue' | 'green' | 'purple' | 'pink' | 'neutral';
+type tagBgColor =
+  | 'blue'
+  | 'green'
+  | 'orange'
+  | 'purple'
+  | 'pink'
+  | 'turquoise'
+  | 'yellow'
+  | 'neutral';
 type tagTextColor = 'black' | 'white';
 
 export type TagVariant = 'default' | 'select';
