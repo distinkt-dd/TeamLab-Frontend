@@ -1,3 +1,5 @@
+const origin = Cypress.config('baseUrl') || 'http://localhost:5173';
+
 const makeAccessToken = (): string => {
   const encode = (value: object) =>
     Cypress.Buffer.from(JSON.stringify(value))
@@ -76,7 +78,7 @@ const interceptRequests = () => {
 describe('выпадающее меню Header', () => {
   it('логотип ведёт на главную и доступен с клавиатуры', () => {
     interceptRequests();
-    cy.visit('http://localhost:5173/projects');
+    cy.visit(`${origin}/projects`);
 
     cy.get('a[aria-label="На главную"]')
       .should('have.attr', 'href', '/')
@@ -89,13 +91,14 @@ describe('выпадающее меню Header', () => {
   for (const path of ['/', '/projects', '/participants', '/my-profile']) {
     it(`остаётся верхним слоем на ${path}`, () => {
       interceptRequests();
-      cy.visit(`http://localhost:5173${path}`, { onBeforeLoad: seedAuth });
+      cy.visit(`${origin}${path}`, { onBeforeLoad: seedAuth });
 
-      cy.get('button[aria-label="перейти в личный кабинет"]')
-        .focus();
-      cy.get('[aria-haspopup="true"] [aria-label="меню"]')
+      cy.get('button[aria-label="Личный кабинет"]').click();
+      cy.get('[aria-label="Личный кабинет"] + div [aria-label="Избранное"]')
         .should('be.visible')
-        .parents('[aria-haspopup="true"]')
+        .parents('[id]')
+        .first()
+        .parent()
         .should(($wrapper) => {
           const dropdown = $wrapper.children().last().get(0);
           const rect = dropdown.getBoundingClientRect();
@@ -112,12 +115,16 @@ describe('выпадающее меню Header', () => {
   it('не выходит за viewport на мобильном экране', () => {
     interceptRequests();
     cy.viewport(375, 900);
-    cy.visit('http://localhost:5173/', { onBeforeLoad: seedAuth });
+    cy.visit(`${origin}/`, { onBeforeLoad: seedAuth });
 
-    cy.get('button[aria-label="перейти в личный кабинет"]')
-      .focus();
-    cy.get('[aria-haspopup="true"] [aria-label="меню"]')
-      .parents('[aria-haspopup="true"]')
+    cy.get('button[aria-label="Открыть меню"]').click();
+    cy.get('button[aria-label="Личный кабинет"]:visible').click();
+    cy.get(
+      '[aria-label="Личный кабинет"] + div [aria-label="Избранное"]:visible'
+    )
+      .parents('[id]')
+      .first()
+      .parent()
       .children()
       .last()
       .should(($dropdown) => {
