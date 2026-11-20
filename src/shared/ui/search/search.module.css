@@ -8,13 +8,52 @@
 }
 
 .searchWrapper {
-  height: 44px;
+  min-height: 44px;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  padding: 6px 8px;
+  border: 1px solid var(--accent-orange-color);
+}
+
+.searchControls {
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 6px 4px;
-  border: 1px solid var(--accent-orange-color);
+  min-width: 0;
+}
+
+.catalogSwitch {
+  display: flex;
+  align-self: flex-start;
+  gap: 2px;
+  padding: 2px;
+  border-radius: 6px;
+  background-color: var(--neutral-quaternary-color, #d8e2ec);
+}
+
+.catalogButton {
+  padding: 4px 10px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.catalogButtonActive {
+  background-color: var(--neutral-default-color, #fff);
+  color: var(--accent-purple-color, #72559b);
+}
+
+.catalogButton:focus-visible {
+  outline: 2px solid var(--accent-orange-color, #fcaf6c);
+  outline-offset: 1px;
 }
 
 .iconWrapper {
@@ -120,6 +159,11 @@
   backdrop-filter: blur(30px);
 }
 
+.searchAllItem {
+  border-top: 1px solid var(--line-color, rgba(44, 44, 46, 0.4));
+  font-weight: 600;
+}
+
 @media (max-width: 600px) {
   .container {
     min-width: 0;
@@ -137,7 +181,7 @@
     background-color: var(--neutral-default-color, #ffffff);
   }
 
-  .searchWrapper > * {
+  .searchControls > * {
     min-width: 0;
   }
 
@@ -170,7 +214,7 @@
   background-color: var(--neutral-default-color, #fff);
 }
 
-.overlay .searchWrapper > :nth-child(2) {
+.overlay .searchControls > :nth-child(2) {
   flex: 1;
   min-width: 0;
 }

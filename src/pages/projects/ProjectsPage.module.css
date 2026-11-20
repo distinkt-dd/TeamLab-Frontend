@@ -51,6 +51,51 @@
   padding-bottom: 15px;
 }
 
+.decorateImg {
+  position: absolute;
+}
+
+.mdPng {
+  max-width: 453px;
+  rotate: -106deg;
+  bottom: 0;
+  left: -7%;
+  z-index: -1;
+}
+
+.wbPng {
+  max-width: 305px;
+  left: 25%;
+  top: 100%;
+  transform: translate(-25%, -50%);
+}
+
+.vfPng {
+  max-width: 299px;
+  right: 10%;
+  top: 30%;
+  z-index: -1;
+}
+
+.decorations {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@media (max-width: 768px) {
+  .vfPng,
+  .wbPng {
+    max-width: 180px;
+  }
+
+  .mdPng {
+    max-width: 260px;
+  }
+}
+
 @media (max-width: 600px) {
   .container {
     padding-inline: 16px;
@@ -67,5 +112,10 @@
   .state {
     padding: 24px;
     font-size: 18px;
+  }
+
+  .vfPng,
+  .wbPng {
+    display: none;
   }
 }

@@ -13,6 +13,7 @@ import {
 import { Button } from '@shared/ui/button';
 import { ProjectsList } from '@widgets/projectsList';
 import { getNextPageNumber } from '@shared/api/pagination';
+import clsx from 'clsx';
 import styles from './ProjectsPage.module.css';
 
 const PAGE_SIZE = 3;
@@ -121,51 +122,70 @@ export const ProjectsPage: React.FC = () => {
   ];
 
   return (
-    <div className={styles.container}>
-      <div className={styles.main}>
-        <Button
-          variant="back"
-          className={styles.backButton}
-          onClick={() => navigate('/')}
-        >
-          На главную
-        </Button>
-        <section className={styles.section}>
-          <h2 className={styles.title}>Все проекты </h2>
-          <Filter
-            className={styles.filter}
-            selects={filterSelects}
-            onApply={applyFilters}
-            onReset={resetFilters}
-          />
-          {areOptionsError && (
-            <p className={styles.optionsError} role="alert">
-              Не удалось загрузить справочники фильтров.
-            </p>
-          )}
-          {isPending && <p className={styles.state}>Загружаем проекты...</p>}
-          {isError && (
-            <p className={styles.state} role="alert">
-              Не удалось загрузить проекты. Попробуйте обновить страницу.
-            </p>
-          )}
-          {!isPending && !isError && projects.length === 0 && (
-            <p className={styles.state}>Проектов пока нет.</p>
-          )}
-          {!isPending && !isError && projects.length > 0 && (
-            <ProjectsList data={projects} className={styles.projectsList} />
-          )}
-          {!isPending && !isError && hasNextPage && (
-            <Button
-              className={styles.button}
-              onClick={() => void fetchNextPage()}
-              disabled={isFetchingNextPage}
-            >
-              {isFetchingNextPage ? 'Загружаем...' : 'Показать еще'}
-            </Button>
-          )}
-        </section>
+    <>
+      <div className={styles.decorations} aria-hidden="true">
+        <img
+          src="/violet-fuzz.png"
+          alt=""
+          className={clsx(styles.decorateImg, styles.vfPng)}
+        />
+        <img
+          src="/magenta-deep.png"
+          alt=""
+          className={clsx(styles.decorateImg, styles.mdPng)}
+        />
+        <img
+          src="/wavy-blue.png"
+          alt=""
+          className={clsx(styles.decorateImg, styles.wbPng)}
+        />
       </div>
-    </div>
+      <div className={styles.container}>
+        <div className={styles.main}>
+          <Button
+            variant="back"
+            className={styles.backButton}
+            onClick={() => navigate('/')}
+          >
+            На главную
+          </Button>
+          <section className={styles.section}>
+            <h2 className={styles.title}>Все проекты </h2>
+            <Filter
+              className={styles.filter}
+              selects={filterSelects}
+              onApply={applyFilters}
+              onReset={resetFilters}
+            />
+            {areOptionsError && (
+              <p className={styles.optionsError} role="alert">
+                Не удалось загрузить справочники фильтров.
+              </p>
+            )}
+            {isPending && <p className={styles.state}>Загружаем проекты...</p>}
+            {isError && (
+              <p className={styles.state} role="alert">
+                Не удалось загрузить проекты. Попробуйте обновить страницу.
+              </p>
+            )}
+            {!isPending && !isError && projects.length === 0 && (
+              <p className={styles.state}>Проектов пока нет.</p>
+            )}
+            {!isPending && !isError && projects.length > 0 && (
+              <ProjectsList data={projects} className={styles.projectsList} />
+            )}
+            {!isPending && !isError && hasNextPage && (
+              <Button
+                className={styles.button}
+                onClick={() => void fetchNextPage()}
+                disabled={isFetchingNextPage}
+              >
+                {isFetchingNextPage ? 'Загружаем...' : 'Показать еще'}
+              </Button>
+            )}
+          </section>
+        </div>
+      </div>
+    </>
   );
 };

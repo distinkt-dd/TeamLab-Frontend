@@ -1,6 +1,7 @@
 import { QuestionItem } from './QuestionItem';
 import styles from './Questions.module.css';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
 const questions_data = [
   {
@@ -40,9 +41,27 @@ const questions_data = [
 
 export const Questions: React.FC = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.hash !== '#faq') return;
+
+    const animationFrame = window.requestAnimationFrame(() => {
+      const reduceMotion = window.matchMedia(
+        '(prefers-reduced-motion: reduce)'
+      ).matches;
+      sectionRef.current?.scrollIntoView({
+        behavior: reduceMotion ? 'auto' : 'smooth',
+        block: 'start',
+      });
+    });
+
+    return () => window.cancelAnimationFrame(animationFrame);
+  }, [location.hash, location.key]);
 
   return (
-    <section className={styles.section}>
+    <section id="faq" ref={sectionRef} className={styles.section}>
       <div className={styles.container}>
         <h2 className={styles.title}>Часто задаваемые вопросы</h2>
         <ul className={styles.list}>
