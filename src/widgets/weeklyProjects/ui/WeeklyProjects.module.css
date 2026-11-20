@@ -6,6 +6,7 @@
   padding: 46px 0 65px;
   position: relative;
   z-index: 0;
+  overflow-x: clip;
 }
 
 .section::before {
@@ -30,6 +31,7 @@
   display: flex;
   flex-direction: column;
   gap: 40px;
+  padding-inline: 32px;
 }
 
 .title {
@@ -37,8 +39,33 @@
   padding-bottom: 13px;
 }
 
+.state {
+  min-height: 120px;
+  color: var(--neutral-default-color);
+  font-size: 20px;
+}
+
 .button {
   color: var(--neutral-default-color);
   border-color: var(--neutral-default-color);
   width: 286px;
+}
+
+@media (max-width: 600px) {
+  .section {
+    padding-block: 40px 56px;
+  }
+
+  .container {
+    gap: 28px;
+    padding-inline: 20px;
+  }
+
+  .title {
+    font-size: 26px;
+  }
+
+  .button {
+    width: 100%;
+  }
 }

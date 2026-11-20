@@ -10,10 +10,12 @@ interface Specialization {
 
 interface SpecializationCardsProps {
   data: Specialization[];
+  onSelect?: (id: number) => void;
 }
 
 export const SpecializationCards: React.FC<SpecializationCardsProps> = ({
   data,
+  onSelect,
 }) => {
   return (
     <div className={styles.specializationCards}>
@@ -21,7 +23,10 @@ export const SpecializationCards: React.FC<SpecializationCardsProps> = ({
       <ul className={styles.list}>
         {data.map((item) => (
           <li key={item.id}>
-            <SpecializationCard name={item.name} />
+            <SpecializationCard
+              name={item.name}
+              onClick={onSelect ? () => onSelect(item.id) : undefined}
+            />
           </li>
         ))}
       </ul>

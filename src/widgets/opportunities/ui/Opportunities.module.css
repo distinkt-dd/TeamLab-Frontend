@@ -4,11 +4,13 @@
   display: flex;
   flex-direction: column;
   gap: 54px;
+  padding-inline: 32px;
 }
 
 .section {
   padding: 47px 0 176px;
   position: relative;
+  overflow-x: clip;
 }
 
 .section::before {
@@ -47,4 +49,23 @@
 
 .signature {
   letter-spacing: -0.4px;
+}
+
+@media (max-width: 600px) {
+  .container {
+    gap: 36px;
+    padding-inline: 20px;
+  }
+
+  .section {
+    padding-block: 40px 80px;
+  }
+
+  .title {
+    font-size: 26px;
+  }
+
+  .img {
+    display: none;
+  }
 }

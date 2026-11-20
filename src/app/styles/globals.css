@@ -14,13 +14,13 @@ body {
   font-weight: 400;
   color: var(--neutral-secondary-color);
   background-color: var(--background-body);
-  height: 100%;
+  min-height: 100%;
 }
 
 #root {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  min-height: 100%;
 }
 
 main {

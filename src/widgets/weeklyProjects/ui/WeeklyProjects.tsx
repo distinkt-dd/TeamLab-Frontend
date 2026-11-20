@@ -1,51 +1,41 @@
+import { useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { getServices } from '@app';
+import { ProjectService, toProjectCardItems } from '@entities/project';
 import { ProjectsList } from '@widgets/projectsList';
 import styles from './WeeklyProjects.module.css';
 import { Button } from '@shared/ui';
-import mock_img1 from '../assets/girl.png';
-import mock_img2 from '../assets/fuzz.png';
-import mock_img3 from '../assets/blob.png';
 import { useNavigate } from 'react-router-dom';
-
-const mock_projects = [
-  {
-    id: 1,
-    name: 'Создание анимационного фильма',
-    image: mock_img1,
-    tags: [
-      'графический дизайнер',
-      'художник',
-      'AI-дизайнер',
-      'front разработчик',
-      'маркетолог',
-    ],
-  },
-  {
-    id: 2,
-    name: 'Сайт приюта для бездомных животных',
-    image: mock_img2,
-    tags: [
-      'веб-дизайнер',
-      'маркетолог',
-      'back разработчик',
-      'front разработчик',
-    ],
-  },
-  {
-    id: 3,
-    name: 'Визуальная новелла «По ту сторону»',
-    image: mock_img3,
-    tags: ['графический дизайнер', 'маркетолог', 'геймдевелопер'],
-  },
-];
 
 export const WeeklyProjects: React.FC = () => {
   const navigate = useNavigate();
+  const { api } = getServices();
+  const projectService = useMemo(() => new ProjectService(api), [api]);
+  const { data, isPending, isError } = useQuery({
+    queryKey: ['projects', 'featured'],
+    queryFn: () => projectService.getFeaturedProjects(),
+  });
+  const projects = useMemo(
+    () => toProjectCardItems(data?.results ?? []),
+    [data]
+  );
 
   return (
     <section className={styles.section}>
       <div className={styles.container}>
         <h2 className={styles.title}>проекты недели</h2>
-        <ProjectsList data={mock_projects} />
+        {isPending && <p className={styles.state}>Загружаем проекты...</p>}
+        {isError && (
+          <p className={styles.state} role="alert">
+            Не удалось загрузить проекты. Попробуйте обновить страницу.
+          </p>
+        )}
+        {!isPending && !isError && projects.length === 0 && (
+          <p className={styles.state}>Закреплённых проектов пока нет.</p>
+        )}
+        {!isPending && !isError && projects.length > 0 && (
+          <ProjectsList data={projects} />
+        )}
         <Button className={styles.button} onClick={() => navigate('/projects')}>
           Смотреть все проекты
         </Button>

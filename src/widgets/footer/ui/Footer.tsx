@@ -6,21 +6,21 @@ import logoDark from '/logo-dark.svg';
 
 const footerData = {
   forSpecialists: [
-    { id: 1, text: 'Проекты', url: '#' },
-    { id: 2, text: 'О резюме', url: '#' },
-    { id: 3, text: 'Рекомендации', url: '#' },
-    { id: 4, text: 'Список статей', url: '#' },
+    { id: 1, text: 'Проекты', url: '/projects' },
+    { id: 2, text: 'О резюме' },
+    { id: 3, text: 'Рекомендации' },
+    { id: 4, text: 'Список статей' },
   ],
   forOrganizers: [
-    { id: 1, text: 'Создать проект', url: '#' },
-    { id: 2, text: 'Поиск специалистов', url: '#' },
+    { id: 1, text: 'Создать проект' },
+    { id: 2, text: 'Поиск специалистов', url: '/participants' },
   ],
   system: [
-    { id: 1, text: 'О проекте', url: '#' },
-    { id: 2, text: 'Инвесторам', url: '#' },
-    { id: 3, text: 'Персональные данные', url: '#' },
-    { id: 4, text: 'ТИМЛАБ API', url: '#' },
-    { id: 5, text: 'Помощь', url: '#' },
+    { id: 1, text: 'О проекте' },
+    { id: 2, text: 'Инвесторам' },
+    { id: 3, text: 'Персональные данные', url: '/policy' },
+    { id: 4, text: 'ТИМЛАБ API' },
+    { id: 5, text: 'Помощь', url: '/questions' },
   ],
 };
 
@@ -72,12 +72,12 @@ export const Footer: React.FC = () => {
             ТИМЛАБ <Icon name="arrowNortheast" />
           </button>
           <div className={styles.socials}>
-            <a href="#" className={styles.socialsIcon}>
+            <span className={styles.socialsIcon} aria-label="Email">
               <Icon name="gmail" />
-            </a>
-            <a href="#" className={styles.socialsIcon}>
+            </span>
+            <span className={styles.socialsIcon} aria-label="Telegram">
               <Icon name="telegram" />
-            </a>
+            </span>
           </div>
         </div>
       </div>
