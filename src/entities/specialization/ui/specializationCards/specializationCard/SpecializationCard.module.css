@@ -17,6 +17,15 @@
   box-shadow: 0 0 0 2px var(--accent-purple-color);
 }
 
+.card:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.card:disabled:hover {
+  box-shadow: none;
+}
+
 @media (max-width: 600px) {
   .card {
     padding-block: 36px;

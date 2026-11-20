@@ -1,35 +1,27 @@
+import { useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { getServices } from '@app';
+import { FieldService } from '@entities/field';
 import { SpecializationCards } from '@entities/specialization';
+import { useNavigate } from 'react-router-dom';
 import styles from './Opportunities.module.css';
 import { FindTeam } from './FindTeam';
 import clouds from '../assets/clouds.png';
-import { useNavigate } from 'react-router-dom';
 
-const mock_specializations = [
-  {
-    id: 1,
-    name: 'Управление продуктом',
-  },
-  {
-    id: 2,
-    name: 'Дизайн',
-  },
-  {
-    id: 3,
-    name: 'Разработка',
-  },
-  {
-    id: 4,
-    name: 'AI',
-  },
-  {
-    id: 5,
-    name: 'Съемки и продакшн',
-  },
-  {
-    id: 6,
-    name: 'Все профили',
-  },
-];
+const HOME_DIRECTIONS = [
+  { slug: 'design', name: 'Дизайн' },
+  { slug: 'audio-music', name: 'Звук и музыка' },
+  { slug: 'content', name: 'Контент' },
+  { slug: 'marketing', name: 'Маркетинг и продвижение' },
+  { slug: 'development', name: 'Разработка' },
+  { slug: 'production', name: 'Съёмки и продакшн' },
+  { slug: 'product', name: 'Продукт' },
+] as const;
+
+const ALL_DIRECTIONS_ID = 'all';
+
+const normalizeFieldName = (name: string) =>
+  name.trim().toLocaleLowerCase('ru-RU').replaceAll('ё', 'е');
 
 const steps_data = [
   {
@@ -48,6 +40,57 @@ const steps_data = [
 
 export const Opportunities: React.FC = () => {
   const navigate = useNavigate();
+  const { api } = getServices();
+  const fieldService = useMemo(() => new FieldService(api), [api]);
+  const fieldsQuery = useQuery({
+    queryKey: ['fields'],
+    queryFn: () => fieldService.list(),
+  });
+  const fieldIdsBySlug = useMemo<Map<string, number>>(() => {
+    const fieldsBySlug = new Map(
+      (fieldsQuery.data ?? [])
+        .filter((field) => field.slug)
+        .map((field) => [field.slug as string, field])
+    );
+    const fieldsByName = new Map(
+      (fieldsQuery.data ?? []).map((field) => [
+        normalizeFieldName(field.name),
+        field,
+      ])
+    );
+
+    return new Map(
+      HOME_DIRECTIONS.flatMap((direction) => {
+        const field =
+          fieldsBySlug.get(direction.slug) ??
+          fieldsByName.get(normalizeFieldName(direction.name));
+
+        return field ? [[direction.slug, field.id] as const] : [];
+      })
+    );
+  }, [fieldsQuery.data]);
+  const directionCards = [
+    ...HOME_DIRECTIONS.map((direction) => ({
+      id: direction.slug,
+      name: direction.name,
+      disabled:
+        fieldsQuery.isPending || !fieldIdsBySlug.has(direction.slug),
+    })),
+    { id: ALL_DIRECTIONS_ID, name: 'Все профили', disabled: false },
+  ];
+
+  const handleDirectionSelect = (directionId: number | string) => {
+    if (directionId === ALL_DIRECTIONS_ID) {
+      navigate('/projects');
+      return;
+    }
+
+    const fieldId = fieldIdsBySlug.get(String(directionId));
+    if (!fieldId) return;
+
+    const params = new URLSearchParams({ field_ids: String(fieldId) });
+    navigate(`/projects?${params.toString()}`);
+  };
 
   return (
     <section className={styles.section}>
@@ -59,8 +102,8 @@ export const Opportunities: React.FC = () => {
           </span>
         </div>
         <SpecializationCards
-          data={mock_specializations}
-          onSelect={() => navigate('/projects')}
+          data={directionCards}
+          onSelect={handleDirectionSelect}
         />
       </div>
       <FindTeam data={steps_data} />
