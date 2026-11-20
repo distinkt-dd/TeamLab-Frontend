@@ -1,10 +1,11 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import styles from './List.module.css';
 
 interface ListItem {
   id: string | number;
   text: string;
-  url: string;
+  url?: string;
 }
 
 interface ListProps {
@@ -19,9 +20,13 @@ export const List: React.FC<ListProps> = ({ title, items }) => {
       <ul className={styles.list}>
         {items.map((item) => (
           <li key={item.id} className={styles.listItem}>
-            <a href={item.url} className={styles.link}>
-              {item.text}
-            </a>
+            {item.url ? (
+              <Link to={item.url} className={styles.link}>
+                {item.text}
+              </Link>
+            ) : (
+              <span className={styles.inactive}>{item.text}</span>
+            )}
           </li>
         ))}
       </ul>

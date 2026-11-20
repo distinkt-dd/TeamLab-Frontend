@@ -1,4 +1,6 @@
 .card {
+  width: 100%;
+  border: none;
   background: var(--gradient-day);
   backdrop-filter: blur(10px);
   padding: 72px 0;
@@ -6,4 +8,18 @@
   font-size: 24px;
   letter-spacing: 0.7px;
   border-radius: 24px;
+  color: inherit;
+  cursor: pointer;
+}
+
+.card:hover,
+.card:focus-visible {
+  box-shadow: 0 0 0 2px var(--accent-purple-color);
+}
+
+@media (max-width: 600px) {
+  .card {
+    padding-block: 36px;
+    font-size: 20px;
+  }
 }

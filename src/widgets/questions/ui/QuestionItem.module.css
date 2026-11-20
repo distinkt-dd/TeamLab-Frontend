@@ -54,3 +54,22 @@
   max-width: 816px;
   margin: 0 auto;
 }
+
+@media (max-width: 600px) {
+  .item,
+  .item:has(.answerOpen) {
+    padding: 18px 20px;
+  }
+
+  .top {
+    gap: 16px;
+  }
+
+  .question {
+    font-size: 18px;
+  }
+
+  .text {
+    font-size: 16px;
+  }
+}

@@ -2,6 +2,7 @@ import { SpecializationCards } from '@entities/specialization';
 import styles from './Opportunities.module.css';
 import { FindTeam } from './FindTeam';
 import clouds from '../assets/clouds.png';
+import { useNavigate } from 'react-router-dom';
 
 const mock_specializations = [
   {
@@ -46,6 +47,8 @@ const steps_data = [
 ];
 
 export const Opportunities: React.FC = () => {
+  const navigate = useNavigate();
+
   return (
     <section className={styles.section}>
       <div className={styles.container}>
@@ -55,7 +58,10 @@ export const Opportunities: React.FC = () => {
             Посмотрите проекты, где нужны специалисты вашего профиля
           </span>
         </div>
-        <SpecializationCards data={mock_specializations} />
+        <SpecializationCards
+          data={mock_specializations}
+          onSelect={() => navigate('/projects')}
+        />
       </div>
       <FindTeam data={steps_data} />
       <img src={clouds} className={styles.img} aria-hidden="true" />
