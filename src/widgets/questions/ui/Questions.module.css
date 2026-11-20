@@ -10,6 +10,7 @@
 .section {
   padding: 45px 0 125px;
   position: relative;
+  scroll-margin-top: 24px;
 }
 
 .section::before {

@@ -6,22 +6,38 @@ import logoDark from '/logo-dark.svg';
 
 const footerData = {
   forSpecialists: [
-    { id: 1, text: 'Проекты', url: '/projects' },
-    { id: 2, text: 'О резюме' },
-    { id: 3, text: 'Рекомендации' },
-    { id: 4, text: 'Список статей' },
+    { id: 1, text: 'Проекты', url: '/projects', enabled: true },
+    { id: 2, text: 'О резюме', enabled: false },
+    { id: 3, text: 'Рекомендации', enabled: false },
+    { id: 4, text: 'Список статей', enabled: false },
   ],
   forOrganizers: [
-    { id: 1, text: 'Создать проект' },
-    { id: 2, text: 'Поиск специалистов', url: '/participants' },
+    { id: 1, text: 'Создать проект', enabled: false },
+    {
+      id: 2,
+      text: 'Поиск специалистов',
+      url: '/participants',
+      enabled: true,
+    },
   ],
   system: [
-    { id: 1, text: 'О проекте' },
-    { id: 2, text: 'Инвесторам' },
-    { id: 3, text: 'Персональные данные', url: '/policy' },
-    { id: 4, text: 'ТИМЛАБ API' },
-    { id: 5, text: 'Помощь', url: '/questions' },
+    { id: 1, text: 'О проекте', enabled: false },
+    { id: 2, text: 'Инвесторам', enabled: false },
+    {
+      id: 3,
+      text: 'Персональные данные',
+      url: '/policy',
+      enabled: true,
+    },
+    { id: 4, text: 'ТИМЛАБ API', enabled: false },
+    { id: 5, text: 'Помощь', url: '/questions', enabled: false },
   ],
+};
+
+const visibleFooterData = {
+  forSpecialists: footerData.forSpecialists.filter((item) => item.enabled),
+  forOrganizers: footerData.forOrganizers.filter((item) => item.enabled),
+  system: footerData.system.filter((item) => item.enabled),
 };
 
 const teamMembers = [
@@ -44,9 +60,15 @@ export const Footer: React.FC = () => {
         </div>
 
         <nav className={styles.navSection}>
-          <List title="Специалистам" items={footerData.forSpecialists} />
-          <List title="Организаторам" items={footerData.forOrganizers} />
-          <List title="Система" items={footerData.system} />
+          <List
+            title="Специалистам"
+            items={visibleFooterData.forSpecialists}
+          />
+          <List
+            title="Организаторам"
+            items={visibleFooterData.forOrganizers}
+          />
+          <List title="Система" items={visibleFooterData.system} />
         </nav>
 
         <div className={styles.extraSection}>

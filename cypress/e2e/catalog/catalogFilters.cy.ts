@@ -356,14 +356,36 @@ describe('фильтры каталогов', () => {
     [375, 900],
   ] as const) {
     it(`не создаёт горизонтальную прокрутку каталогов при ${width}px`, () => {
-      cy.intercept('GET', '**/api/v1/projects/**', paginated([project(1, 'Проект')]));
-      cy.intercept('GET', '**/api/v1/users/**',
-        paginated([participant(1, 'participant-1')])
+      cy.intercept(
+        'GET',
+        '**/api/v1/projects/**',
+        paginated([
+          project(1, 'Проект'),
+          project(2, 'Второй проект'),
+          project(3, 'Третий проект'),
+          project(4, 'Четвёртый проект'),
+        ])
+      );
+      cy.intercept(
+        'GET',
+        '**/api/v1/users/**',
+        paginated([
+          participant(1, 'participant-1'),
+          participant(2, 'participant-2'),
+          participant(3, 'participant-3'),
+          participant(4, 'participant-4'),
+        ])
       );
       cy.viewport(width, height);
 
       cy.visit('http://localhost:5173/projects');
       cy.contains('span', /^Проект$/).should('be.visible');
+      cy.get('img[src="/magenta-deep.png"]').should('be.visible');
+      for (const src of ['/violet-fuzz.png', '/wavy-blue.png']) {
+        cy.get(`img[src="${src}"]`).should(
+          width <= 600 ? 'not.be.visible' : 'be.visible'
+        );
+      }
       cy.document().then((document) => {
         expect(document.documentElement.scrollWidth).to.equal(
           document.documentElement.clientWidth

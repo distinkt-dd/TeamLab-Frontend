@@ -75,6 +75,15 @@ const interceptCatalogDictionaries = () => {
   cy.intercept('GET', '**/api/v1/skills/**', []).as('skills');
 };
 
+const expectFaqAtViewportTop = () => {
+  cy.get('#faq').should(($faq) => {
+    const top = $faq.get(0).getBoundingClientRect().top;
+
+    expect(top).to.be.at.least(0);
+    expect(top).to.be.lessThan(120);
+  });
+};
+
 describe('главная страница', () => {
   beforeEach(() => {
     interceptCommonRequests();
@@ -100,8 +109,59 @@ describe('главная страница', () => {
 
     cy.get('footer').within(() => {
       cy.contains('a', 'Проекты').should('have.attr', 'href', '/projects');
-      cy.contains('О резюме').should('not.match', 'a');
+      cy.contains('a', 'Поиск специалистов').should(
+        'have.attr',
+        'href',
+        '/participants'
+      );
+      cy.contains('a', 'Персональные данные').should(
+        'have.attr',
+        'href',
+        '/policy'
+      );
     });
+  });
+
+  it('прокручивает к FAQ с главной и при повторном нажатии', () => {
+    cy.intercept('GET', '**/api/v1/projects/featured/**', paginated([]));
+    cy.visit('http://localhost:5173/');
+
+    cy.contains('a', 'Вопросы').click();
+    cy.location('pathname').should('eq', '/');
+    cy.location('hash').should('eq', '#faq');
+    expectFaqAtViewportTop();
+
+    cy.scrollTo('top', { duration: 0 });
+    cy.window().its('scrollY').should('eq', 0);
+    cy.contains('a', 'Вопросы').click();
+    expectFaqAtViewportTop();
+  });
+
+  it('прокручивает к FAQ при прямом открытии и обновлении страницы', () => {
+    cy.intercept('GET', '**/api/v1/projects/featured/**', paginated([]));
+    cy.visit('http://localhost:5173/#faq');
+
+    cy.location('hash').should('eq', '#faq');
+    expectFaqAtViewportTop();
+
+    cy.reload();
+    cy.location('hash').should('eq', '#faq');
+    expectFaqAtViewportTop();
+  });
+
+  it('переходит к FAQ со страницы проектов', () => {
+    cy.intercept('GET', '**/api/v1/projects/featured/**', paginated([]));
+    interceptCatalogDictionaries();
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v1/projects/' },
+      paginated([])
+    );
+    cy.visit('http://localhost:5173/projects');
+
+    cy.contains('a', 'Вопросы').click();
+    cy.location('pathname').should('eq', '/');
+    cy.location('hash').should('eq', '#faq');
+    expectFaqAtViewportTop();
   });
 
   it('показывает пустое состояние и открывает все проекты из карточки направления', () => {
@@ -211,18 +271,51 @@ describe('главная страница', () => {
     cy.location('search').should('eq', '');
   });
 
-  it('не создаёт горизонтальную прокрутку на мобильном экране', () => {
-    cy.intercept('GET', '**/api/v1/projects/featured/**', paginated([]));
-    cy.viewport(375, 900);
-    cy.visit('http://localhost:5173/');
-    cy.contains('Закреплённых проектов пока нет.').should(
-      'be.visible'
-    );
+  for (const [width, height] of [
+    [1440, 1000],
+    [768, 1000],
+    [375, 900],
+  ] as const) {
+    it(`показывает сокращённую навигацию без переполнения при ${width}px`, () => {
+      cy.intercept('GET', '**/api/v1/projects/featured/**', paginated([]));
+      cy.viewport(width, height);
+      cy.visit('http://localhost:5173/');
+      cy.contains('Закреплённых проектов пока нет.').should('be.visible');
 
-    cy.document().then((document) => {
-      expect(document.documentElement.scrollWidth).to.eq(
-        document.documentElement.clientWidth
-      );
+      if (width <= 600) {
+        cy.get('button[aria-label="Открыть меню"]').click();
+      }
+
+      cy.get('div[class*="_header_"]').first().within(() => {
+        cy.contains('a:visible', 'Проекты').should('be.visible');
+        cy.contains('a:visible', 'Участники').should('be.visible');
+        cy.contains('a:visible', 'Вопросы')
+          .should('be.visible')
+          .and('have.attr', 'href', '/#faq');
+      });
+      cy.get('footer').within(() => {
+        for (const hiddenItem of [
+          'О резюме',
+          'Рекомендации',
+          'Список статей',
+          'Создать проект',
+          'О проекте',
+          'Инвесторам',
+          'ТИМЛАБ API',
+          'Помощь',
+        ]) {
+          cy.contains(hiddenItem).should('not.exist');
+        }
+        cy.contains('a', 'Проекты').should('be.visible');
+        cy.contains('a', 'Поиск специалистов').should('be.visible');
+        cy.contains('a', 'Персональные данные').should('be.visible');
+      });
+
+      cy.document().then((document) => {
+        expect(document.documentElement.scrollWidth).to.eq(
+          document.documentElement.clientWidth
+        );
+      });
     });
-  });
+  }
 });

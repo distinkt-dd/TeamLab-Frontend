@@ -4,10 +4,15 @@ import { Input } from '../input';
 import { Icon } from '@shared/icons';
 import styles from './search.module.css';
 
+export type SearchCatalog = 'projects' | 'participants';
+
 interface SearchProps {
   onSearch: (value: string) => void;
+  catalog: SearchCatalog;
+  onCatalogChange: (catalog: SearchCatalog) => void;
+  initialValue?: string;
+  popularSuggestions?: string[];
   suggestions?: string[];
-  searchHistory?: string[];
   maxSuggestions?: number;
   className?: string;
   id?: string;
@@ -16,34 +21,60 @@ interface SearchProps {
 
 export const Search = ({
   onSearch,
+  catalog,
+  onCatalogChange,
+  initialValue = '',
+  popularSuggestions,
   suggestions,
-  searchHistory,
   maxSuggestions = 5,
   className,
   id,
   overlay = false,
 }: SearchProps) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState(initialValue);
   const [showDropdown, setShowDropdown] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const containerRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const normalizedInput = inputValue.trim();
+  const visiblePopularSuggestions = useMemo(
+    () =>
+      normalizedInput
+        ? []
+        : Array.from(new Set(popularSuggestions ?? [])).slice(
+            0,
+            maxSuggestions
+          ),
+    [maxSuggestions, normalizedInput, popularSuggestions]
+  );
   const filteredSuggestions = useMemo(() => {
-    return (suggestions || [])
-      .filter((s) => s.toLowerCase().includes(inputValue.toLowerCase()))
-      .slice(0, maxSuggestions);
-  }, [inputValue, suggestions, maxSuggestions]);
+    if (!normalizedInput) return [];
 
-  const filteredHistory = useMemo(() => {
-    return (searchHistory || [])
-      .filter((historyItem) =>
-        historyItem.toLowerCase().includes(inputValue.toLowerCase())
-      )
-      .slice(0, maxSuggestions);
-  }, [inputValue, searchHistory, maxSuggestions]);
+    const query = normalizedInput.toLocaleLowerCase('ru-RU');
+    const uniqueSuggestions = new Map<string, string>();
+
+    for (const suggestion of suggestions ?? []) {
+      const normalizedSuggestion = suggestion.trim();
+      const key = normalizedSuggestion.toLocaleLowerCase('ru-RU');
+      if (
+        normalizedSuggestion &&
+        key.includes(query) &&
+        !uniqueSuggestions.has(key)
+      ) {
+        uniqueSuggestions.set(key, normalizedSuggestion);
+      }
+    }
+
+    return Array.from(uniqueSuggestions.values()).slice(0, maxSuggestions);
+  }, [maxSuggestions, normalizedInput, suggestions]);
+  const selectableItems = normalizedInput
+    ? [...filteredSuggestions, normalizedInput]
+    : visiblePopularSuggestions;
+  const searchAllLabel =
+    catalog === 'projects' ? 'во всех проектах' : 'среди участников';
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -74,19 +105,19 @@ export const Search = ({
   const getActiveDescendantId = (): string | undefined => {
     if (highlightedIndex < 0) return undefined;
 
-    if (highlightedIndex < filteredSuggestions.length) {
-      const suggestion = filteredSuggestions[highlightedIndex];
-      if (!suggestion) return undefined;
-      return `suggestion-${highlightedIndex}-${suggestion.replace(/\s+/g, '-')}`;
-    } else {
-      const historyIndex = highlightedIndex - filteredSuggestions.length;
-      const historyItem = filteredHistory[historyIndex];
-      if (!historyItem) return undefined;
-      return `history-${historyIndex}-${historyItem.replace(/\s+/g, '-')}`;
-    }
+    return selectableItems[highlightedIndex]
+      ? `search-option-${highlightedIndex}`
+      : undefined;
   };
 
-  const handleOpenSearch = () => setIsSearchOpen((open) => !open);
+  const handleOpenSearch = () => {
+    const nextIsOpen = !isSearchOpen;
+    setIsSearchOpen(nextIsOpen);
+    setShowDropdown(nextIsOpen);
+    if (nextIsOpen) {
+      window.requestAnimationFrame(() => inputRef.current?.focus());
+    }
+  };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -95,12 +126,19 @@ export const Search = ({
     setShowDropdown(true);
   };
 
-  const handleSuggestionClick = (suggestion: string) => {
-    setInputValue(suggestion);
-    setHighlightedIndex(-1);
-    inputRef.current?.focus();
+  const submitSearch = (valueToSearch: string) => {
+    const normalizedValue = valueToSearch.trim();
+    if (!normalizedValue) return;
+
+    setInputValue(normalizedValue);
+    onSearch(normalizedValue);
+    setIsSearchOpen(false);
     setShowDropdown(false);
+    setHighlightedIndex(-1);
   };
+
+  const handleSuggestionClick = (suggestion: string) =>
+    submitSearch(suggestion);
 
   const handleClearInput = () => {
     setInputValue('');
@@ -108,16 +146,13 @@ export const Search = ({
     inputRef.current?.focus();
   };
 
-  const handleSearch = () => {
-    onSearch(inputValue);
-    setIsSearchOpen(false);
-    setInputValue('');
-    setShowDropdown(false);
-    setHighlightedIndex(-1);
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    submitSearch(inputValue);
   };
 
   const handleInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    const totalItems = filteredSuggestions.length + filteredHistory.length;
+    const totalItems = selectableItems.length;
 
     switch (event.key) {
       case 'ArrowDown':
@@ -133,9 +168,8 @@ export const Search = ({
       case 'Enter':
         if (highlightedIndex >= 0) {
           event.preventDefault();
-          const allItems = [...filteredSuggestions, ...filteredHistory];
-          handleSuggestionClick(allItems[highlightedIndex]);
-          setShowDropdown(false);
+          const selectedItem = selectableItems[highlightedIndex];
+          if (selectedItem) handleSuggestionClick(selectedItem);
         }
         break;
       case 'Escape':
@@ -161,40 +195,66 @@ export const Search = ({
         </Button>
       )}
       {isSearchOpen && (
-        <div className={styles.searchWrapper}>
-          <div className={styles.iconWrapper}>
-            <Icon name="search" />
+        <form className={styles.searchWrapper} onSubmit={handleSubmit}>
+          <div
+            className={styles.catalogSwitch}
+            role="group"
+            aria-label="Каталог поиска"
+          >
+            {(
+              [
+                ['projects', 'Проекты'],
+                ['participants', 'Участники'],
+              ] as const
+            ).map(([value, label]) => (
+              <button
+                key={value}
+                type="button"
+                className={`${styles.catalogButton} ${
+                  catalog === value ? styles.catalogButtonActive : ''
+                }`}
+                aria-pressed={catalog === value}
+                onClick={() => onCatalogChange(value)}
+              >
+                {label}
+              </button>
+            ))}
           </div>
-          <Input
-            ref={inputRef}
-            aria-label="Поисковый запрос"
-            className={styles.input}
-            value={inputValue}
-            onChange={handleInputChange}
-            onFocus={() => setShowDropdown(true)}
-            onKeyDown={handleInputKeyDown}
-            aria-haspopup="listbox"
-            aria-owns="search-dropdown"
-            aria-activedescendant={getActiveDescendantId()}
-            aria-autocomplete="list"
-          />
-          <button
-            type="button"
-            className={`${styles.iconWrapper} ${styles.iconCloseWrapper}`}
-            aria-label="Очистить поле поиска"
-            onClick={handleClearInput}
-          >
-            <Icon name="close" />
-          </button>
-          <Button
-            variant="secondary"
-            className={styles.button}
-            onClick={handleSearch}
-          >
-            Найти
-          </Button>
+          <div className={styles.searchControls}>
+            <div className={styles.iconWrapper}>
+              <Icon name="search" />
+            </div>
+            <Input
+              ref={inputRef}
+              aria-label="Поисковый запрос"
+              className={styles.input}
+              value={inputValue}
+              onChange={handleInputChange}
+              onFocus={() => setShowDropdown(true)}
+              onKeyDown={handleInputKeyDown}
+              aria-haspopup="listbox"
+              aria-owns="search-dropdown"
+              aria-activedescendant={getActiveDescendantId()}
+              aria-autocomplete="list"
+            />
+            <button
+              type="button"
+              className={`${styles.iconWrapper} ${styles.iconCloseWrapper}`}
+              aria-label="Очистить поле поиска"
+              onClick={handleClearInput}
+            >
+              <Icon name="close" />
+            </button>
+            <Button
+              type="submit"
+              variant="secondary"
+              className={styles.button}
+            >
+              Найти
+            </Button>
+          </div>
           {showDropdown &&
-            (filteredSuggestions.length > 0 || filteredHistory.length > 0) && (
+            selectableItems.length > 0 && (
               <div
                 className={styles.dropdown}
                 ref={dropdownRef}
@@ -203,67 +263,65 @@ export const Search = ({
                 aria-label="Результаты поиска"
                 aria-live="polite"
               >
-                {filteredSuggestions.length > 0 && (
+                {visiblePopularSuggestions.length > 0 && (
                   <ul
-                    className={`${styles.suggestions} ${
-                      filteredHistory.length === 0
-                        ? styles['suggestions--no-border']
-                        : ''
-                    }`}
+                    className={`${styles.suggestions} ${styles['suggestions--no-border']}`}
                   >
-                    {filteredSuggestions.map((suggestion, index) => {
-                      const suggestionId = `suggestion-${index}-${suggestion.replace(/\s+/g, '-')}`;
-
-                      return (
-                        <li
-                          id={suggestionId}
-                          key={`suggestion-${suggestion}`}
-                          className={`${styles.dropdownItem} ${styles.suggestionItem} ${
-                            highlightedIndex === index ? styles.highlighted : ''
-                          }`}
-                          onClick={() => handleSuggestionClick(suggestion)}
-                          role="option"
-                          aria-selected={highlightedIndex === index}
-                          tabIndex={-1}
-                        >
-                          {suggestion}
-                        </li>
-                      );
-                    })}
+                    {visiblePopularSuggestions.map((suggestion, index) => (
+                      <li
+                        id={`search-option-${index}`}
+                        key={`popular-${suggestion}`}
+                        className={`${styles.dropdownItem} ${styles.suggestionItem} ${
+                          highlightedIndex === index ? styles.highlighted : ''
+                        }`}
+                        onClick={() => handleSuggestionClick(suggestion)}
+                        role="option"
+                        aria-selected={highlightedIndex === index}
+                        tabIndex={-1}
+                      >
+                        {suggestion}
+                      </li>
+                    ))}
                   </ul>
                 )}
-                {filteredHistory.length > 0 && (
+                {normalizedInput && (
                   <ul>
-                    {filteredHistory.map((historyItem, index) => {
-                      const historyId = `history-${index}-${historyItem.replace(/\s+/g, '-')}`;
-
-                      return (
-                        <li
-                          id={historyId}
-                          key={`history-${historyItem}`}
-                          className={`${styles.dropdownItem} ${
-                            highlightedIndex ===
-                            index + filteredSuggestions.length
-                              ? styles.highlighted
-                              : ''
-                          }`}
-                          onClick={() => handleSuggestionClick(historyItem)}
-                          role="option"
-                          aria-selected={
-                            highlightedIndex ===
-                            index + filteredSuggestions.length
-                          }
-                          tabIndex={-1}
-                        >
-                          {historyItem}
-                        </li>
-                      );
-                    })}
+                    {filteredSuggestions.map((suggestion, index) => (
+                      <li
+                        id={`search-option-${index}`}
+                        key={`suggestion-${suggestion}`}
+                        className={`${styles.dropdownItem} ${
+                          highlightedIndex === index ? styles.highlighted : ''
+                        }`}
+                        onClick={() => handleSuggestionClick(suggestion)}
+                        role="option"
+                        aria-selected={highlightedIndex === index}
+                        tabIndex={-1}
+                      >
+                        {suggestion}
+                      </li>
+                    ))}
+                    <li
+                      id={`search-option-${filteredSuggestions.length}`}
+                      className={`${styles.dropdownItem} ${styles.searchAllItem} ${
+                        highlightedIndex === filteredSuggestions.length
+                          ? styles.highlighted
+                          : ''
+                      }`}
+                      onClick={() => handleSuggestionClick(normalizedInput)}
+                      role="option"
+                      aria-selected={
+                        highlightedIndex === filteredSuggestions.length
+                      }
+                      tabIndex={-1}
+                    >
+                      Искать «{normalizedInput}» {searchAllLabel}
+                    </li>
                   </ul>
                 )}
               </div>
             )}
-        </div>
+        </form>
       )}
     </div>
   );
