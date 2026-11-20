@@ -1,4 +1,8 @@
 .header {
+  /* Собственный контекст наложения: выпадашка личного кабинета выходит за границы
+     шапки и без этого уходит под контент страницы (z-index у него выше) */
+  position: relative;
+  z-index: 5;
   font-family: var(--font-family-base, 'Inter', sans-serif);
   font-weight: 400;
   font-size: 18px;
@@ -74,7 +78,7 @@
 
 .dropdown {
   position: absolute;
-  top: 62px;
+  top: calc(100% + 16px);
   left: 0;
   width: 253px;
   display: flex;
@@ -92,6 +96,17 @@
     )
   );
   padding: 20px 20px 40px;
+}
+
+/* Невидимая перемычка в зазоре между кнопкой и дропдауном: без неё курсор при
+   переходе вниз выходит за пределы обёртки, hover слетает и дропдаун закрывается */
+.dropdown::before {
+  content: '';
+  position: absolute;
+  top: -16px;
+  right: 0;
+  left: 0;
+  height: 16px;
 }
 
 .actionIcons {

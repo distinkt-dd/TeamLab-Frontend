@@ -437,48 +437,51 @@
   font-size: 16px;
 }
 
-/* Редактор участника: вкладки участников («папки», активная сливается с панелью ниже)
+/* Редактор участника: вкладки участников (отдельные плашки по макету)
    и панель с полями выбранного участника */
 .participantEditor {
   margin-top: 86px;
 }
 
-/* Полоса вкладок: подложка той же тональности, что и низ --gradient-day, чтобы
-   белая активная вкладка читалась и сливалась с панелью ниже */
+/* Полоса вкладок: плашки 217x70 со скруглением 8px и зазором 27px (Frame 56);
+   вкладки всегда в одну строку — при 6-7 участниках они сжимаются, а не переносятся */
 .participantTabs {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: flex-end;
-  margin-bottom: -1px;
-  padding: 16px 30px 0;
-  border-radius: 24px 24px 0 0;
+  flex-wrap: nowrap;
+  gap: 27px;
+  align-items: stretch;
+  margin-bottom: 24px;
 }
 
 .participantTab,
 .participantTabActive,
 .participantTabError {
-  min-width: 148px;
+  flex: 0 1 217px;
+  min-width: 0;
   max-width: 100%;
-  min-height: 54px;
+  min-height: 70px;
   border: 0;
-  border-radius: 14px 14px 0 0;
-  padding: 14px 28px;
-  /*   background-color: rgba(114, 85, 155, 0.6); */
+  border-radius: 8px;
+  padding: 8px;
+  background: var(--gradient-day);
+  backdrop-filter: var(--bg-blur);
+  -webkit-backdrop-filter: var(--bg-blur);
   color: var(--neutral-secondary-color);
   font-family: var(--font-family-base);
-  font-size: 16px;
-  line-height: 1.25;
+  font-size: 18px;
+  line-height: 1.5;
   text-align: center;
-  transform: skewX(-10deg);
   cursor: pointer;
 }
 
-/* Активная вкладка */
+/* Активная вкладка — Gradient Night из макета: в токенах проекта
+   --gradient-night светлый, поэтому значение берём из макета */
 .participantTabActive {
-  background-color: var(--neutral-default-color);
-  font-weight: 500;
-  border: 1px solid var(--line-color);
+  background: linear-gradient(
+    180deg,
+    rgba(87, 71, 107, 0.4) 0%,
+    rgba(161, 150, 197, 0.08) 100%
+  );
 }
 
 .participantTabError {
@@ -487,10 +490,7 @@
 
 .participantTabLabel {
   display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  transform: skewX(10deg);
+  overflow-wrap: break-word;
 }
 
 .participantTab:hover,
@@ -506,7 +506,7 @@
 }
 
 .participantPanel {
-  border-radius: 0 0 24px 24px;
+  border-radius: 24px;
   padding: 34px 40px 44px;
   background: var(--gradient-day);
   backdrop-filter: var(--bg-blur);
@@ -1016,23 +1016,26 @@
     font-size: 13px;
   }
 
+  /* На узких экранах плашки сохраняют ширину, а полоса прокручивается по горизонтали */
   .participantTabs {
-    gap: 6px;
-    padding: 12px 12px 0;
+    gap: 8px;
+    margin-bottom: 16px;
+    overflow-x: auto;
+    padding: 2px 0;
   }
 
   .participantTab,
   .participantTabActive,
   .participantTabError {
-    min-width: 112px;
-    min-height: 46px;
-    border-radius: 12px 12px 0 0;
-    padding: 10px 16px;
+    flex: 0 0 140px;
+    min-height: 56px;
+    border-radius: 8px;
+    padding: 8px;
     font-size: 14px;
   }
 
   .participantPanel {
-    border-radius: 0 0 18px 18px;
+    border-radius: 18px;
     padding: 26px 20px 32px;
   }
 
