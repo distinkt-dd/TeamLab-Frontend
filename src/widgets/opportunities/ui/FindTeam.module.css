@@ -38,3 +38,47 @@
   width: 286px;
   margin-top: 40px;
 }
+
+@media (max-width: 900px) {
+  .findTeam {
+    margin-top: 80px;
+    padding-block: 56px 72px;
+  }
+
+  .container {
+    padding-inline: 32px;
+  }
+
+  .list {
+    flex-direction: column;
+  }
+
+  .list > li > * {
+    max-width: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .findTeam {
+    margin-top: 56px;
+    padding-block: 40px 48px;
+    border-radius: 24px;
+  }
+
+  .container {
+    padding-inline: 20px;
+  }
+
+  .title {
+    font-size: 26px;
+  }
+
+  .list {
+    gap: 16px;
+    padding-top: 36px;
+  }
+
+  .button {
+    width: 100%;
+  }
+}

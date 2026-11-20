@@ -90,3 +90,44 @@
   font-size: 24px;
   color: var(--accent-purple-color);
 }
+
+@media (max-width: 600px) {
+  .item {
+    flex-direction: column;
+    gap: 24px;
+    padding: 20px;
+  }
+
+  .left {
+    min-width: 0;
+    gap: 16px;
+  }
+
+  .image,
+  .imageFallback {
+    width: 64px;
+    height: 64px;
+    flex: 0 0 64px;
+  }
+
+  .name {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .right {
+    width: 100%;
+    align-items: stretch;
+    flex-direction: column;
+    margin-right: 0;
+    gap: 20px;
+  }
+
+  .tags {
+    max-width: none;
+  }
+
+  .button {
+    width: 100%;
+  }
+}

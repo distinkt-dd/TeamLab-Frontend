@@ -135,9 +135,9 @@ export const Header: React.FC = () => {
   return (
     <div className={styles.header}>
       <div className={styles.container}>
-        <div className={styles.logoWrapper}>
+        <Link to="/" className={styles.logoWrapper} aria-label="На главную">
           <img src={isLiteTheme ? logoLight : logoDark} alt="ТИМЛАБ" />
-        </div>
+        </Link>
         <nav className={styles.nav}>
           <ul className={styles.list}>
             {navItems.map((item) => (

@@ -1,8 +1,6 @@
 .header {
-  /* Собственный контекст наложения: выпадашка личного кабинета выходит за границы
-     шапки и без этого уходит под контент страницы (z-index у него выше) */
   position: relative;
-  z-index: 5;
+  z-index: 100;
   font-family: var(--font-family-base, 'Inter', sans-serif);
   font-weight: 400;
   font-size: 18px;
@@ -27,6 +25,12 @@
   display: flex;
   align-items: start;
   justify-content: center;
+}
+
+.logoWrapper:focus-visible {
+  border-radius: 4px;
+  outline: 2px solid var(--accent-purple-color, #72559b);
+  outline-offset: 4px;
 }
 
 .nav {
@@ -96,6 +100,7 @@
     )
   );
   padding: 20px 20px 40px;
+  z-index: 2;
 }
 
 /* Невидимая перемычка в зазоре между кнопкой и дропдауном: без неё курсор при

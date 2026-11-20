@@ -29,3 +29,15 @@
   right: -140px;
   z-index: -1;
 }
+
+@media (max-width: 600px) {
+  .list {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .TLImg,
+  .RBImg {
+    display: none;
+  }
+}

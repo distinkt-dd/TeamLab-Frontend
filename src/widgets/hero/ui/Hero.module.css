@@ -3,6 +3,7 @@
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
+  overflow-x: clip;
 }
 
 .container {
@@ -74,4 +75,49 @@
 .titleSignature {
   font-weight: 500;
   letter-spacing: 0.1px;
+}
+
+@media (max-width: 900px) {
+  .container {
+    padding-inline: 32px;
+  }
+
+  .left {
+    width: 100%;
+    max-width: 100%;
+    padding-right: 0;
+  }
+
+  .rightSignature {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding-inline: 20px;
+  }
+
+  .left {
+    padding-block: 24px 40px;
+  }
+
+  .title {
+    margin-top: 72px;
+    font-size: 34px;
+  }
+
+  .titleAccent {
+    font-size: 42px;
+  }
+
+  .buttonContainer {
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 72px;
+  }
+
+  .buttonContainer > * {
+    width: 100%;
+  }
 }
