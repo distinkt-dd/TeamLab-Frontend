@@ -53,3 +53,28 @@
   border: none;
   cursor: pointer;
 }
+
+@media (max-width: 900px) {
+  .filter {
+    flex-direction: column;
+  }
+
+  .buttonContainer {
+    max-width: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .selectContainer,
+  .selectWrap {
+    width: 100%;
+  }
+
+  .selectContainer {
+    flex-direction: column;
+  }
+
+  .selectWrap > div {
+    width: 100%;
+  }
+}

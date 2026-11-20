@@ -2,6 +2,8 @@
   max-width: 1240px;
   width: 100%;
   margin: 0 auto;
+  padding-inline: 20px;
+  box-sizing: border-box;
 }
 
 .section {
@@ -22,6 +24,21 @@
 .buttonMore {
   max-width: 286px;
   margin: 0 auto;
+}
+
+.state {
+  margin: 0;
+  border-radius: 20px;
+  padding: 40px;
+  background: var(--gradient-day);
+  color: var(--neutral-secondary-color);
+  font-size: 20px;
+  line-height: 130%;
+}
+
+.optionsError {
+  margin: -24px 0 0;
+  color: var(--accent-red-color);
 }
 
 .decorateImg {
@@ -56,4 +73,36 @@
   overflow: hidden;
   pointer-events: none;
   z-index: -1;
+}
+
+@media (max-width: 768px) {
+  .vfPng,
+  .wbPng {
+    max-width: 180px;
+  }
+
+  .mdPng {
+    max-width: 260px;
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding-inline: 16px;
+  }
+
+  .section {
+    margin-block: 24px 72px;
+    row-gap: 28px;
+  }
+
+  .state {
+    padding: 24px;
+    font-size: 18px;
+  }
+
+  .vfPng,
+  .wbPng {
+    display: none;
+  }
 }

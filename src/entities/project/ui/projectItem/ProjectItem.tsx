@@ -1,12 +1,13 @@
 import { Button, Tag } from '@shared/ui';
 import { useNavigate } from 'react-router-dom';
+import type { ProjectCardTag } from '../../types';
 import styles from './ProjectItem.module.css';
 
 interface ProjectItemProps {
   id: number;
   name: string;
   image?: string;
-  tags?: string[];
+  tags?: ProjectCardTag[];
   showProjectActions?: boolean;
 }
 
@@ -34,9 +35,13 @@ export const ProjectItem: React.FC<ProjectItemProps> = ({
       <div className={styles.right}>
         {tags && tags.length > 0 && (
           <div className={styles.tags}>
-            {tags.map((tag, i) => (
-              <Tag className={styles.tag} key={i}>
-                {tag}
+            {tags.map((tag, index) => (
+              <Tag
+                className={styles.tag}
+                bgColor={tag.color ?? 'neutral'}
+                key={tag.id ?? `${tag.label}-${index}`}
+              >
+                {tag.label}
               </Tag>
             ))}
           </div>

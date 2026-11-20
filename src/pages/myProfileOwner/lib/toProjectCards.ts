@@ -7,7 +7,14 @@ export const toProjectCards = (projects: ProjectDetail[]): ProjectCardItem[] =>
     id: project.id,
     name: project.title,
     image: project.image ?? undefined,
-    tags: project.roles
-      .map((role) => role.specialization_name)
-      .filter((name): name is string => Boolean(name)),
+    tags: project.roles.flatMap((role) =>
+      role.specialization_name
+        ? [
+            {
+              id: role.specialization_id,
+              label: role.specialization_name,
+            },
+          ]
+        : []
+    ),
   }));

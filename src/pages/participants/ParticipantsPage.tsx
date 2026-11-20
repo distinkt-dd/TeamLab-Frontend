@@ -1,176 +1,120 @@
-import { useAppSelector } from '@app';
-import { useAppDispatch } from '@app/hooks';
-import { fetchUsers } from '@entities/user/model/actions';
+import { useMemo } from 'react';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import { getServices } from '@app';
+import { UserService } from '@entities/user';
 import {
-  selectUserError,
-  selectUserLoading,
-  selectUsers,
-  selectUsersNextPage,
-} from '@entities/user/model/selectors';
-import { Filter } from '@features/filter';
+  Filter,
+  type FilterSelect,
+  useCatalogFilterOptions,
+  useCatalogFilters,
+} from '@features/filter';
+import { getNextPageNumber } from '@shared/api/pagination';
 import { Button } from '@shared/ui';
 import { ParticipantsList } from '@widgets/participantsList';
 import clsx from 'clsx';
-import { useNavigate } from 'react-router-dom';
 import styles from './ParticipantsPage.module.css';
 
-// const mockUsers: UserPublicMock[] = [
-//   {
-//     id: 5,
-//     username: 'second_project_owner',
-//     display_name: 'Project Owner',
-//     avatar: mock_img6,
-//     specialization_id: null,
-//     level: 'senior',
-//     city: 'Санкт-Петербург',
-//     workload_hours_per_week: 32,
-//     work_format: null,
-//     employment_type: 'full_time',
-//     skills: [],
-//     search_status: null,
-//   },
-//   {
-//     id: 4,
-//     username: 'demo_member',
-//     display_name: 'Member Demo',
-//     avatar: mock_img6,
-//     specialization_id: 2,
-//     specialization_name: 'Frontend-разработчик',
-//     level: 'middle',
-//     city: 'Казань',
-//     workload_hours_per_week: 24,
-//     work_format: null,
-//     employment_type: 'full_time',
-//     skills: [
-//       {
-//         id: 6,
-//         user_id: 4,
-//         skill_id: 5,
-//         name: 'React',
-//         level: '',
-//         created_at: '2026-07-12T14:39:32.471460Z',
-//         updated_at: '2026-07-12T14:39:32.471470Z',
-//       },
-//     ],
-//     search_status: null,
-//   },
-//   {
-//     id: 3,
-//     username: 'demo_designer',
-//     display_name: 'Designer Demo',
-//     avatar: mock_img6,
-//     specialization_id: 5,
-//     specialization_name: 'UX/UI-дизайнер',
-//     level: 'senior',
-//     city: 'Санкт-Петербург',
-//     workload_hours_per_week: 40,
-//     work_format: null,
-//     employment_type: 'full_time',
-//     skills: [
-//       {
-//         id: 4,
-//         user_id: 3,
-//         skill_id: 6,
-//         name: 'Figma',
-//         level: '',
-//         created_at: '2026-07-12T14:39:32.470346Z',
-//         updated_at: '2026-07-12T14:39:32.470356Z',
-//       },
-//       {
-//         id: 5,
-//         user_id: 3,
-//         skill_id: 7,
-//         name: 'UX-исследования',
-//         level: '',
-//         created_at: '2026-07-12T14:39:32.470900Z',
-//         updated_at: '2026-07-12T14:39:32.470917Z',
-//       },
-//     ],
-//     search_status: null,
-//   },
-//   {
-//     id: 2,
-//     username: 'demo_backend',
-//     display_name: 'Backend Demo',
-//     avatar: mock_img6,
-//     specialization_id: 1,
-//     specialization_name: 'Backend-разработчик',
-//     level: 'junior',
-//     city: 'Москва',
-//     workload_hours_per_week: 12,
-//     work_format: null,
-//     employment_type: 'full_time',
-//     skills: [
-//       {
-//         id: 3,
-//         user_id: 2,
-//         skill_id: 3,
-//         name: 'DRF',
-//         level: '',
-//         created_at: '2026-07-12T14:39:32.469777Z',
-//         updated_at: '2026-07-12T14:39:32.469788Z',
-//       },
-//       {
-//         id: 2,
-//         user_id: 2,
-//         skill_id: 2,
-//         name: 'Django',
-//         level: '',
-//         created_at: '2026-07-12T14:39:32.469216Z',
-//         updated_at: '2026-07-12T14:39:32.469227Z',
-//       },
-//       {
-//         id: 1,
-//         user_id: 2,
-//         skill_id: 1,
-//         name: 'Python',
-//         level: '',
-//         created_at: '2026-07-12T14:39:32.468513Z',
-//         updated_at: '2026-07-12T14:39:32.468525Z',
-//       },
-//     ],
-//     search_status: null,
-//   },
-//   {
-//     id: 1,
-//     username: 'demo_owner',
-//     display_name: 'Demo Owner',
-//     avatar: mock_img6,
-//     specialization_id: null,
-//     level: 'middle',
-//     city: 'Москва',
-//     workload_hours_per_week: 24,
-//     work_format: null,
-//     employment_type: 'full_time',
-//     skills: [],
-//     search_status: null,
-//   },
-// ];
+const PAGE_SIZE = 6;
 
 export const ParticipantsPage: React.FC = () => {
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const participants = useAppSelector(selectUsers);
-  const nextPage = useAppSelector(selectUsersNextPage);
-  const isLoading = useAppSelector(selectUserLoading);
-  const error = useAppSelector(selectUserError);
-
-  const handleBack = () => {
-    navigate('/');
+  const { api } = getServices();
+  const userService = useMemo(() => new UserService(api), [api]);
+  const {
+    appliedFilters,
+    draftFilters,
+    setDraftFilters,
+    applyFilters,
+    resetFilters,
+    passthroughParams,
+  } = useCatalogFilters();
+  const {
+    fieldOptions,
+    specializationOptions,
+    skillOptions,
+    isPending: areOptionsPending,
+    isError: areOptionsError,
+  } = useCatalogFilterOptions(api);
+  const requestFilters = {
+    account_type: 'participant' as const,
+    field_ids: appliedFilters.fieldIds.join(',') || undefined,
+    specialization_ids:
+      appliedFilters.specializationIds.join(',') || undefined,
+    skill_ids: appliedFilters.skillIds.join(',') || undefined,
+    search: passthroughParams.search,
+    ordering: passthroughParams.ordering,
   };
 
-  if (!participants) {
-    return error ? <p role="alert">{error}</p> : <>Загрузка</>;
-  }
+  const {
+    data,
+    isPending,
+    isError,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: ['participants', 'catalog', requestFilters],
+    queryFn: ({ pageParam }) =>
+      userService.list({
+        page: pageParam,
+        limit: PAGE_SIZE,
+        ...requestFilters,
+      }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => getNextPageNumber(lastPage.next),
+  });
 
-  const handleShowMore = () => {
-    if (nextPage === null || isLoading) return;
-    void dispatch(fetchUsers({ page: nextPage }));
-  };
+  const participants = useMemo(
+    () =>
+      Array.from(
+        new Map(
+          (data?.pages ?? [])
+            .flatMap((page) => page.results)
+            .map((participant) => [participant.id, participant])
+        ).values()
+      ),
+    [data]
+  );
+
+  const filterSelects: FilterSelect[] = [
+    {
+      key: 'fields',
+      multiple: true,
+      options: fieldOptions,
+      value: draftFilters.fieldIds,
+      onChange: (fieldIds) =>
+        setDraftFilters((filters) => ({ ...filters, fieldIds })),
+      labelText: 'Все направления',
+      disabled: areOptionsPending || fieldOptions.length === 0,
+    },
+    {
+      key: 'specializations',
+      multiple: true,
+      variant: 'tags',
+      options: specializationOptions,
+      value: draftFilters.specializationIds,
+      onChange: (specializationIds) =>
+        setDraftFilters((filters) => ({ ...filters, specializationIds })),
+      labelText: 'Специализации',
+      disabled: areOptionsPending || specializationOptions.length === 0,
+    },
+    {
+      key: 'skills',
+      multiple: true,
+      variant: 'tags',
+      options: skillOptions,
+      value: draftFilters.skillIds,
+      onChange: (skillIds) =>
+        setDraftFilters((filters) => ({ ...filters, skillIds })),
+      labelText: 'Навыки',
+      disabled: areOptionsPending || skillOptions.length === 0,
+    },
+  ];
 
   return (
     <>
-      <div className={styles.decorations} aria-hidden>
+      <div className={styles.decorations} aria-hidden="true">
         <img
           src="/violet-fuzz.png"
           alt=""
@@ -193,23 +137,43 @@ export const ParticipantsPage: React.FC = () => {
             className={styles.buttonBack}
             type="button"
             variant="back"
-            onClick={() => handleBack()}
+            onClick={() => navigate('/')}
           >
             На главную
           </Button>
           <h2 className={styles.title}>Все участники</h2>
-          <Filter />
-          {error && <p role="alert">{error}</p>}
-          {participants.length === 0 && !error && <p>Участников пока нет.</p>}
-          {participants.length > 0 && <ParticipantsList users={participants} />}
-          {nextPage !== null && (
+          <Filter
+            selects={filterSelects}
+            onApply={applyFilters}
+            onReset={resetFilters}
+          />
+          {areOptionsError && (
+            <p className={styles.optionsError} role="alert">
+              Не удалось загрузить справочники фильтров.
+            </p>
+          )}
+          {isPending && (
+            <p className={styles.state}>Загружаем участников...</p>
+          )}
+          {isError && (
+            <p className={styles.state} role="alert">
+              Не удалось загрузить участников. Попробуйте обновить страницу.
+            </p>
+          )}
+          {!isPending && !isError && participants.length === 0 && (
+            <p className={styles.state}>Участников пока нет.</p>
+          )}
+          {!isPending && !isError && participants.length > 0 && (
+            <ParticipantsList users={participants} />
+          )}
+          {!isPending && !isError && hasNextPage && (
             <Button
               type="button"
               className={styles.buttonMore}
-              onClick={handleShowMore}
-              disabled={isLoading}
+              onClick={() => void fetchNextPage()}
+              disabled={isFetchingNextPage}
             >
-              {isLoading ? 'Загружаем...' : 'Показать еще'}
+              {isFetchingNextPage ? 'Загружаем...' : 'Показать еще'}
             </Button>
           )}
         </section>

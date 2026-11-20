@@ -1,6 +1,9 @@
 .container {
   max-width: 1240px;
+  width: 100%;
   margin: 0 auto;
+  padding-inline: 20px;
+  box-sizing: border-box;
   position: relative;
 }
 
@@ -12,6 +15,11 @@
   color: var(--neutral-secondary-color);
   font-size: 20px;
   line-height: 130%;
+}
+
+.optionsError {
+  margin: -24px 0 0;
+  color: var(--accent-red-color);
 }
 
 .button {
@@ -41,4 +49,23 @@
   position: static;
   align-self: flex-start;
   padding-bottom: 15px;
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding-inline: 16px;
+  }
+
+  .main {
+    padding-top: 24px;
+  }
+
+  .section {
+    gap: 28px;
+  }
+
+  .state {
+    padding: 24px;
+    font-size: 18px;
+  }
 }

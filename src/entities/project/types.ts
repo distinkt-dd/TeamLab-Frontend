@@ -47,8 +47,24 @@ export interface ProjectCardItem {
   id: number;
   name: string;
   image?: string;
-  tags: string[];
+  tags: ProjectCardTag[];
 }
+
+export interface ProjectCardTag {
+  id?: number;
+  color?: ProjectTagColor;
+  label: string;
+}
+
+export type ProjectTagColor =
+  | 'blue'
+  | 'green'
+  | 'orange'
+  | 'pink'
+  | 'purple'
+  | 'turquoise'
+  | 'yellow'
+  | 'neutral';
 
 export interface ProjectRole {
   id: number;
@@ -79,6 +95,7 @@ export interface GetProjectsParams extends PaginationParams {
   search?: string;
   status?: ProjectStatus;
   field_id?: number;
+  field_ids?: string;
   specialization_ids?: string;
   skill_ids?: string;
   ordering?: string;

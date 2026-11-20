@@ -151,12 +151,13 @@ describe('актуальные API-контракты списков и публ
     cy.intercept('GET', '**/api/v1/users/me/notifications/?*', replyPages);
 
     cy.visit('http://localhost:5173/');
+    cy.get('a[aria-label="На главную"]').should('be.visible');
     cy.window().then(async (window) => {
       const [{ getServices }, { ProjectService }, { UserService }] =
         await Promise.all([
-          importAutModule<typeof import('@app/store/services')>(
+          importAutModule<typeof import('@app')>(
             window,
-            '/src/app/store/services.ts'
+            '/src/app/index.ts'
           ),
           importAutModule<typeof import('@entities/project/ProjectService')>(
             window,

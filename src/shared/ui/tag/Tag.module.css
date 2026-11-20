@@ -38,6 +38,18 @@
   background-color: var(--lable-pink-color);
 }
 
+.yellow {
+  background-color: var(--lable-yellow-color);
+}
+
+.orange {
+  background-color: var(--lable-orange-color);
+}
+
+.turquoise {
+  background-color: var(--lable-turquoise-color);
+}
+
 .neutral {
   background-color: var(--neutral-grey-color);
 }

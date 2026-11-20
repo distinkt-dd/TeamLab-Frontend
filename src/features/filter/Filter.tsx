@@ -181,7 +181,11 @@ export const Filter: React.FC<FilterProps> = ({
           {applyText}
         </Button>
         {showReset && (
-          <button className={styles.resetButton} onClick={handleReset}>
+          <button
+            type="button"
+            className={styles.resetButton}
+            onClick={handleReset}
+          >
             {resetText}
           </button>
         )}
