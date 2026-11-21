@@ -11,6 +11,7 @@ import type {
   ListUsersParams,
   CurrentUserProjects,
   CurrentUserNotification,
+  CurrentUserApplication,
 } from './types';
 import { USERS, USERS_ME } from '../../shared/api/constants';
 import type { PaginatedResponse } from '@shared/api/types';
@@ -18,6 +19,13 @@ import { collectPaginatedResults } from '@shared/api/pagination';
 
 const MY_PROJECTS_PATH = `${USERS_ME}projects/`;
 const NOTIFICATIONS_PATH = `${USERS_ME}notifications/`;
+const APPLICATIONS_PATH = `${USERS_ME}applications/`;
+
+interface CurrentUserApplicationsParams {
+  page?: number;
+  limit?: number;
+  status?: CurrentUserApplication['status'];
+}
 
 export class UserService {
   private readonly api: Api;
@@ -64,6 +72,27 @@ export class UserService {
 
   getAllNotifications(): Promise<CurrentUserNotification[]> {
     return collectPaginatedResults((page) => this.getNotifications({ page }));
+  }
+
+  getApplications(
+    params?: CurrentUserApplicationsParams
+  ): Promise<PaginatedResponse<CurrentUserApplication>> {
+    return this.api.get<PaginatedResponse<CurrentUserApplication>>(
+      APPLICATIONS_PATH,
+      {
+        page: params?.page,
+        limit: params?.limit,
+        status: params?.status,
+      }
+    );
+  }
+
+  getAllApplications(
+    params?: Omit<CurrentUserApplicationsParams, 'page'>
+  ): Promise<CurrentUserApplication[]> {
+    return collectPaginatedResults((page) =>
+      this.getApplications({ ...params, page })
+    );
   }
 
   uploadAvatar(data: AvatarUpdateRequest): Promise<AvatarResponse> {

@@ -17,6 +17,8 @@ export const MyProfileParticipantPage: React.FC = () => {
     isProjectsPending,
     isProjectsError,
     waitingItems,
+    isWaitingPending,
+    isWaitingError,
     updateNotifications,
     isNotificationUpdating,
     isNotificationUpdateError,
@@ -56,11 +58,11 @@ export const MyProfileParticipantPage: React.FC = () => {
           onLogout={handleLogout}
           profileEmail={user?.email}
           waitingItems={waitingItems}
-          isWaitingPending={isProjectsPending}
-          isWaitingError={isProjectsError}
-          waitingPendingText="Загружаем приглашения..."
-          waitingErrorText="Не удалось загрузить приглашения. Попробуйте обновить страницу."
-          waitingEmptyText="Приглашений пока нет."
+          isWaitingPending={isWaitingPending}
+          isWaitingError={isWaitingError}
+          waitingPendingText="Загружаем заявки..."
+          waitingErrorText="Не удалось загрузить заявки. Попробуйте обновить страницу."
+          waitingEmptyText="Заявок пока нет."
         />
       </div>
     </div>

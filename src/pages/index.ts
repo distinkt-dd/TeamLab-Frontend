@@ -7,6 +7,7 @@ export { MainPage } from './main';
 export { MyProfileOwnerPage } from './myProfileOwner';
 export { MyProfileParticipantPage } from './myProfileParticipant';
 export { ParticipantsPage } from './participants';
+export { ParticipantPublicProfilePage } from './participantPublicProfile';
 export { PolicyPage } from './policy';
 export { ProfilePage } from './profile';
 export { ProjectCardPage } from './projectCard';

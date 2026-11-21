@@ -3,6 +3,11 @@ import { FavoriteProjectService } from '@entities/favorite-project';
 import { MembershipService } from '@entities/membership';
 import { ProjectService } from '@entities/project';
 import { RoleInterestService } from '@entities/role-interest';
+import {
+  currentUserApplicationsQueryKey,
+  currentUserInvitationsQueryKey,
+  currentUserProjectsQueryKey,
+} from '@entities/user';
 import type {
   ProjectDetail,
   ProjectRole,
@@ -12,6 +17,7 @@ import type {
 import { selectAuthUser } from '@features/auth';
 import { Icon } from '@shared/icons';
 import { Button, Tag } from '@shared/ui';
+import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import tasksDecoration from './assets/Orange Notepad Dark Void-no-bg-preview (carve.photos) 1.png';
@@ -196,6 +202,7 @@ export const ProjectCardPage: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const currentUser = useAppSelector(selectAuthUser);
+  const queryClient = useQueryClient();
   const projectId = Number(id);
   const isValidProjectId = Number.isInteger(projectId) && projectId > 0;
   const { api } = getServices();
@@ -303,6 +310,11 @@ export const ProjectCardPage: React.FC = () => {
             }
           : currentProject
       );
+      if (currentUser?.account_type === 'participant') {
+        await queryClient.invalidateQueries({
+          queryKey: currentUserApplicationsQueryKey(currentUser.id),
+        });
+      }
     } catch (error: unknown) {
       setActionError(getErrorText(error));
     } finally {
@@ -409,6 +421,16 @@ export const ProjectCardPage: React.FC = () => {
             }
           : currentProject
       );
+      if (currentUser?.account_type === 'participant') {
+        await Promise.all([
+          queryClient.invalidateQueries({
+            queryKey: currentUserInvitationsQueryKey(currentUser.id),
+          }),
+          queryClient.invalidateQueries({
+            queryKey: currentUserProjectsQueryKey(currentUser.id),
+          }),
+        ]);
+      }
     } catch (error: unknown) {
       setActionError(getErrorText(error));
     } finally {

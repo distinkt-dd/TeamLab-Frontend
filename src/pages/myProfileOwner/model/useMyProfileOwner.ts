@@ -61,7 +61,7 @@ export const useMyProfileOwner = () => {
     isPending: isWaitingPending,
     isError: isWaitingError,
   } = useQuery({
-    queryKey: ['currentUserNotifications'],
+    queryKey: ['currentUserNotifications', user?.id ?? 0],
     queryFn: () => userService.getAllNotifications(),
     enabled: !!user, // не запускаем, пока нет user
   });
@@ -69,11 +69,17 @@ export const useMyProfileOwner = () => {
   // Имя откликнувшегося и специализация роли — пункт блока «В ожидании ответа».
   const waitingItems = useMemo(
     () =>
-      (notifications ?? []).map(({ id, username, project_role_name }) => ({
-        id,
-        title: username,
-        tag: project_role_name,
-      })),
+      (notifications ?? []).map(
+        ({ id, user_id, username, project_role_name }) => ({
+          id,
+          title: username,
+          tag: project_role_name,
+          href:
+            Number.isInteger(user_id) && user_id > 0
+              ? `/participants/${user_id}`
+              : undefined,
+        })
+      ),
     [notifications]
   );
 

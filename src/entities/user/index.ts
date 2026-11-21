@@ -9,6 +9,11 @@ export type {
 } from './lib/registration';
 export { UserService } from './UserService';
 export {
+  currentUserApplicationsQueryKey,
+  currentUserInvitationsQueryKey,
+  currentUserProjectsQueryKey,
+} from './model/queryKeys';
+export {
   CURRENT_USER_QUERY_KEY,
   useOptimisticUserUpdate,
 } from './model/useOptimisticUserUpdate';

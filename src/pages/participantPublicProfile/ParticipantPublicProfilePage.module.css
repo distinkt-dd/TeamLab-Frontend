@@ -1,0 +1,521 @@
+.page {
+  position: relative;
+  min-width: 0;
+}
+
+.heroBg {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 480px;
+  background-image: url('../editProfile/assets/78926410116964ca76324e7756826f4385279e22.png');
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: 100% auto;
+  transform: rotate(180deg);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.container {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 32px 20px 120px;
+}
+
+.backButton {
+  position: static;
+  margin-bottom: 24px;
+}
+
+.heroSection {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(300px, 0.85fr);
+  gap: 32px;
+}
+
+.aboutCard,
+.summaryCard {
+  box-sizing: border-box;
+  border-radius: 20px;
+  background: var(--gradient-day);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+}
+
+.aboutCard {
+  position: relative;
+  min-height: 390px;
+  padding: 40px;
+}
+
+.identity {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  margin-bottom: 24px;
+}
+
+.avatar {
+  flex: 0 0 144px;
+  width: 144px;
+  height: 144px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.specialization {
+  max-width: 100%;
+  margin: 12px 0 0;
+  font-family: var(--font-family-base);
+  font-size: clamp(24px, 3vw, 36px);
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+  text-transform: uppercase;
+}
+
+.bio {
+  white-space: pre-line;
+  font-size: 18px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.bioCollapsed {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 6;
+  mask-image: linear-gradient(to bottom, #000 70%, transparent 100%);
+}
+
+.bioButton {
+  display: block;
+  width: 260px;
+  margin: 20px auto 0;
+}
+
+.summaryCard {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 40px;
+}
+
+.displayName {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.username {
+  margin: 4px 0 20px;
+  color: rgba(44, 44, 46, 0.65);
+  overflow-wrap: anywhere;
+}
+
+.profileTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.contacts {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line-color);
+}
+
+.contacts h3,
+.contacts p,
+.inviteBlock p,
+.inviteHint,
+.invitationStatus {
+  margin: 0;
+}
+
+.contacts h3 {
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+
+.contacts p,
+.inviteBlock p,
+.inviteHint,
+.invitationStatus {
+  color: rgba(44, 44, 46, 0.7);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.contactList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.contactList a {
+  color: var(--neutral-secondary-color);
+  text-underline-offset: 4px;
+}
+
+.inviteBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 28px;
+}
+
+.inviteBlock label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.projectSelect {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 36px 10px 14px;
+  border: 1px solid var(--line-color);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--neutral-secondary-color);
+  font: inherit;
+}
+
+.invitationButton {
+  box-sizing: border-box;
+  min-height: 55px;
+  height: auto;
+  padding: 12px 16px;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+.relationActions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.membershipBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.membershipBlock p {
+  align-self: stretch;
+  color: var(--neutral-secondary-color);
+}
+
+.membershipBlock p span {
+  color: var(--accent-blue-color);
+}
+
+.removeButton {
+  width: auto;
+}
+
+.inviteHint {
+  margin-top: auto;
+  padding-top: 28px;
+}
+
+.skillsSection,
+.worksSection {
+  margin-top: 100px;
+}
+
+.sectionTitle {
+  margin: 0 0 36px;
+  text-transform: uppercase;
+}
+
+.skillsLayout {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.8fr) minmax(0, 1.4fr);
+  gap: 48px;
+  align-items: stretch;
+}
+
+.skillsDecoration {
+  min-height: 720px;
+  background-image: url('../editProfile/assets/f521b1c6dbe3aedac4bbe45c0955b2cabb293a48.png');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: auto 100%;
+}
+
+.skillsGroups {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  gap: 40px;
+  min-width: 0;
+}
+
+.skillGroup {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.8fr) minmax(0, 1.2fr);
+  gap: 32px;
+  align-items: start;
+}
+
+.skillLevel,
+.skillList li,
+.emptyLevel {
+  box-sizing: border-box;
+  min-height: 40px;
+  margin: 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line-color);
+  font-size: 18px;
+  line-height: 1.4;
+}
+
+.skillList {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.skillList li,
+.emptyLevel {
+  overflow-wrap: anywhere;
+}
+
+.emptyLevel {
+  color: rgba(44, 44, 46, 0.55);
+}
+
+.worksGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 32px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.workCard {
+  display: grid;
+  grid-template-columns: minmax(140px, 180px) minmax(0, 1fr);
+  min-height: 360px;
+  overflow: hidden;
+  border-radius: 20px;
+  background: var(--gradient-day);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+}
+
+.workImage {
+  width: 100%;
+  height: 100%;
+  min-height: 360px;
+  object-fit: cover;
+}
+
+.workImagePlaceholder {
+  background: url('../editProfile/assets/workImagePlaceholder.svg') center / cover
+    no-repeat;
+}
+
+.workContent {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+  padding: 28px;
+}
+
+.workContent h3,
+.workContent p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.workContent h3 {
+  font-size: 24px;
+  line-height: 1.25;
+}
+
+.workContent p {
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+.workLabel {
+  display: block;
+  margin-bottom: 4px;
+  color: rgba(44, 44, 46, 0.55);
+  font-size: 13px;
+}
+
+.technologies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.workLink {
+  align-self: flex-start;
+  margin-top: auto;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--line-color);
+  color: var(--neutral-secondary-color);
+  font-size: 16px;
+  font-weight: 500;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.emptySection,
+.state {
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  padding: 40px;
+  border-radius: 20px;
+  background: var(--gradient-day);
+  font-size: 18px;
+}
+
+.statePage {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 1280px;
+  min-height: 50vh;
+  margin: 0 auto;
+  padding: 48px 20px;
+}
+
+@media (max-width: 1023px) {
+  .heroSection {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .summaryCard {
+    min-height: 360px;
+  }
+
+  .inviteBlock,
+  .inviteHint {
+    margin-top: 28px;
+  }
+
+  .skillsLayout {
+    grid-template-columns: minmax(220px, 0.65fr) minmax(0, 1.35fr);
+    gap: 24px;
+  }
+
+  .skillGroup {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .worksGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  .container {
+    padding-inline: 16px;
+    padding-bottom: 72px;
+  }
+
+  .aboutCard,
+  .summaryCard {
+    padding: 24px;
+  }
+
+  .aboutCard {
+    min-height: 0;
+  }
+
+  .identity {
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .avatar {
+    flex-basis: 96px;
+    width: 96px;
+    height: 96px;
+  }
+
+  .specialization {
+    font-size: 22px;
+  }
+
+  .bio {
+    font-size: 16px;
+  }
+
+  .bioButton {
+    width: 100%;
+  }
+
+  .skillsSection,
+  .worksSection {
+    margin-top: 72px;
+  }
+
+  .skillsLayout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .skillsDecoration {
+    min-height: 300px;
+    background-size: auto 100%;
+  }
+
+  .skillsGroups {
+    gap: 32px;
+  }
+
+  .workCard {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .workImage {
+    min-height: 220px;
+    max-height: 320px;
+  }
+}
+
+@media (max-width: 420px) {
+  .identity {
+    flex-direction: column;
+  }
+
+  .avatar {
+    width: 112px;
+    height: 112px;
+  }
+
+  .summaryCard {
+    min-height: 0;
+  }
+
+  .invitationButton {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .skillsDecoration {
+    min-height: 240px;
+  }
+}
