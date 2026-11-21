@@ -41,6 +41,23 @@
   overflow-wrap: anywhere;
 }
 
+a.waitingTitle {
+  border-bottom: 1px solid transparent;
+  color: inherit;
+  text-decoration: none;
+}
+
+a.waitingTitle:hover {
+  border-bottom-color: currentColor;
+  color: var(--accent-purple-color);
+}
+
+a.waitingTitle:focus-visible {
+  border-radius: 2px;
+  outline: 2px solid var(--accent-orange-color);
+  outline-offset: 4px;
+}
+
 .waitingTag {
   flex-shrink: 0;
 }

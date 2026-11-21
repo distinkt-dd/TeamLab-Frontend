@@ -59,6 +59,18 @@ const projectDetail = {
   ],
 };
 
+const makeAccessToken = (): string => {
+  const encode = (value: object) =>
+    Cypress.Buffer.from(JSON.stringify(value))
+      .toString('base64')
+      .replace(/=/g, '')
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_');
+  return `${encode({ alg: 'none', typ: 'JWT' })}.${encode({
+    exp: Math.floor(Date.now() / 1_000) + 3_600,
+  })}.signature`;
+};
+
 const visitProject = (detail: object = projectDetail) => {
   cy.intercept('GET', '**/api/v1/projects/42/', detail).as('projectDetail');
 
@@ -74,11 +86,12 @@ const visitProject = (detail: object = projectDetail) => {
               display_name: 'Candidate',
               account_type: 'participant',
             },
-            accessToken: 'test-access-token',
+            accessToken: makeAccessToken(),
             refreshToken: 'test-refresh-token',
             loading: false,
             error: null,
           }),
+          _persist: JSON.stringify({ version: -1, rehydrated: true }),
         })
       );
     },
@@ -88,6 +101,17 @@ const visitProject = (detail: object = projectDetail) => {
 };
 
 describe('подробная карточка проекта', () => {
+  beforeEach(() => {
+    cy.intercept('GET', '**/api/v1/skills/**', []);
+    cy.intercept('GET', '**/api/v1/specializations/**', []);
+    cy.intercept('GET', '**/api/v1/users/me/notifications/**', {
+      count: 0,
+      next: null,
+      previous: null,
+      results: [],
+    });
+  });
+
   it('синхронно переключает обе вкладки и содержимое роли', () => {
     visitProject();
 
@@ -227,6 +251,71 @@ describe('подробная карточка проекта', () => {
 
     cy.contains('button', 'Принять приглашение').should('not.be.disabled');
     cy.contains('button', 'Отклонить').should('not.be.disabled');
+  });
+
+  it('обновляет приглашения в Header после принятия', () => {
+    let isPending = true;
+
+    cy.intercept('GET', '**/api/v1/users/me/notifications/**', (request) => {
+      request.reply({
+        count: isPending ? 1 : 0,
+        next: null,
+        previous: null,
+        results: isPending
+          ? [
+              {
+                id: 56,
+                source: 'invitation',
+                status: 'pending',
+                user_id: 2,
+                username: 'candidate',
+                project_id: 42,
+                project_title: projectDetail.title,
+                project_role_id: 10,
+                project_role_name: 'Backend-разработчик',
+                created_at: '2026-03-31T10:00:00Z',
+              },
+            ]
+          : [],
+      });
+    }).as('notifications');
+    cy.intercept('POST', '**/api/v1/role-interests/56/accept/', (request) => {
+      isPending = false;
+      request.reply({
+        statusCode: 200,
+        body: {
+          id: 56,
+          user_id: 2,
+          username: 'candidate',
+          project_id: 42,
+          project_title: projectDetail.title,
+          project_role_id: 10,
+          project_role_name: 'Backend-разработчик',
+          source: 'invitation',
+          status: 'accepted',
+          membership_id: 77,
+          membership_status: 'active',
+          reviewed_at: '2026-03-31T10:10:00Z',
+          created_at: '2026-03-31T10:00:00Z',
+          updated_at: '2026-03-31T10:10:00Z',
+        },
+      });
+    }).as('acceptInvitation');
+
+    visitProject({
+      ...projectDetail,
+      my_interest_id: 56,
+      my_interest_status: 'pending',
+      my_interest_source: 'invitation',
+    });
+    cy.wait('@notifications');
+    cy.contains('button', 'Принять приглашение').click();
+    cy.wait('@acceptInvitation');
+    cy.wait('@notifications');
+
+    cy.contains('button', 'Личный кабинет').click();
+    cy.get('button[aria-label="Ожидающих приглашений: 0"]').click();
+    cy.contains('Приглашений пока нет.').should('be.visible');
   });
 
   it('прекращает активное участие через membership API', () => {

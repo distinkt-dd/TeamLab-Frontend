@@ -66,6 +66,13 @@ export interface UserPublic {
   city: string | null;
   contacts_visible: boolean;
   social_links: SocialLinks | null;
+  matching_project_role_id?: number | null;
+  matching_project_role_name?: string | null;
+  project_interest_id?: number | null;
+  project_interest_status?: 'pending' | 'accepted' | 'rejected' | null;
+  project_interest_source?: 'application' | 'invitation' | null;
+  project_membership_id?: number | null;
+  project_membership_status?: 'active' | 'left' | 'removed' | null;
   created_at?: string;
   updated_at?: string;
   skills: Skill[];
@@ -183,6 +190,19 @@ export interface CurrentUserNotification {
   project_role_id: number;
   project_role_name: string | null;
   created_at: string;
+}
+
+export interface CurrentUserApplication {
+  id: number;
+  user_id: number;
+  project_id: number;
+  project_title: string;
+  project_role_id: number;
+  project_role_name: string | null;
+  source: 'application' | 'invitation';
+  status: 'pending' | 'accepted' | 'rejected';
+  created_at: string;
+  updated_at: string;
 }
 
 export interface SetPasswordRequest {

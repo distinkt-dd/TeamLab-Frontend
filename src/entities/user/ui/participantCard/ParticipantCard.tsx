@@ -1,6 +1,7 @@
 import { EmploymentTypeMapped, UserLevelMapped } from '@entities/user/mapped';
 import { type UserPublic } from '@entities/user/types';
 import { Button, Tag } from '@shared/ui';
+import { useNavigate } from 'react-router-dom';
 import styles from './ParticipantCard.module.css';
 
 type ParticipantProps = {
@@ -8,6 +9,8 @@ type ParticipantProps = {
 };
 
 export const ParticipantCard = ({ user }: ParticipantProps) => {
+  const navigate = useNavigate();
+
   return (
     <div className={styles.card}>
       <div className={styles.userBlock}>
@@ -53,7 +56,12 @@ export const ParticipantCard = ({ user }: ParticipantProps) => {
         ))}
       </div>
       <div className={styles.actionsBlock}>
-        <Button type="button" variant="tertiary">
+        <Button
+          type="button"
+          variant="tertiary"
+          onClick={() => navigate(`/participants/${user.id}`)}
+          aria-label={`Открыть профиль ${user.display_name}`}
+        >
           В профиль
         </Button>
       </div>

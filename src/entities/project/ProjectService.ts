@@ -85,6 +85,14 @@ export class ProjectService {
     );
   }
 
+  getAllProjectInvitations(
+    projectId: number
+  ): Promise<ProjectInvitationCard[]> {
+    return collectPaginatedResults((page) =>
+      this.getProjectInvitations(projectId, { page })
+    );
+  }
+
   createProjectInvitation(
     projectId: number,
     data: ProjectInvitationCreateRequest

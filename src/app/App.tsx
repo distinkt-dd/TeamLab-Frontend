@@ -6,6 +6,7 @@ import {
   LoginPage,
   MainPage,
   ParticipantsPage,
+  ParticipantPublicProfilePage,
   PolicyPage,
   ProfilePage,
   ProjectCardPage,
@@ -32,6 +33,10 @@ export function App() {
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
         <Route path="participants" element={<ParticipantsPage />} />
+        <Route
+          path="participants/:id"
+          element={<ParticipantPublicProfilePage />}
+        />
         <Route path="projects/:id" element={<ProjectCardPage />} />
         <Route path="*" element={<ErrorPage />} />
         <Route path="questions" element={<QuestionsPage />} />

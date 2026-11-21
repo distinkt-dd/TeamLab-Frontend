@@ -143,10 +143,56 @@
   color: var(--accent-orange-color, #fcaf6c);
 }
 
+.iconWrapperActive {
+  border-radius: 8px;
+  outline: 1.5px solid var(--accent-purple-color, #72559b);
+}
+
 .personalList {
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+.notificationsPanel {
+  min-width: 0;
+}
+
+.notificationList {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.notificationLink,
+.notificationText {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  color: inherit;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.notificationLink {
+  text-decoration: none;
+}
+
+.notificationLink:hover {
+  color: var(--accent-purple-color, #72559b);
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}
+
+.notificationLink:focus-visible {
+  border-radius: 4px;
+  outline: 2px solid var(--accent-purple-color, #72559b);
+  outline-offset: 3px;
+}
+
+.notificationState {
+  line-height: 1.35;
 }
 
 @media (max-width: 1100px) {

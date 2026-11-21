@@ -1,5 +1,6 @@
 import type { ProfileVisibility } from '@entities/user/types';
 import { Button, Tag } from '@shared/ui';
+import { Link } from 'react-router-dom';
 import styles from './ProfileSettings.module.css';
 import { NotificationSelect } from './NotificationSelect';
 import { VisibilitySelect } from './VisibilitySelect';
@@ -9,6 +10,7 @@ export interface ProfileWaitingItem {
   id: number;
   title: string;
   tag?: string | null;
+  href?: string;
 }
 
 export interface ProfileSettingsProps {
@@ -111,7 +113,13 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({
             <ul className={styles.waitingList}>
               {waitingItems.map((item) => (
                 <li className={styles.waitingItem} key={item.id}>
-                  <span className={styles.waitingTitle}>{item.title}</span>
+                  {item.href ? (
+                    <Link className={styles.waitingTitle} to={item.href}>
+                      {item.title}
+                    </Link>
+                  ) : (
+                    <span className={styles.waitingTitle}>{item.title}</span>
+                  )}
                   {item.tag && (
                     <Tag className={styles.waitingTag}>{item.tag}</Tag>
                   )}
