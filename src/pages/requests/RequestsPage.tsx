@@ -434,46 +434,44 @@ export const RequestsPage: React.FC = () => {
                           aria-hidden="true"
                         />
                       )}
-                      <div className={styles.person}>
-                        {avatar ? (
-                          <img
-                            className={styles.avatar}
-                            src={avatar}
-                            alt={user.display_name}
-                          />
-                        ) : (
-                          <span className={styles.avatarFallback}>
-                            {getInitials(user.display_name, user.username)}
-                          </span>
-                        )}
+                      <div className={styles.personBlock}>
+                        <div className={styles.person}>
+                          {avatar ? (
+                            <img
+                              className={styles.avatar}
+                              src={avatar}
+                              alt={user.display_name}
+                            />
+                          ) : (
+                            <span className={styles.avatarFallback}>
+                              {getInitials(user.display_name, user.username)}
+                            </span>
+                          )}
 
-                        <div className={styles.info}>
-                          <div>
+                          <div className={styles.info}>
                             <h3 className={styles.name}>
                               {user.specialization_name ?? 'Не указана'}
                             </h3>
                             <p className={styles.username}>{user.username}</p>
                           </div>
-
-                          <ul className={styles.meta}>
-                            <li>
-                              {user.level
-                                ? levelLabels[user.level]
-                                : 'Не указан'}
-                            </li>
-                            <li>{user.city ?? 'Не указан'}</li>
-                            <li>
-                              {user.workload_hours_per_week
-                                ? `${user.workload_hours_per_week} ч/нед`
-                                : 'Не указано'}
-                            </li>
-                            <li>
-                              {user.employment_type
-                                ? employmentLabels[user.employment_type]
-                                : 'Не указано'}
-                            </li>
-                          </ul>
                         </div>
+
+                        <ul className={styles.meta}>
+                          <li>
+                            {user.level ? levelLabels[user.level] : 'Не указан'}
+                          </li>
+                          <li>{user.city ?? 'Не указан'}</li>
+                          <li>
+                            {user.workload_hours_per_week
+                              ? `${user.workload_hours_per_week} ч/нед`
+                              : 'Не указано'}
+                          </li>
+                          <li>
+                            {user.employment_type
+                              ? employmentLabels[user.employment_type]
+                              : 'Не указано'}
+                          </li>
+                        </ul>
                       </div>
 
                       <div className={styles.tags}>

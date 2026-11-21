@@ -64,6 +64,31 @@
   color: var(--accent-purple-color);
 }
 
+.requestsEntry {
+  position: relative;
+  display: inline-flex;
+}
+
+.requestsBadge {
+  position: absolute;
+  top: -6px;
+  right: -12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding-inline: 5px;
+  border-radius: 20px;
+  background-color: var(--accent-pink-color);
+  color: var(--neutral-secondary-color);
+  font-family: var(--font-family-base);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  pointer-events: none;
+}
+
 .projectsBlock {
   padding: 32px 0;
 }
