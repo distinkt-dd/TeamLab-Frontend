@@ -3,9 +3,13 @@ import styles from './ProfileHeader.module.css';
 
 interface ProfileHeaderProps {
   onBack: () => void;
+  onFavorites: () => void;
 }
 
-export const ProfileHeader: React.FC<ProfileHeaderProps> = ({ onBack }) => {
+export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
+  onBack,
+  onFavorites,
+}) => {
   return (
     <>
       <Button variant="back" className={styles.backButton} onClick={onBack}>
@@ -17,7 +21,11 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({ onBack }) => {
           <Button className={styles.navButton} iconName="notifications">
             Уведомления
           </Button>
-          <Button className={styles.navButton} iconName="like">
+          <Button
+            className={styles.navButton}
+            iconName="like"
+            onClick={onFavorites}
+          >
             Избранное
           </Button>
         </div>

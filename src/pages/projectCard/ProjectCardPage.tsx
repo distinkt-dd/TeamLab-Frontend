@@ -1,5 +1,8 @@
 import { getServices, useAppSelector } from '@app';
-import { FavoriteProjectService } from '@entities/favorite-project';
+import {
+  FAVORITE_PROJECTS_QUERY_KEY,
+  FavoriteProjectService,
+} from '@entities/favorite-project';
 import { MembershipService } from '@entities/membership';
 import { ProjectService } from '@entities/project';
 import { RoleInterestService } from '@entities/role-interest';
@@ -349,6 +352,9 @@ export const ProjectCardPage: React.FC = () => {
             }
           : currentProject
       );
+      void queryClient.invalidateQueries({
+        queryKey: FAVORITE_PROJECTS_QUERY_KEY,
+      });
     } catch (error: unknown) {
       setFavoriteError(getErrorText(error));
     } finally {

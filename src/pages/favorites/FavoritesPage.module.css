@@ -1,0 +1,140 @@
+.container {
+  max-width: 1240px;
+  width: 100%;
+  margin: 0 auto;
+  padding-inline: 20px;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 0;
+}
+
+/* Фон личного кабинета участника. */
+.container::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  height: 100%;
+  left: 50%;
+  transform: translateX(-50vw); /* сдвигаем к левому краю вьюпорта */
+  width: 100vw;
+  background-image: url('../myProfileParticipant/assets/my-profile-bg.png');
+  background-repeat: no-repeat;
+  background-position: -140px -120px;
+  background-size: 835px auto;
+  pointer-events: none;
+}
+
+.main {
+  padding: 40px 0 56px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.backButton {
+  position: static;
+  align-self: flex-start;
+  padding-bottom: 15px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.title {
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+.state {
+  margin: 0;
+  border-radius: 20px;
+  padding: 40px;
+  background: var(--gradient-day);
+  color: var(--neutral-secondary-color);
+  font-size: 20px;
+  line-height: 130%;
+}
+
+.emptyButton {
+  max-width: 286px;
+}
+
+.error {
+  margin: 0;
+  color: var(--accent-red-color);
+}
+
+.sections {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* Секция: две широкие карточки в левый столбец и две узкие в правую строку. */
+.sectionRow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 32px;
+  align-items: stretch;
+}
+
+.column,
+.row {
+  list-style: none;
+  min-width: 0;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 32px;
+}
+
+@media (max-width: 1100px) {
+  .column {
+    gap: 24px;
+  }
+
+  .row {
+    gap: 24px;
+  }
+}
+
+@media (max-width: 900px) {
+  .sectionRow {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding-inline: 16px;
+  }
+
+  .main {
+    padding-top: 24px;
+  }
+
+  .section {
+    gap: 28px;
+  }
+
+  .state {
+    padding: 24px;
+    font-size: 18px;
+  }
+}
