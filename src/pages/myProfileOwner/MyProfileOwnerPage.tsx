@@ -25,6 +25,8 @@ export const MyProfileOwnerPage: React.FC = () => {
     isNotificationUpdateError,
   } = useMyProfileOwner();
 
+  const pendingRequestsCount = waitingItems.length;
+
   const visibleProjects = projectCards.slice(0, visibleCount);
   const hasMore = visibleCount < projectCards.length;
 
@@ -54,6 +56,24 @@ export const MyProfileOwnerPage: React.FC = () => {
             <Button className={styles.navButton} iconName="notifications">
               Уведомления
             </Button>
+            <div className={styles.requestsEntry}>
+              <Button
+                className={styles.navButton}
+                onClick={() => navigate('/requests')}
+                aria-label={
+                  pendingRequestsCount > 0
+                    ? `Заявки, новых: ${pendingRequestsCount}`
+                    : 'Заявки'
+                }
+              >
+                Заявки
+              </Button>
+              {pendingRequestsCount > 0 && (
+                <span className={styles.requestsBadge} aria-hidden="true">
+                  {pendingRequestsCount}
+                </span>
+              )}
+            </div>
           </div>
         </section>
         <section>
