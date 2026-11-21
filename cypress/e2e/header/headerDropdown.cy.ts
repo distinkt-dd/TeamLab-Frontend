@@ -44,6 +44,22 @@ const paginated = (results: unknown[] = []) => ({
   results,
 });
 
+const ownerApplication = (
+  id: number,
+  status: 'pending' | 'accepted' = 'pending'
+) => ({
+  id,
+  source: 'application',
+  status,
+  user_id: id + 10,
+  username: `participant-${id}`,
+  project_id: 42,
+  project_title: 'Демо-проект TeamLab',
+  project_role_id: 31,
+  project_role_name: 'Backend-разработчик',
+  created_at: '2026-01-01T00:00:00Z',
+});
+
 const currentUser = {
   id: 1,
   username: 'header-user',
@@ -70,9 +86,12 @@ const currentUser = {
   updated_at: '2026-01-01T00:00:00Z',
 };
 
-const interceptRequests = () => {
+const interceptRequests = (accountType: 'owner' | 'participant' = 'owner') => {
   cy.intercept('GET', '**/api/v1/**', paginated());
-  cy.intercept('GET', '**/api/v1/users/me/', currentUser);
+  cy.intercept('GET', '**/api/v1/users/me/', {
+    ...currentUser,
+    account_type: accountType,
+  });
   cy.intercept('GET', '**/api/v1/fields/**', []);
   cy.intercept('GET', '**/api/v1/specializations/**', [
     {
@@ -136,10 +155,7 @@ describe('выпадающее меню Header', () => {
       cy.visit(`${origin}${path}`, { onBeforeLoad: seedAuth });
 
       cy.get('button[aria-label="Личный кабинет"]').click();
-      cy.get('[aria-label="Личный кабинет"] + div [aria-label="Избранное"]')
-        .should('be.visible')
-        .parents('[id]')
-        .first()
+      cy.get('[aria-label="Личный кабинет"] + div:visible')
         .parent()
         .should(($wrapper) => {
           const dropdown = $wrapper.children().last().get(0);
@@ -161,11 +177,7 @@ describe('выпадающее меню Header', () => {
 
     cy.get('button[aria-label="Открыть меню"]').click();
     cy.get('button[aria-label="Личный кабинет"]:visible').click();
-    cy.get(
-      '[aria-label="Личный кабинет"] + div [aria-label="Избранное"]:visible'
-    )
-      .parents('[id]')
-      .first()
+    cy.get('[aria-label="Личный кабинет"] + div:visible')
       .parent()
       .children()
       .last()
@@ -174,6 +186,90 @@ describe('выпадающее меню Header', () => {
         expect(rect.left).to.be.at.least(0);
         expect(rect.right).to.be.at.most(375);
       });
+  });
+
+  it('скрывает избранное у владельца', () => {
+    interceptRequests();
+    cy.visit(`${origin}/`, { onBeforeLoad: seedAuth });
+
+    cy.get('button[aria-label="Личный кабинет"]').click();
+    cy.get('[aria-label="Личный кабинет"] + div:visible')
+      .find('[aria-label="Избранное"]')
+      .should('not.exist');
+    cy.get('button[aria-label="Заявки, ожидают ответа: 0"]')
+      .parent()
+      .find('span')
+      .should('not.exist');
+  });
+
+  it('показывает одну pending-заявку владельца', () => {
+    interceptRequests();
+    cy.intercept(
+      'GET',
+      '**/api/v1/users/me/notifications/**',
+      paginated([ownerApplication(1)])
+    );
+    cy.visit(`${origin}/`, { onBeforeLoad: seedAuth });
+
+    cy.get('button[aria-label="Личный кабинет"]').click();
+    cy.get('button[aria-label="Заявки, ожидают ответа: 1"]')
+      .parent()
+      .find('span')
+      .should('have.text', '1');
+  });
+
+  it('считает все страницы pending-заявок и открывает /requests с клавиатуры', () => {
+    interceptRequests();
+    cy.intercept('GET', '**/api/v1/users/me/notifications/**', (request) => {
+      const page = new URL(request.url).searchParams.get('page');
+
+      request.reply(
+        page === '2'
+          ? {
+              count: 4,
+              next: null,
+              previous: '/api/v1/users/me/notifications/?page=1',
+              results: [
+                ownerApplication(2),
+                ownerApplication(3, 'accepted'),
+                {
+                  ...ownerApplication(4),
+                  source: 'invitation',
+                },
+              ],
+            }
+          : {
+              count: 4,
+              next: '/api/v1/users/me/notifications/?page=2',
+              previous: null,
+              results: [ownerApplication(1)],
+            }
+      );
+    });
+    cy.visit(`${origin}/`, { onBeforeLoad: seedAuth });
+
+    cy.get('button[aria-label="Личный кабинет"]').click();
+    cy.get('button[aria-label="Заявки, ожидают ответа: 2"]')
+      .should('be.visible')
+      .focus()
+      .should('be.focused')
+      .parent()
+      .find('span')
+      .should('have.text', '2');
+    cy.get('button[aria-label="Заявки, ожидают ответа: 2"]').focus();
+    cy.press(Cypress.Keyboard.Keys.ENTER);
+    cy.location('pathname').should('eq', '/requests');
+  });
+
+  it('сохраняет избранное у участника', () => {
+    interceptRequests('participant');
+    cy.visit(`${origin}/`, {
+      onBeforeLoad: (window) => seedAuth(window, 'participant'),
+    });
+    cy.get('button[aria-label="Личный кабинет"]').click();
+    cy.get('[aria-label="Личный кабинет"] + div:visible')
+      .find('[aria-label="Избранное"]')
+      .should('be.visible');
   });
 });
 

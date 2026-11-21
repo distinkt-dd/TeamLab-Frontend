@@ -125,6 +125,11 @@
   padding: 0 10.5px 12px;
 }
 
+.ownerActionIcons {
+  justify-content: center;
+  gap: 24px;
+}
+
 .iconWrapper {
   display: flex;
   justify-content: center;
