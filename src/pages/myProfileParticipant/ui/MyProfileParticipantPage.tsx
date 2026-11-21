@@ -34,7 +34,10 @@ export const MyProfileParticipantPage: React.FC = () => {
   return (
     <div className={styles.container}>
       <div className={styles.main}>
-        <ProfileHeader onBack={() => navigate('/')} />
+        <ProfileHeader
+          onBack={() => navigate('/')}
+          onFavorites={() => navigate('/favorites')}
+        />
         <CurrentProjects
           projects={projectCards}
           isPending={isProjectsPending}
