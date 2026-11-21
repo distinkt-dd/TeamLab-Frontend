@@ -33,7 +33,10 @@ const seedAuth = (window: Window, accountType: AccountType): void => {
   );
 };
 
-const currentUser = (accountType: AccountType) => ({
+const currentUser = (
+  accountType: AccountType,
+  ownedProjectIds: number[] = []
+) => ({
   id: 1,
   username: 'current-user',
   display_name: 'Current User',
@@ -56,7 +59,29 @@ const currentUser = (accountType: AccountType) => ({
   social_links: null,
   skills: [],
   portfolio_works: [],
-  owned_project_ids: [],
+  owned_project_ids: ownedProjectIds,
+});
+
+const projectDetail = (id: number, title: string) => ({
+  id,
+  owner_id: 1,
+  field_id: 1,
+  title,
+  description: 'Описание',
+  problem: null,
+  image: null,
+  status: 'open',
+  is_favorited: false,
+  roles: [],
+  matching_role_id: null,
+  matching_role_name: null,
+  my_interest_id: null,
+  my_interest_status: null,
+  my_interest_source: null,
+  my_membership_id: null,
+  my_membership_status: null,
+  created_at: '2026-01-01T00:00:00Z',
+  updated_at: '2026-01-01T00:00:00Z',
 });
 
 describe('ссылки в блоке ожидания личного кабинета', () => {
@@ -65,8 +90,8 @@ describe('ссылки в блоке ожидания личного кабин�
     cy.intercept('GET', '**/api/v1/specializations/**', []);
   });
 
-  it('ведёт владельца в профиль участника по user_id', () => {
-    cy.intercept('GET', '**/api/v1/users/me/', currentUser('owner'));
+  it('показывает pending-приглашения всех проектов и ведёт в профиль по user_id', () => {
+    cy.intercept('GET', '**/api/v1/users/me/', currentUser('owner', [42, 43]));
     cy.intercept('GET', '**/api/v1/users/me/notifications/**', {
       count: 1,
       next: null,
@@ -77,12 +102,69 @@ describe('ссылки в блоке ожидания личного кабин�
           source: 'application',
           status: 'pending',
           user_id: 7,
-          username: 'demo_backend',
+          username: 'incoming_applicant',
           project_id: 42,
           project_title: 'Демо-проект TeamLab',
           project_role_id: 31,
           project_role_name: 'Backend-разработчик',
           created_at: '2026-01-01T00:00:00Z',
+        },
+      ],
+    });
+    cy.intercept(
+      'GET',
+      '**/api/v1/projects/42/',
+      projectDetail(42, 'Демо-проект TeamLab')
+    );
+    cy.intercept(
+      'GET',
+      '**/api/v1/projects/43/',
+      projectDetail(43, 'Второй проект')
+    );
+    cy.intercept('GET', '**/api/v1/projects/42/invitations/**', {
+      count: 2,
+      next: null,
+      previous: null,
+      results: [
+        {
+          id: 20,
+          user_id: 7,
+          username: 'demo_backend',
+          project_role_id: 31,
+          project_role_name: 'Backend-разработчик',
+          source: 'invitation',
+          status: 'pending',
+          created_at: '2026-01-01T00:00:00Z',
+          updated_at: '2026-01-01T00:00:00Z',
+        },
+        {
+          id: 21,
+          user_id: 9,
+          username: 'accepted_participant',
+          project_role_id: 31,
+          project_role_name: 'Backend-разработчик',
+          source: 'invitation',
+          status: 'accepted',
+          created_at: '2026-01-01T00:00:00Z',
+          updated_at: '2026-01-02T00:00:00Z',
+        },
+      ],
+    });
+    cy.intercept('GET', '**/api/v1/projects/43/invitations/**', {
+      count: 1,
+      next: null,
+      previous: null,
+      results: [
+        {
+          id: 22,
+          user_id: 8,
+          username: 'demo_designer',
+          project_role_id: 32,
+          project_role_name: 'UX/UI-дизайнер',
+          source: 'invitation',
+          status: 'pending',
+          created_at: '2026-01-01T00:00:00Z',
+          updated_at: '2026-01-01T00:00:00Z',
         },
       ],
     });
@@ -97,8 +179,45 @@ describe('ссылки в блоке ожидания личного кабин�
     cy.visit('http://localhost:5173/my-profile', {
       onBeforeLoad: (window) => seedAuth(window, 'owner'),
     });
+    cy.contains('incoming_applicant').should('not.exist');
+    cy.contains('accepted_participant').should('not.exist');
+    cy.contains('a', 'demo_designer').should('be.visible');
+    cy.contains('Второй проект · UX/UI-дизайнер').should('be.visible');
+    cy.get('button[aria-label="Заявки, новых: 1"]')
+      .should('be.visible')
+      .and('contain.text', 'Заявки');
+    cy.contains('button', 'Заявки').should('have.length', 1);
     cy.contains('a', 'demo_backend').focus().should('be.focused').click();
     cy.location('pathname').should('eq', '/participants/7');
+  });
+
+  it('показывает пустое состояние, если исходящих приглашений нет', () => {
+    cy.intercept('GET', '**/api/v1/users/me/', currentUser('owner'));
+    cy.intercept('GET', '**/api/v1/users/me/notifications/**', {
+      count: 1,
+      next: null,
+      previous: null,
+      results: [
+        {
+          id: 10,
+          source: 'application',
+          status: 'pending',
+          user_id: 7,
+          username: 'incoming_applicant',
+          project_id: 42,
+          project_title: 'Демо-проект TeamLab',
+          project_role_id: 31,
+          project_role_name: 'Backend-разработчик',
+          created_at: '2026-01-01T00:00:00Z',
+        },
+      ],
+    });
+
+    cy.visit('http://localhost:5173/my-profile', {
+      onBeforeLoad: (window) => seedAuth(window, 'owner'),
+    });
+    cy.contains('Приглашений пока нет.').should('be.visible');
+    cy.contains('incoming_applicant').should('not.exist');
   });
 
   it('ведёт участника на карточку проекта по project_id', () => {
@@ -267,9 +386,7 @@ describe('ссылки в блоке ожидания личного кабин�
     });
     cy.get('button[aria-label="Открыть меню"]').click();
     cy.get('button[aria-label="Личный кабинет"]:visible').click();
-    cy.get(
-      'button[aria-label="Ожидающих приглашений: 0"]:visible'
-    ).click();
+    cy.get('button[aria-label="Ожидающих приглашений: 0"]:visible').click();
     cy.contains('Приглашений пока нет.').should('be.visible');
     cy.contains('Заявок пока нет.').should('be.visible');
     cy.get('section[aria-label="Входящие приглашения"]:visible')

@@ -18,14 +18,13 @@ export const MyProfileOwnerPage: React.FC = () => {
     isProjectsPending,
     isProjectsError,
     waitingItems,
+    pendingRequestsCount,
     isWaitingPending,
     isWaitingError,
     updateNotifications,
     isNotificationUpdating,
     isNotificationUpdateError,
   } = useMyProfileOwner();
-
-  const pendingRequestsCount = waitingItems.length;
 
   const visibleProjects = projectCards.slice(0, visibleCount);
   const hasMore = visibleCount < projectCards.length;
@@ -53,12 +52,10 @@ export const MyProfileOwnerPage: React.FC = () => {
         <section className={styles.section}>
           <h2 className={styles.title}>Личный кабинет</h2>
           <div className={styles.navItems}>
-            <Button className={styles.navButton} iconName="notifications">
-              Уведомления
-            </Button>
             <div className={styles.requestsEntry}>
               <Button
                 className={styles.navButton}
+                iconName="notifications"
                 onClick={() => navigate('/requests')}
                 aria-label={
                   pendingRequestsCount > 0
@@ -127,9 +124,9 @@ export const MyProfileOwnerPage: React.FC = () => {
           waitingItems={waitingItems}
           isWaitingPending={isWaitingPending}
           isWaitingError={isWaitingError}
-          waitingPendingText="Загружаем отклики..."
-          waitingErrorText="Не удалось загрузить отклики. Попробуйте обновить страницу."
-          waitingEmptyText="Откликов пока нет."
+          waitingPendingText="Загружаем приглашения..."
+          waitingErrorText="Не удалось загрузить приглашения. Попробуйте обновить страницу."
+          waitingEmptyText="Приглашений пока нет."
         />
       </div>
     </div>

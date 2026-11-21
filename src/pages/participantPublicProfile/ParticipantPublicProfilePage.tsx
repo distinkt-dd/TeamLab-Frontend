@@ -13,7 +13,11 @@ import {
   SkillLevelMapped,
   UserLevelMapped,
 } from '@entities/user/mapped';
-import { CURRENT_USER_QUERY_KEY, UserService } from '@entities/user';
+import {
+  CURRENT_USER_QUERY_KEY,
+  UserService,
+  ownerPendingInvitationsQueryKey,
+} from '@entities/user';
 import type {
   SearchStatus,
   SkillLevel,
@@ -40,7 +44,6 @@ const searchStatusLabels: Record<SearchStatus, string> = {
   looking_for_members: 'Ищу участников',
   not_looking: 'Не ищу',
 };
-
 const workFormatLabels: Record<WorkFormat, string> = {
   remote: 'Удалённо',
   hybrid: 'Гибрид',
@@ -246,6 +249,9 @@ export const ParticipantPublicProfilePage: React.FC = () => {
         queryClient.invalidateQueries({ queryKey: profileQueryKey }),
         queryClient.invalidateQueries({
           queryKey: ['participant-project-relation', participantId, projectId],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ownerPendingInvitationsQueryKey(authUser?.id ?? 0),
         }),
       ]);
     },

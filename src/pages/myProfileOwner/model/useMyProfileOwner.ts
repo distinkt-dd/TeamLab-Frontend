@@ -3,14 +3,21 @@ import { ProjectService } from '@entities/project';
 import {
   CURRENT_USER_QUERY_KEY,
   UserService,
+  currentUserNotificationsQueryKey,
+  ownerPendingInvitationsQueryKey,
   useOptimisticUserUpdate,
 } from '@entities/user';
+import type { ProjectInvitationCard } from '@entities/project/types';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { toProjectCards } from '../lib/toProjectCards';
 
-// Данные личного кабинета владельца: текущий пользователь, его проекты
-// и отклики, ожидающие ответа.
+interface OwnerPendingInvitation extends ProjectInvitationCard {
+  projectId: number;
+}
+
+// Данные личного кабинета владельца: текущий пользователь, его проекты,
+// входящие заявки и отправленные приглашения, ожидающие ответа.
 export const useMyProfileOwner = () => {
   const { api } = getServices();
   const queryClient = useQueryClient();
@@ -55,31 +62,79 @@ export const useMyProfileOwner = () => {
     [projects]
   );
 
-  // Отклики на проекты владельца, ожидающие решения: GET /users/me/notifications/.
-  const {
-    data: notifications,
-    isPending: isWaitingPending,
-    isError: isWaitingError,
-  } = useQuery({
-    queryKey: ['currentUserNotifications', user?.id ?? 0],
+  // Входящие заявки остаются источником счётчика отдельной страницы «Заявки».
+  const { data: notifications } = useQuery({
+    queryKey: currentUserNotificationsQueryKey(user?.id ?? 0),
     queryFn: () => userService.getAllNotifications(),
     enabled: !!user, // не запускаем, пока нет user
   });
 
-  // Имя откликнувшегося и специализация роли — пункт блока «В ожидании ответа».
+  const projectIds = useMemo(
+    () => [...(user?.owned_project_ids ?? [])].sort((a, b) => a - b),
+    [user?.owned_project_ids]
+  );
+
+  // Исходящие pending-приглашения собираются по всем проектам владельца.
+  const {
+    data: invitations,
+    isPending: isWaitingPending,
+    isError: isWaitingError,
+  } = useQuery({
+    queryKey: [...ownerPendingInvitationsQueryKey(user?.id ?? 0), projectIds],
+    queryFn: async (): Promise<OwnerPendingInvitation[]> => {
+      const projectInvitations = await Promise.all(
+        projectIds.map(async (projectId) => {
+          const items =
+            await projectService.getAllProjectInvitations(projectId);
+          return items.map((invitation) => ({ ...invitation, projectId }));
+        })
+      );
+
+      return Array.from(
+        new Map(
+          projectInvitations
+            .flat()
+            .filter(
+              ({ source, status }) =>
+                source === 'invitation' && status === 'pending'
+            )
+            .map((invitation) => [invitation.id, invitation])
+        ).values()
+      );
+    },
+    enabled: !!user,
+  });
+
+  const projectTitles = useMemo(
+    () =>
+      new Map((projects ?? []).map((project) => [project.id, project.title])),
+    [projects]
+  );
+
+  // Имя приглашённого участника и контекст проекта/роли.
   const waitingItems = useMemo(
     () =>
-      (notifications ?? []).map(
-        ({ id, user_id, username, project_role_name }) => ({
+      (invitations ?? []).map(
+        ({ id, user_id, username, project_role_name, projectId }) => ({
           id,
           title: username,
-          tag: project_role_name,
+          tag: [projectTitles.get(projectId), project_role_name]
+            .filter(Boolean)
+            .join(' · '),
           href:
             Number.isInteger(user_id) && user_id > 0
               ? `/participants/${user_id}`
               : undefined,
         })
       ),
+    [invitations, projectTitles]
+  );
+
+  const pendingRequestsCount = useMemo(
+    () =>
+      (notifications ?? []).filter(
+        ({ source, status }) => source === 'application' && status === 'pending'
+      ).length,
     [notifications]
   );
 
@@ -98,6 +153,7 @@ export const useMyProfileOwner = () => {
     isProjectsPending,
     isProjectsError,
     waitingItems,
+    pendingRequestsCount,
     isWaitingPending,
     isWaitingError,
     updateNotifications: updateNotifications.mutate,

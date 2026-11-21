@@ -11,7 +11,9 @@ export { UserService } from './UserService';
 export {
   currentUserApplicationsQueryKey,
   currentUserInvitationsQueryKey,
+  currentUserNotificationsQueryKey,
   currentUserProjectsQueryKey,
+  ownerPendingInvitationsQueryKey,
 } from './model/queryKeys';
 export {
   CURRENT_USER_QUERY_KEY,

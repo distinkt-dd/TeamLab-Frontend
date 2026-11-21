@@ -2,6 +2,7 @@ import { getServices, useAppSelector } from '@app';
 import {
   UserService,
   currentUserInvitationsQueryKey,
+  currentUserNotificationsQueryKey,
 } from '@entities/user';
 import { selectAuthUser, selectIsAuthenticated } from '@features/auth';
 import { Icon } from '@shared/icons';
@@ -23,6 +24,7 @@ export const PersonalMenu = () => {
   const { api } = getServices();
   const userService = useMemo(() => new UserService(api), [api]);
   const isParticipant = user?.account_type === 'participant';
+  const isOwner = user?.account_type === 'owner';
 
   const {
     data: notifications,
@@ -37,10 +39,23 @@ export const PersonalMenu = () => {
   const invitations = useMemo(
     () =>
       (notifications ?? []).filter(
-        ({ source, status }) =>
-          source === 'invitation' && status === 'pending'
+        ({ source, status }) => source === 'invitation' && status === 'pending'
       ),
     [notifications]
+  );
+
+  const { data: ownerNotifications } = useQuery({
+    queryKey: currentUserNotificationsQueryKey(user?.id ?? 0),
+    queryFn: () => userService.getAllNotifications(),
+    enabled: isAuthenticated && isOwner && Boolean(user?.id),
+  });
+
+  const pendingApplicationsCount = useMemo(
+    () =>
+      (ownerNotifications ?? []).filter(
+        ({ source, status }) => source === 'application' && status === 'pending'
+      ).length,
+    [ownerNotifications]
   );
 
   useEffect(() => {
@@ -105,7 +120,11 @@ export const PersonalMenu = () => {
       </Button>
       {isOpen && isAuthenticated && (
         <div className={styles.dropdown} id={menuId}>
-          <div className={styles.actionIcons}>
+          <div
+            className={`${styles.actionIcons} ${
+              isOwner ? styles.ownerActionIcons : ''
+            }`}
+          >
             <button
               type="button"
               aria-label="Меню"
@@ -123,11 +142,9 @@ export const PersonalMenu = () => {
                 aria-label={
                   isParticipant
                     ? `Ожидающих приглашений: ${invitations.length}`
-                    : 'Уведомления'
+                    : `Заявки, ожидают ответа: ${pendingApplicationsCount}`
                 }
-                aria-expanded={
-                  isParticipant ? areNotificationsOpen : undefined
-                }
+                aria-expanded={isParticipant ? areNotificationsOpen : undefined}
                 aria-controls={
                   isParticipant && areNotificationsOpen
                     ? notificationsId
@@ -141,30 +158,35 @@ export const PersonalMenu = () => {
                     setAreNotificationsOpen((open) => !open);
                   } else {
                     setIsOpen(false);
+                    navigate('/requests');
                   }
                 }}
               >
                 <Icon name="notifications" size={44} />
               </button>
-              {isParticipant ? (
-                invitations.length > 0 && (
-                  <span className={styles.counter}>{invitations.length}</span>
-                )
-              ) : (
-                <span className={styles.counter}>0</span>
-              )}
+              {isParticipant
+                ? invitations.length > 0 && (
+                    <span className={styles.counter}>{invitations.length}</span>
+                  )
+                : pendingApplicationsCount > 0 && (
+                    <span className={styles.counter}>
+                      {pendingApplicationsCount}
+                    </span>
+                  )}
             </div>
-            <Link
-              to="/favorites"
-              aria-label="Избранное"
-              className={styles.iconWrapper}
-              onClick={() => {
-                setIsOpen(false);
-                setAreNotificationsOpen(false);
-              }}
-            >
-              <Icon name="like" size={44} />
-            </Link>
+            {isParticipant && (
+              <Link
+                to="/favorites"
+                aria-label="Избранное"
+                className={styles.iconWrapper}
+                onClick={() => {
+                  setIsOpen(false);
+                  setAreNotificationsOpen(false);
+                }}
+              >
+                <Icon name="like" size={44} />
+              </Link>
+            )}
           </div>
           {isParticipant && areNotificationsOpen ? (
             <section
