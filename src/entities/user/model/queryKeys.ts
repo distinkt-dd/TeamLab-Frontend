@@ -12,3 +12,8 @@ export const currentUserNotificationsQueryKey = (userId: number) =>
 
 export const ownerPendingInvitationsQueryKey = (ownerId: number) =>
   ['ownerPendingInvitations', ownerId] as const;
+
+// Входящие заявки в проекты владельца (страница «Заявки»).
+// Не путать с currentUserApplicationsQueryKey — там заявки самого участника.
+export const ownerRequestsQueryKey = (ownerId: number) =>
+  ['ownerRequests', ownerId] as const;

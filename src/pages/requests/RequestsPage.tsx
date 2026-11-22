@@ -1,21 +1,12 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FieldService } from '@entities/field';
-import type { Field } from '@entities/field/types';
-import { ProjectService } from '@entities/project';
-import type { ProjectApplicationCard } from '@entities/project/types';
-import { SkillService } from '@entities/skill';
-import type { Skill as CatalogSkill } from '@entities/skill/types';
-import { SpecializationService } from '@entities/specialization';
-import type { Specialization } from '@entities/specialization/types';
-import { UserService } from '@entities/user/UserService';
 import type { EmploymentType, UserLevel } from '@entities/user/types';
 import { Filter, type FilterOption, type FilterSelect } from '@features/filter';
-import { getServices } from '@app/store/services';
 import { Button, Tag } from '@shared/ui';
 import blueFuzz from '@entities/specialization/assets/blue_fuzz.png';
 import pinkFuzz from '@entities/specialization/assets/pink_fuzz.png';
 import violetFuzz from '@widgets/loginForm/assets/violet_fuzz.png';
+import { useRequests } from './model/useRequests';
 import styles from './RequestsPage.module.css';
 
 const VISIBLE_SKILLS_COUNT = 4;
@@ -45,11 +36,6 @@ interface RequestsFilters {
   tagIds: string[];
   city: string;
   period: string;
-}
-
-interface ApplicationItem extends ProjectApplicationCard {
-  project_id: number;
-  project_title: string;
 }
 
 const emptyFilters: RequestsFilters = {
@@ -129,114 +115,21 @@ const getImageUrl = (avatar: string | null, baseUrl: string) => {
   }
 };
 
-const makeOptions = <T extends { id: number; name: string }>(
-  items: T[]
-): FilterOption[] =>
-  items.map((item) => ({
-    value: String(item.id),
-    label: item.name,
-  }));
-
 export const RequestsPage: React.FC = () => {
   const navigate = useNavigate();
-  const [applications, setApplications] = useState<ApplicationItem[]>([]);
-  const [fields, setFields] = useState<Field[]>([]);
-  const [specializations, setSpecializations] = useState<Specialization[]>([]);
-  const [skills, setSkills] = useState<CatalogSkill[]>([]);
+  const {
+    applications,
+    isPending,
+    error,
+    fieldOptions,
+    skillOptions,
+    specializationFieldIdById,
+    baseUrl,
+  } = useRequests();
   const [draftFilters, setDraftFilters] =
     useState<RequestsFilters>(emptyFilters);
   const [appliedFilters, setAppliedFilters] =
     useState<RequestsFilters>(emptyFilters);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let isCancelled = false;
-
-    const loadRequests = async () => {
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        const { api } = getServices();
-        const userService = new UserService(api);
-        const projectService = new ProjectService(api);
-        const fieldService = new FieldService(api);
-        const specializationService = new SpecializationService(api);
-        const skillService = new SkillService(api);
-
-        const [currentUser, fieldsData, specializationsData, skillsData] =
-          await Promise.all([
-            userService.getCurrent(),
-            fieldService.list(),
-            specializationService.list(),
-            skillService.list(),
-          ]);
-
-        if (isCancelled) return;
-
-        setFields(fieldsData);
-        setSpecializations(specializationsData);
-        setSkills(skillsData);
-
-        if (currentUser.account_type !== 'owner') {
-          setApplications([]);
-          return;
-        }
-
-        const applicationGroups = await Promise.all(
-          currentUser.owned_project_ids.map(async (projectId) => {
-            const [project, projectApplications] = await Promise.all([
-              projectService.getProjectDetail(projectId),
-              projectService.getAllProjectApplications(projectId),
-            ]);
-
-            return projectApplications.map((application) => ({
-              ...application,
-              project_id: project.id,
-              project_title: project.title,
-            }));
-          })
-        );
-
-        if (isCancelled) return;
-
-        setApplications(
-          applicationGroups
-            .flat()
-            .sort(
-              (left, right) =>
-                new Date(right.created_at).getTime() -
-                new Date(left.created_at).getTime()
-            )
-        );
-      } catch (requestError) {
-        if (isCancelled) return;
-        const message =
-          requestError instanceof Error
-            ? requestError.message
-            : 'Не удалось загрузить заявки.';
-        setError(message);
-      } finally {
-        if (!isCancelled) setIsLoading(false);
-      }
-    };
-
-    void loadRequests();
-
-    return () => {
-      isCancelled = true;
-    };
-  }, []);
-
-  const specializationById = useMemo(() => {
-    return new Map(
-      specializations.map((specialization) => [
-        specialization.id,
-        specialization,
-      ])
-    );
-  }, [specializations]);
 
   const cityOptions = useMemo(() => {
     const uniqueCities = Array.from(
@@ -260,13 +153,13 @@ export const RequestsPage: React.FC = () => {
       const user = application.user;
 
       if (appliedFilters.fieldIds.length > 0) {
-        const specialization = user.specialization_id
-          ? specializationById.get(user.specialization_id)
+        const fieldId = user.specialization_id
+          ? specializationFieldIdById.get(user.specialization_id)
           : undefined;
 
         if (
-          !specialization ||
-          !appliedFilters.fieldIds.includes(String(specialization.field_id))
+          fieldId === undefined ||
+          !appliedFilters.fieldIds.includes(String(fieldId))
         ) {
           return false;
         }
@@ -294,29 +187,29 @@ export const RequestsPage: React.FC = () => {
 
       return true;
     });
-  }, [applications, appliedFilters, specializationById]);
+  }, [applications, appliedFilters, specializationFieldIdById]);
 
   const filterSelects: FilterSelect[] = [
     {
       key: 'fields',
       multiple: true,
-      options: makeOptions(fields),
+      options: fieldOptions,
       value: draftFilters.fieldIds,
       onChange: (fieldIds) =>
         setDraftFilters((filters) => ({ ...filters, fieldIds })),
       labelText: 'Все направления',
-      disabled: fields.length === 0,
+      disabled: fieldOptions.length === 0,
     },
     {
       key: 'tags',
       multiple: true,
       variant: 'tags',
-      options: makeOptions(skills),
+      options: skillOptions,
       value: draftFilters.tagIds,
       onChange: (tagIds) =>
         setDraftFilters((filters) => ({ ...filters, tagIds })),
       labelText: 'Теги',
-      disabled: skills.length === 0,
+      disabled: skillOptions.length === 0,
     },
     {
       key: 'period',
@@ -341,8 +234,6 @@ export const RequestsPage: React.FC = () => {
     setAppliedFilters(emptyFilters);
   };
 
-  const baseUrl = getServices().api.baseUrl;
-
   return (
     <main className={styles.main}>
       <div className={styles.container}>
@@ -364,15 +255,15 @@ export const RequestsPage: React.FC = () => {
             showReset={false}
           />
 
-          {isLoading && <p className={styles.state}>Загружаем заявки...</p>}
+          {isPending && <p className={styles.state}>Загружаем заявки...</p>}
 
-          {!isLoading && error && (
+          {!isPending && error && (
             <p className={styles.state} role="alert">
               {error}
             </p>
           )}
 
-          {!isLoading && !error && filteredApplications.length === 0 && (
+          {!isPending && !error && filteredApplications.length === 0 && (
             <p className={styles.state}>
               {applications.length === 0
                 ? 'Новых заявок пока нет.'
@@ -380,7 +271,7 @@ export const RequestsPage: React.FC = () => {
             </p>
           )}
 
-          {!isLoading && !error && filteredApplications.length > 0 && (
+          {!isPending && !error && filteredApplications.length > 0 && (
             <ul className={styles.list}>
               {filteredApplications.map((application, index) => {
                 const user = application.user;
