@@ -1,7 +1,7 @@
 import { EmploymentTypeMapped, UserLevelMapped } from '@entities/user/mapped';
 import { type UserPublic } from '@entities/user/types';
 import { Button, Tag } from '@shared/ui';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import styles from './ParticipantCard.module.css';
 
 type ParticipantProps = {
@@ -10,6 +10,21 @@ type ParticipantProps = {
 
 export const ParticipantCard = ({ user }: ParticipantProps) => {
   const navigate = useNavigate();
+  const hasProfileId = Number.isInteger(user.id) && user.id > 0;
+  const displayName = user.display_name?.trim();
+  const username = user.username.trim();
+  const primaryName = displayName || username;
+  const shouldShowUsername =
+    !!displayName &&
+    !!username &&
+    displayName.toLocaleLowerCase('ru-RU') !==
+      username.toLocaleLowerCase('ru-RU');
+  const participantName = (
+    <>
+      <p className="text-l">{primaryName}</p>
+      {shouldShowUsername && <p className="text-s">{username}</p>}
+    </>
+  );
 
   return (
     <div className={styles.card}>
@@ -18,11 +33,20 @@ export const ParticipantCard = ({ user }: ParticipantProps) => {
           <img
             src={user.avatar ?? '/girl.png'}
             className={styles.image}
-            alt={user.display_name}
+            alt={primaryName}
           />
           <div className={styles.userSelfText}>
-            <p className="text-l">{user.display_name}</p>
-            <p className="text-s">{user.username}</p>
+            {hasProfileId ? (
+              <Link
+                to={`/participants/${user.id}`}
+                className={styles.userLink}
+                aria-label={`Открыть профиль ${primaryName}`}
+              >
+                {participantName}
+              </Link>
+            ) : (
+              participantName
+            )}
           </div>
         </div>
         <div className={styles.userInfo}>
@@ -59,7 +83,10 @@ export const ParticipantCard = ({ user }: ParticipantProps) => {
         <Button
           type="button"
           variant="tertiary"
-          onClick={() => navigate(`/participants/${user.id}`)}
+          onClick={() => {
+            if (hasProfileId) navigate(`/participants/${user.id}`);
+          }}
+          disabled={!hasProfileId}
           aria-label={`Открыть профиль ${user.display_name}`}
         >
           В профиль

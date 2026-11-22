@@ -47,6 +47,20 @@
   letter-spacing: 1%;
 }
 
+.nameLink {
+  border-radius: 4px;
+  transition: color var(--transition-duration);
+}
+
+.nameLink:hover {
+  color: var(--accent-purple-color);
+}
+
+.nameLink:focus-visible {
+  outline: 2px solid var(--accent-purple-color);
+  outline-offset: 3px;
+}
+
 .right {
   display: flex;
   align-items: center;
