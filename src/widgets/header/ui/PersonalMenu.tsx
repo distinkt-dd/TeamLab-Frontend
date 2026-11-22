@@ -12,14 +12,18 @@ import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styles from './header.module.css';
 
+type PersonalMenuTab = 'navigation' | 'notifications' | 'favorites';
+
 export const PersonalMenu = () => {
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const user = useAppSelector(selectAuthUser);
   const [isOpen, setIsOpen] = useState(false);
-  const [areNotificationsOpen, setAreNotificationsOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<PersonalMenuTab>('navigation');
   const wrapperRef = useRef<HTMLDivElement>(null);
   const menuId = useId();
+  const navigationId = useId();
   const notificationsId = useId();
+  const favoritesId = useId();
   const navigate = useNavigate();
   const { api } = getServices();
   const userService = useMemo(() => new UserService(api), [api]);
@@ -64,13 +68,13 @@ export const PersonalMenu = () => {
     const handleOutsideClick = (event: MouseEvent) => {
       if (!wrapperRef.current?.contains(event.target as Node)) {
         setIsOpen(false);
-        setAreNotificationsOpen(false);
+        setActiveTab('navigation');
       }
     };
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         setIsOpen(false);
-        setAreNotificationsOpen(false);
+        setActiveTab('navigation');
         wrapperRef.current?.querySelector('button')?.focus();
       }
     };
@@ -95,9 +99,12 @@ export const PersonalMenu = () => {
       className={styles.personalWrapper}
       ref={wrapperRef}
       onBlur={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget)) {
+        if (
+          event.relatedTarget &&
+          !event.currentTarget.contains(event.relatedTarget)
+        ) {
           setIsOpen(false);
-          setAreNotificationsOpen(false);
+          setActiveTab('navigation');
         }
       }}
     >
@@ -107,7 +114,7 @@ export const PersonalMenu = () => {
         onClick={() => {
           if (isAuthenticated) {
             setIsOpen((open) => !open);
-            setAreNotificationsOpen(false);
+            setActiveTab('navigation');
           } else navigate('/login');
         }}
         aria-label={
@@ -128,11 +135,14 @@ export const PersonalMenu = () => {
             <button
               type="button"
               aria-label="Меню"
-              className={styles.iconWrapper}
-              onClick={() => {
-                setIsOpen(false);
-                setAreNotificationsOpen(false);
-              }}
+              aria-expanded={activeTab === 'navigation'}
+              aria-controls={
+                activeTab === 'navigation' ? navigationId : undefined
+              }
+              className={`${styles.iconWrapper} ${
+                activeTab === 'navigation' ? styles.iconWrapperActive : ''
+              }`}
+              onClick={() => setActiveTab('navigation')}
             >
               <Icon name="burgerM" size={44} />
             </button>
@@ -144,20 +154,23 @@ export const PersonalMenu = () => {
                     ? `Ожидающих приглашений: ${invitations.length}`
                     : `Заявки, ожидают ответа: ${pendingApplicationsCount}`
                 }
-                aria-expanded={isParticipant ? areNotificationsOpen : undefined}
+                aria-expanded={
+                  isParticipant ? activeTab === 'notifications' : undefined
+                }
                 aria-controls={
-                  isParticipant && areNotificationsOpen
+                  isParticipant && activeTab === 'notifications'
                     ? notificationsId
                     : undefined
                 }
                 className={`${styles.iconWrapper} ${
-                  areNotificationsOpen ? styles.iconWrapperActive : ''
+                  activeTab === 'notifications' ? styles.iconWrapperActive : ''
                 }`}
                 onClick={() => {
                   if (isParticipant) {
-                    setAreNotificationsOpen((open) => !open);
+                    setActiveTab('notifications');
                   } else {
                     setIsOpen(false);
+                    setActiveTab('navigation');
                     navigate('/requests');
                   }
                 }}
@@ -175,20 +188,23 @@ export const PersonalMenu = () => {
                   )}
             </div>
             {isParticipant && (
-              <Link
-                to="/favorites"
+              <button
+                type="button"
                 aria-label="Избранное"
-                className={styles.iconWrapper}
-                onClick={() => {
-                  setIsOpen(false);
-                  setAreNotificationsOpen(false);
-                }}
+                aria-expanded={activeTab === 'favorites'}
+                aria-controls={
+                  activeTab === 'favorites' ? favoritesId : undefined
+                }
+                className={`${styles.iconWrapper} ${
+                  activeTab === 'favorites' ? styles.iconWrapperActive : ''
+                }`}
+                onClick={() => setActiveTab('favorites')}
               >
                 <Icon name="like" size={44} />
-              </Link>
+              </button>
             )}
           </div>
-          {isParticipant && areNotificationsOpen ? (
+          {isParticipant && activeTab === 'notifications' ? (
             <section
               className={styles.notificationsPanel}
               id={notificationsId}
@@ -218,7 +234,7 @@ export const PersonalMenu = () => {
                           title={invitation.project_title}
                           onClick={() => {
                             setIsOpen(false);
-                            setAreNotificationsOpen(false);
+                            setActiveTab('navigation');
                           }}
                         >
                           {invitation.project_title}
@@ -233,15 +249,35 @@ export const PersonalMenu = () => {
                 </ul>
               )}
             </section>
+          ) : isParticipant && activeTab === 'favorites' ? (
+            <section
+              className={styles.notificationsPanel}
+              id={favoritesId}
+              aria-label="Избранные проекты"
+            >
+              <Link
+                to="/favorites"
+                className={styles.notificationLink}
+                onClick={() => {
+                  setIsOpen(false);
+                  setActiveTab('navigation');
+                }}
+              >
+                Открыть избранные проекты
+              </Link>
+            </section>
           ) : (
-            <nav aria-label="Личный кабинет">
+            <nav id={navigationId} aria-label="Личный кабинет">
               <ul className={styles.personalList}>
                 {links.map((item) => (
                   <li key={item.path}>
                     <Link
                       to={item.path}
                       className={styles.link}
-                      onClick={() => setIsOpen(false)}
+                      onClick={() => {
+                        setIsOpen(false);
+                        setActiveTab('navigation');
+                      }}
                     >
                       {item.text}
                     </Link>

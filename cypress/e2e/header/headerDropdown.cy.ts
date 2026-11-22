@@ -170,6 +170,109 @@ describe('выпадающее меню Header', () => {
     });
   }
 
+  it('открывает навигацию владельца по умолчанию и сохраняет активную вкладку при повторном нажатии', () => {
+    interceptRequests();
+    cy.visit(`${origin}/`, { onBeforeLoad: seedAuth });
+
+    cy.get('button[aria-label="Личный кабинет"]').click();
+    cy.get('nav[aria-label="Личный кабинет"]').should('be.visible');
+    cy.get('button[aria-label="Меню"]')
+      .should('have.attr', 'aria-expanded', 'true')
+      .and('have.css', 'outline-style', 'solid')
+      .focus();
+    cy.press(Cypress.Keyboard.Keys.ENTER);
+    cy.get('button[aria-label="Меню"]').should(
+      'have.attr',
+      'aria-expanded',
+      'true'
+    );
+    cy.get('nav[aria-label="Личный кабинет"]').within(() => {
+      cy.contains('a', 'Участники').should(
+        'have.attr',
+        'href',
+        '/participants'
+      );
+      cy.contains('a', 'Профиль').should('have.attr', 'href', '/my-profile');
+      cy.contains('a', 'Настройки').should(
+        'have.attr',
+        'href',
+        '/edit-profile'
+      );
+      cy.contains('a', 'Проекты').should('not.exist');
+    });
+
+    cy.get('nav[aria-label="Личный кабинет"]').should('be.visible');
+
+    cy.get('button[aria-label="Личный кабинет"]').click();
+    cy.get('button[aria-label="Личный кабинет"]').click();
+    cy.get('button[aria-label="Меню"]').should(
+      'have.attr',
+      'aria-expanded',
+      'true'
+    );
+    cy.get('nav[aria-label="Личный кабинет"]').should('be.visible');
+  });
+
+  it('переключает навигацию и уведомления участника без одновременного содержимого', () => {
+    interceptRequests('participant');
+    cy.visit(`${origin}/`, {
+      onBeforeLoad: (window) => seedAuth(window, 'participant'),
+    });
+
+    cy.get('button[aria-label="Личный кабинет"]').click();
+    cy.get('button[aria-label="Меню"]')
+      .should('have.attr', 'aria-expanded', 'true')
+      .and('have.css', 'outline-style', 'solid');
+    cy.get('nav[aria-label="Личный кабинет"]').within(() => {
+      cy.contains('a', 'Проекты').should('have.attr', 'href', '/projects');
+      cy.contains('a', 'Профиль').should('have.attr', 'href', '/my-profile');
+      cy.contains('a', 'Настройки').should(
+        'have.attr',
+        'href',
+        '/edit-profile'
+      );
+      cy.contains('a', 'Участники').should('not.exist');
+    });
+
+    cy.get('button[aria-label="Ожидающих приглашений: 0"]').click();
+    cy.get('nav[aria-label="Личный кабинет"]').should('not.exist');
+    cy.get('section[aria-label="Входящие приглашения"]').should('be.visible');
+    cy.get('button[aria-label="Ожидающих приглашений: 0"]')
+      .should('have.attr', 'aria-expanded', 'true')
+      .and('have.css', 'outline-style', 'solid')
+      .click()
+      .blur();
+    cy.get('section[aria-label="Входящие приглашения"]').click();
+    cy.get('section[aria-label="Входящие приглашения"]').should('be.visible');
+    cy.get('button[aria-label="Ожидающих приглашений: 0"]')
+      .should('have.attr', 'aria-expanded', 'true')
+      .and('have.css', 'outline-style', 'solid');
+    cy.get('button[aria-label="Меню"]').click();
+    cy.get('section[aria-label="Входящие приглашения"]').should('not.exist');
+    cy.get('nav[aria-label="Личный кабинет"]').should('be.visible');
+    cy.get('button[aria-label="Избранное"]')
+      .click()
+      .should('have.attr', 'aria-expanded', 'true')
+      .and('have.css', 'outline-style', 'solid')
+      .click();
+    cy.get('section[aria-label="Избранные проекты"]').should('be.visible');
+    cy.contains('a', 'Открыть избранные проекты').click();
+    cy.location('pathname').should('eq', '/favorites');
+    cy.get('[aria-label="Личный кабинет"] + div').should('not.exist');
+  });
+
+  it('закрывает панель после выбора пункта навигации', () => {
+    interceptRequests();
+    cy.visit(`${origin}/`, { onBeforeLoad: seedAuth });
+
+    cy.get('button[aria-label="Личный кабинет"]').click();
+    cy.get('nav[aria-label="Личный кабинет"]')
+      .contains('a', 'Участники')
+      .click();
+    cy.location('pathname').should('eq', '/participants');
+    cy.get('[aria-label="Личный кабинет"] + div').should('not.exist');
+  });
+
   it('не выходит за viewport на мобильном экране', () => {
     interceptRequests();
     cy.viewport(375, 900);

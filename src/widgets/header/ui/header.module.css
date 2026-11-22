@@ -148,7 +148,7 @@
   color: var(--accent-orange-color, #fcaf6c);
 }
 
-.iconWrapperActive {
+.iconWrapper.iconWrapperActive {
   border-radius: 8px;
   outline: 1.5px solid var(--accent-purple-color, #72559b);
 }

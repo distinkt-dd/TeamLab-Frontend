@@ -1,5 +1,5 @@
 import { Button, Tag } from '@shared/ui';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import type { ProjectCardTag } from '../../types';
 import styles from './ProjectItem.module.css';
 
@@ -19,6 +19,7 @@ export const ProjectItem: React.FC<ProjectItemProps> = ({
   showProjectActions = false,
 }: ProjectItemProps) => {
   const navigate = useNavigate();
+  const hasProjectId = Number.isInteger(id) && id > 0;
 
   return (
     <li className={styles.item} key={id}>
@@ -30,7 +31,16 @@ export const ProjectItem: React.FC<ProjectItemProps> = ({
             {name.charAt(0)}
           </span>
         )}
-        <span className={styles.name}>{name}</span>
+        {hasProjectId ? (
+          <Link
+            to={`/projects/${id}`}
+            className={`${styles.name} ${styles.nameLink}`}
+          >
+            {name}
+          </Link>
+        ) : (
+          <span className={styles.name}>{name}</span>
+        )}
       </div>
       <div className={styles.right}>
         {tags && tags.length > 0 && (
@@ -64,7 +74,10 @@ export const ProjectItem: React.FC<ProjectItemProps> = ({
           <Button
             variant="tertiary"
             className={styles.button}
-            onClick={() => navigate(`/projects/${id}`)}
+            onClick={() => {
+              if (hasProjectId) navigate(`/projects/${id}`);
+            }}
+            disabled={!hasProjectId}
           >
             К проекту
           </Button>
