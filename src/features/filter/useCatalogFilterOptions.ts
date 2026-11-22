@@ -7,7 +7,9 @@ import { SpecializationService } from '@entities/specialization/SpecializationSe
 import type { Api } from '@shared/api/api.class';
 import type { FilterOption } from './Filter';
 
-const toOptions = (items: Array<{ id: number; name: string }>): FilterOption[] =>
+const toOptions = (
+  items: Array<{ id: number; name: string }>
+): FilterOption[] =>
   items
     .map((item) => ({ value: String(item.id), label: item.name }))
     .sort((left, right) => left.label.localeCompare(right.label, 'ru'));
@@ -32,6 +34,18 @@ export const useCatalogFilterOptions = (api: Api) => {
     queryKey: ['skills'],
     queryFn: () => skillService.list({ ordering: 'name' }),
   });
+  // Маппинг «специализация → направление»: нужен странице "Заявки",
+  // чтобы фильтровать по направлениям без лишнего запроса справочника.
+  const specializationFieldIdById = useMemo(
+    () =>
+      new Map(
+        (specializationsQuery.data ?? []).map((specialization) => [
+          specialization.id,
+          specialization.field_id,
+        ])
+      ),
+    [specializationsQuery.data]
+  );
   const specializationColors = useMemo(() => {
     const fieldNames = new Map(
       (fieldsQuery.data ?? []).map((field) => [field.id, field.name])
@@ -49,6 +63,7 @@ export const useCatalogFilterOptions = (api: Api) => {
     fieldOptions: toOptions(fieldsQuery.data ?? []),
     specializationOptions: toOptions(specializationsQuery.data ?? []),
     specializationColors,
+    specializationFieldIdById,
     skillOptions: toOptions(skillsQuery.data ?? []),
     isPending:
       fieldsQuery.isPending ||

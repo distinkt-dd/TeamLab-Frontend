@@ -4,7 +4,7 @@ import {
   FavoriteProjectService,
 } from '@entities/favorite-project';
 import { MembershipService } from '@entities/membership';
-import { ProjectService } from '@entities/project';
+import { ProjectService, projectDetailQueryKey } from '@entities/project';
 import { RoleInterestService } from '@entities/role-interest';
 import {
   currentUserApplicationsQueryKey,
@@ -20,8 +20,8 @@ import type {
 import { selectAuthUser } from '@features/auth';
 import { Icon } from '@shared/icons';
 import { Button, Tag } from '@shared/ui';
-import { useQueryClient } from '@tanstack/react-query';
-import { useEffect, useMemo, useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import tasksDecoration from './assets/Orange Notepad Dark Void-no-bg-preview (carve.photos) 1.png';
 import benefitsDecoration from './assets/Red Fur Oblique View-no-bg-preview (carve.photos) 1.png';
@@ -217,52 +217,40 @@ export const ProjectCardPage: React.FC = () => {
     [api]
   );
 
-  const [project, setProject] = useState<ProjectDetail | null>(null);
-  const [selectedRoleId, setSelectedRoleId] = useState<number | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isApplying, setIsApplying] = useState(false);
-  const [isLeavingMembership, setIsLeavingMembership] = useState(false);
-  const [isInvitationActionPending, setIsInvitationActionPending] =
-    useState(false);
-  const [isFavoritePending, setIsFavoritePending] = useState(false);
-  const [loadError, setLoadError] = useState<string | null>(null);
-  const [actionError, setActionError] = useState<string | null>(null);
-  const [favoriteError, setFavoriteError] = useState<string | null>(null);
-  const [reloadKey, setReloadKey] = useState(0);
+  // Данные проекта живут в кэше TanStack Query; локально хранится только
+  // выбранная роль. projectId в выборе защищает от «залипшей» роли
+  // при переходе между карточками.
+  const [roleChoice, setRoleChoice] = useState<{
+    projectId: number;
+    roleId: number;
+  } | null>(null);
 
-  useEffect(() => {
-    let isCancelled = false;
+  const {
+    data: projectData,
+    isPending: isProjectPending,
+    isError: isProjectError,
+    error: projectError,
+    refetch: refetchProject,
+  } = useQuery({
+    queryKey: projectDetailQueryKey(projectId),
+    queryFn: () => projectService.getProjectDetail(projectId),
+    enabled: isValidProjectId,
+    // Ошибка показывается сразу после первого неудачного запроса.
+    retry: false,
+  });
 
-    if (!isValidProjectId) {
-      return undefined;
-    }
+  const project = projectData ?? null;
+  const isLoading = isProjectPending;
+  const loadError = isProjectError ? getErrorText(projectError) : null;
 
-    queueMicrotask(() => {
-      if (isCancelled) return;
-      setIsLoading(true);
-      setLoadError(null);
-    });
-
-    projectService
-      .getProjectDetail(projectId)
-      .then((data) => {
-        if (isCancelled) return;
-        setProject(data);
-        setSelectedRoleId(getInitialRoleId(data));
-      })
-      .catch((error: unknown) => {
-        if (isCancelled) return;
-        setProject(null);
-        setLoadError(getErrorText(error));
-      })
-      .finally(() => {
-        if (!isCancelled) setIsLoading(false);
-      });
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [isValidProjectId, projectId, projectService, reloadKey]);
+  const initialRoleId = useMemo(
+    () => (project ? getInitialRoleId(project) : null),
+    [project]
+  );
+  const selectedRoleId =
+    roleChoice && roleChoice.projectId === projectId
+      ? roleChoice.roleId
+      : initialRoleId;
 
   const selectedRole = useMemo<ProjectRole | null>(() => {
     if (!project || selectedRoleId === null) return null;
@@ -278,155 +266,65 @@ export const ProjectCardPage: React.FC = () => {
     ? getCtaState(project, currentUser, selectedRoleId)
     : { label: 'Хочу работать', canApply: false, hint: null };
 
-  const handleRoleSelect = (roleId: number) => {
-    setSelectedRoleId(roleId);
-    setActionError(null);
-  };
+  // Результат действий пишется в кэш детали проекта: реакция мгновенная,
+  // а повторный GET не нужен (как и до перехода на Query).
+  const patchProject = (updater: (current: ProjectDetail) => ProjectDetail) =>
+    queryClient.setQueryData<ProjectDetail>(
+      projectDetailQueryKey(projectId),
+      (currentProject) =>
+        currentProject ? updater(currentProject) : currentProject
+    );
 
-  const handleApply = async () => {
-    if (
-      !project ||
-      !ctaState.canApply ||
-      selectedRoleId !== project.matching_role_id ||
-      isApplying
-    ) {
-      return;
-    }
-
-    setIsApplying(true);
-    setActionError(null);
-
-    try {
-      const application = await projectService.createProjectApplication(
-        project.id
-      );
-      setSelectedRoleId(application.project_role_id);
-      setProject((currentProject) =>
-        currentProject
-          ? {
-              ...currentProject,
-              matching_role_id: application.project_role_id,
-              matching_role_name: application.project_role_name,
-              my_interest_id: application.id,
-              my_interest_status: application.status,
-              my_interest_source: application.source,
-            }
-          : currentProject
-      );
+  const applyMutation = useMutation({
+    mutationFn: () => projectService.createProjectApplication(projectId),
+    onSuccess: async (application) => {
+      setRoleChoice({ projectId, roleId: application.project_role_id });
+      patchProject((currentProject) => ({
+        ...currentProject,
+        matching_role_id: application.project_role_id,
+        matching_role_name: application.project_role_name,
+        my_interest_id: application.id,
+        my_interest_status: application.status,
+        my_interest_source: application.source,
+      }));
       if (currentUser?.account_type === 'participant') {
         await queryClient.invalidateQueries({
           queryKey: currentUserApplicationsQueryKey(currentUser.id),
         });
       }
-    } catch (error: unknown) {
-      setActionError(getErrorText(error));
-    } finally {
-      setIsApplying(false);
-    }
-  };
+    },
+  });
 
-  const handleFavoriteToggle = async () => {
-    if (
-      !project ||
-      currentUser?.account_type !== 'participant' ||
-      isFavoritePending
-    ) {
-      return;
-    }
+  const leaveMembershipMutation = useMutation({
+    mutationFn: (membershipId: number) => membershipService.leave(membershipId),
+    onSuccess: (membership) => {
+      patchProject((currentProject) => ({
+        ...currentProject,
+        my_membership_status: membership.status,
+      }));
+    },
+  });
 
-    setIsFavoritePending(true);
-    setFavoriteError(null);
-
-    try {
-      if (project.is_favorited) {
-        await favoriteService.delete(project.id);
-      } else {
-        await favoriteService.create({ project_id: project.id });
-      }
-
-      setProject((currentProject) =>
-        currentProject
-          ? {
-              ...currentProject,
-              is_favorited: !currentProject.is_favorited,
-            }
-          : currentProject
-      );
-      void queryClient.invalidateQueries({
-        queryKey: FAVORITE_PROJECTS_QUERY_KEY,
-      });
-    } catch (error: unknown) {
-      setFavoriteError(getErrorText(error));
-    } finally {
-      setIsFavoritePending(false);
-    }
-  };
-
-  const handleLeaveMembership = async () => {
-    if (
-      !project ||
-      !hasActiveMembership(project) ||
-      project.my_membership_id === null ||
-      isLeavingMembership
-    ) {
-      return;
-    }
-
-    setIsLeavingMembership(true);
-    setActionError(null);
-
-    try {
-      const membership = await membershipService.leave(
-        project.my_membership_id
-      );
-      setProject((currentProject) =>
-        currentProject
-          ? {
-              ...currentProject,
-              my_membership_status: membership.status,
-            }
-          : currentProject
-      );
-    } catch (error: unknown) {
-      setActionError(getErrorText(error));
-    } finally {
-      setIsLeavingMembership(false);
-    }
-  };
-
-  const handleInvitationAction = async (action: 'accept' | 'reject') => {
-    if (
-      !project ||
-      project.my_interest_id === null ||
-      project.my_interest_source !== 'invitation' ||
-      project.my_interest_status !== 'pending' ||
-      isInvitationActionPending
-    ) {
-      return;
-    }
-
-    setIsInvitationActionPending(true);
-    setActionError(null);
-
-    try {
-      const interest = await roleInterestService[action](
-        project.my_interest_id
-      );
-      setSelectedRoleId(interest.project_role_id);
-      setProject((currentProject) =>
-        currentProject
-          ? {
-              ...currentProject,
-              matching_role_id: interest.project_role_id,
-              matching_role_name: interest.project_role_name,
-              my_interest_id: interest.id,
-              my_interest_status: interest.status,
-              my_interest_source: interest.source,
-              my_membership_id: interest.membership_id,
-              my_membership_status: interest.membership_status,
-            }
-          : currentProject
-      );
+  const invitationMutation = useMutation({
+    mutationFn: ({
+      action,
+      interestId,
+    }: {
+      action: 'accept' | 'reject';
+      interestId: number;
+    }) => roleInterestService[action](interestId),
+    onSuccess: async (interest) => {
+      setRoleChoice({ projectId, roleId: interest.project_role_id });
+      patchProject((currentProject) => ({
+        ...currentProject,
+        matching_role_id: interest.project_role_id,
+        matching_role_name: interest.project_role_name,
+        my_interest_id: interest.id,
+        my_interest_status: interest.status,
+        my_interest_source: interest.source,
+        my_membership_id: interest.membership_id,
+        my_membership_status: interest.membership_status,
+      }));
       if (currentUser?.account_type === 'participant') {
         await Promise.all([
           queryClient.invalidateQueries({
@@ -437,11 +335,100 @@ export const ProjectCardPage: React.FC = () => {
           }),
         ]);
       }
-    } catch (error: unknown) {
-      setActionError(getErrorText(error));
-    } finally {
-      setIsInvitationActionPending(false);
+    },
+  });
+
+  const favoriteMutation = useMutation({
+    mutationFn: async (isFavorited: boolean) => {
+      if (isFavorited) {
+        await favoriteService.delete(projectId);
+        return;
+      }
+
+      await favoriteService.create({ project_id: projectId });
+    },
+    onSuccess: (_result, isFavorited) => {
+      patchProject((currentProject) => ({
+        ...currentProject,
+        is_favorited: !isFavorited,
+      }));
+      void queryClient.invalidateQueries({
+        queryKey: FAVORITE_PROJECTS_QUERY_KEY,
+      });
+    },
+  });
+
+  const actionErrorSource =
+    applyMutation.error ??
+    leaveMembershipMutation.error ??
+    invitationMutation.error;
+  const actionError = actionErrorSource
+    ? getErrorText(actionErrorSource)
+    : null;
+  const favoriteError = favoriteMutation.error
+    ? getErrorText(favoriteMutation.error)
+    : null;
+
+  const handleRoleSelect = (roleId: number) => {
+    setRoleChoice({ projectId, roleId });
+    applyMutation.reset();
+    leaveMembershipMutation.reset();
+    invitationMutation.reset();
+  };
+
+  const handleApply = () => {
+    if (
+      !project ||
+      !ctaState.canApply ||
+      selectedRoleId !== project.matching_role_id ||
+      applyMutation.isPending
+    ) {
+      return;
     }
+
+    applyMutation.mutate();
+  };
+
+  const handleFavoriteToggle = () => {
+    if (
+      !project ||
+      currentUser?.account_type !== 'participant' ||
+      favoriteMutation.isPending
+    ) {
+      return;
+    }
+
+    favoriteMutation.mutate(project.is_favorited);
+  };
+
+  const handleLeaveMembership = () => {
+    if (
+      !project ||
+      !hasActiveMembership(project) ||
+      project.my_membership_id === null ||
+      leaveMembershipMutation.isPending
+    ) {
+      return;
+    }
+
+    leaveMembershipMutation.mutate(project.my_membership_id);
+  };
+
+  const handleInvitationAction = (action: 'accept' | 'reject') => {
+    if (
+      !project ||
+      project.my_interest_id === null ||
+      project.my_interest_source !== 'invitation' ||
+      project.my_interest_status !== 'pending' ||
+      invitationMutation.isPending
+    ) {
+      return;
+    }
+
+    invitationMutation.mutate({
+      action,
+      interestId: project.my_interest_id,
+    });
   };
 
   if (!isValidProjectId) {
@@ -475,13 +462,13 @@ export const ProjectCardPage: React.FC = () => {
       <main className={styles.page}>
         <div className={`${styles.container} ${styles.errorState}`}>
           <h1 className={styles.errorTitle}>Проект не найден</h1>
-          <p className={styles.errorText}>{loadError}</p>
+          <p className={styles.errorText}>
+            {loadError ?? 'Не удалось загрузить проект.'}
+          </p>
           <div className={styles.errorActions}>
-            {isValidProjectId && (
-              <Button onClick={() => setReloadKey((key) => key + 1)}>
-                Попробовать снова
-              </Button>
-            )}
+            <Button onClick={() => void refetchProject()}>
+              Попробовать снова
+            </Button>
             <Button variant="secondary" onClick={() => navigate('/projects')}>
               Все проекты
             </Button>
@@ -574,7 +561,7 @@ export const ProjectCardPage: React.FC = () => {
                 }`}
                 onClick={handleFavoriteToggle}
                 disabled={
-                  isFavoritePending ||
+                  favoriteMutation.isPending ||
                   currentUser?.account_type !== 'participant'
                 }
                 aria-pressed={project.is_favorited}
@@ -635,7 +622,8 @@ export const ProjectCardPage: React.FC = () => {
                     className={styles.leaveMembershipButton}
                     onClick={handleLeaveMembership}
                     disabled={
-                      isLeavingMembership || project.my_membership_id === null
+                      leaveMembershipMutation.isPending ||
+                      project.my_membership_id === null
                     }
                   >
                     Прекратить участие
@@ -647,7 +635,7 @@ export const ProjectCardPage: React.FC = () => {
                       className={styles.acceptInvitationButton}
                       onClick={() => handleInvitationAction('accept')}
                       disabled={
-                        isInvitationActionPending ||
+                        invitationMutation.isPending ||
                         project.my_interest_id === null
                       }
                     >
@@ -657,7 +645,7 @@ export const ProjectCardPage: React.FC = () => {
                       className={styles.rejectInvitationButton}
                       onClick={() => handleInvitationAction('reject')}
                       disabled={
-                        isInvitationActionPending ||
+                        invitationMutation.isPending ||
                         project.my_interest_id === null
                       }
                     >
@@ -668,12 +656,12 @@ export const ProjectCardPage: React.FC = () => {
                   <Button
                     className={styles.applyButton}
                     onClick={handleApply}
-                    disabled={!ctaState.canApply || isApplying}
+                    disabled={!ctaState.canApply || applyMutation.isPending}
                     aria-describedby={
                       ctaState.hint ? 'project-application-hint' : undefined
                     }
                   >
-                    {isApplying ? 'Отправляем…' : ctaState.label}
+                    {applyMutation.isPending ? 'Отправляем…' : ctaState.label}
                   </Button>
                 )}
                 <div className={styles.actionMessages}>

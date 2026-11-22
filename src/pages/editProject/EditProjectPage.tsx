@@ -1,7 +1,7 @@
 import { getServices } from '@app';
 import { FieldService } from '@entities/field';
 import type { Field } from '@entities/field/types';
-import { ProjectService } from '@entities/project';
+import { ProjectService, projectDetailQueryKey } from '@entities/project';
 import type { ProjectDetail } from '@entities/project/types';
 import { ProjectRoleService } from '@entities/project-role';
 import type { ImageUploadStage } from '@entities/image-upload';
@@ -265,7 +265,10 @@ const EditProjectContent: React.FC<EditProjectContentProps> = ({
     setBaseline(freshProject);
     setDraft(reconciledDraft);
     setNeedsServerRefresh(false);
-    queryClient.setQueryData(['project', currentDraft.projectId], freshProject);
+    queryClient.setQueryData(
+      projectDetailQueryKey(currentDraft.projectId),
+      freshProject
+    );
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: ['projects'] }),
       queryClient.invalidateQueries({ queryKey: ['userProjects'] }),
@@ -747,7 +750,7 @@ export const EditProjectPage: React.FC = () => {
   });
 
   const projectQuery = useQuery({
-    queryKey: ['project', projectId],
+    queryKey: projectDetailQueryKey(projectId),
     queryFn: () => projectService.getProjectDetail(projectId),
     enabled: isValidProjectId,
   });

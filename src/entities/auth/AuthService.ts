@@ -1,5 +1,4 @@
 import { persistor, store } from '@app/store';
-import { resetUserState } from '@entities/user/model/slice';
 import { logout, setAuthData } from '@features/auth/model/authSlice';
 import type { Api } from '@shared/api/api.class';
 import { AUTH } from '@shared/api/constants';
@@ -112,7 +111,6 @@ export class AuthService {
     this.latestLoginAttempt += 1;
     const refreshState = this.tokenManager.beginLogout();
     store.dispatch(logout());
-    store.dispatch(resetUserState());
     this.clearCachedState();
 
     const persistCleanup = this.ensurePersistedAuthCleared();
@@ -187,7 +185,6 @@ export class AuthService {
     this.assertAuthOperationCurrent(operation);
 
     const replacesSession = this.hasAuthState();
-    store.dispatch(resetUserState());
     this.clearCachedState();
 
     this.tokenManager.startSession();
