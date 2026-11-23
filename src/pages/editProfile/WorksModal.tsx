@@ -1,12 +1,13 @@
 import { useRef, useState } from 'react';
+import type { PortfolioWork } from '@entities/portfolioWork/types';
 import { Button, Input, Tag } from '@shared/ui';
 import { Icon } from '@shared/icons';
 import { EditProfileModal } from './EditProfileModal';
 import workImagePlaceholder from './assets/workImagePlaceholder.svg';
 import styles from './WorksModal.module.css';
 
-// Черновик одной работы: логотип уходит в image lifecycle после создания
-// работы, поэтому файл хранится отдельно от текстовых полей.
+// Черновик одной работы: изображение проходит отдельный image lifecycle,
+// поэтому файл и признак удаления хранятся отдельно от текстовых полей.
 export interface WorkDraft {
   title: string;
   task: string;
@@ -14,6 +15,7 @@ export interface WorkDraft {
   technologies: string[];
   link: string;
   imageFile: File | null;
+  removeExistingImage: boolean;
 }
 
 // Состояние карточки формы: к черновику добавляются ключ React, превью
@@ -27,6 +29,7 @@ interface WorkCardState extends WorkDraft {
 interface WorksModalProps {
   isSaving: boolean;
   error: string | null;
+  initialWork?: PortfolioWork | null;
   onClose: () => void;
   onSave: (works: WorkDraft[]) => void;
 }
@@ -39,31 +42,59 @@ const createEmptyCard = (key: number): WorkCardState => ({
   technologies: [],
   link: '',
   imageFile: null,
+  removeExistingImage: false,
   imagePreview: null,
   technologyInput: '',
 });
+
+const createCardFromWork = (work: PortfolioWork): WorkCardState => ({
+  key: work.id,
+  title: work.title,
+  task: work.task ?? '',
+  solution: work.solution ?? '',
+  technologies: work.technologies ?? [],
+  link: work.link ?? '',
+  imageFile: null,
+  removeExistingImage: false,
+  imagePreview: work.image,
+  technologyInput: '',
+});
+
+const appendTechnology = (technologies: string[], value: string) => {
+  const technology = value.trim();
+  if (!technology) return technologies;
+
+  const normalizedTechnology = technology.toLocaleLowerCase();
+  const isDuplicate = technologies.some(
+    (item) => item.trim().toLocaleLowerCase() === normalizedTechnology
+  );
+
+  return isDuplicate ? technologies : [...technologies, technology];
+};
 
 const toDraft = (card: WorkCardState): WorkDraft => ({
   title: card.title,
   task: card.task,
   solution: card.solution,
-  technologies: card.technologies,
+  technologies: appendTechnology(card.technologies, card.technologyInput),
   link: card.link,
   imageFile: card.imageFile,
+  removeExistingImage: card.removeExistingImage,
 });
 
-// Модалка «Мои работы»: плюс внизу добавляет ещё одну карточку формы,
-// «Сохранить» создаёт все заполненные работы разом.
+// Модалка «Мои работы»: в режиме создания плюс добавляет карточки,
+// в режиме редактирования форма предзаполнена одной существующей работой.
 export const WorksModal: React.FC<WorksModalProps> = ({
   isSaving,
   error,
+  initialWork,
   onClose,
   onSave,
 }) => {
   const nextKeyRef = useRef(1);
   const logoInputsRef = useRef(new Map<number, HTMLInputElement>());
   const [cards, setCards] = useState<WorkCardState[]>(() => [
-    createEmptyCard(0),
+    initialWork ? createCardFromWork(initialWork) : createEmptyCard(0),
   ]);
 
   const updateCard = (key: number, patch: Partial<WorkCardState>) => {
@@ -78,13 +109,10 @@ export const WorksModal: React.FC<WorksModalProps> = ({
 
   const handleTechnologyAdd = (key: number) => {
     const card = cards.find((item) => item.key === key);
-    const technology = card?.technologyInput.trim() ?? '';
-    if (!card || !technology) return;
+    if (!card || !card.technologyInput.trim()) return;
 
     updateCard(key, {
-      technologies: card.technologies.includes(technology)
-        ? card.technologies
-        : [...card.technologies, technology],
+      technologies: appendTechnology(card.technologies, card.technologyInput),
       technologyInput: '',
     });
   };
@@ -107,6 +135,7 @@ export const WorksModal: React.FC<WorksModalProps> = ({
     reader.onload = () => {
       updateCard(key, {
         imageFile: file,
+        removeExistingImage: false,
         imagePreview: typeof reader.result === 'string' ? reader.result : null,
       });
     };
@@ -114,7 +143,11 @@ export const WorksModal: React.FC<WorksModalProps> = ({
   };
 
   const handleLogoRemove = (key: number) => {
-    updateCard(key, { imageFile: null, imagePreview: null });
+    updateCard(key, {
+      imageFile: null,
+      imagePreview: null,
+      removeExistingImage: Boolean(initialWork?.image),
+    });
   };
 
   const setLogoInputRef =
@@ -135,7 +168,7 @@ export const WorksModal: React.FC<WorksModalProps> = ({
 
   return (
     <EditProfileModal
-      title="Мои работы"
+      title={initialWork ? 'Редактировать работу' : 'Мои работы'}
       size="wide"
       isSaving={isSaving}
       error={error}
@@ -180,9 +213,9 @@ export const WorksModal: React.FC<WorksModalProps> = ({
                 disabled={isSaving}
                 onClick={() => logoInputsRef.current.get(card.key)?.click()}
               >
-                {card.imageFile ? 'Заменить логотип' : 'Добавить логотип'}
+                {card.imagePreview ? 'Заменить логотип' : 'Добавить логотип'}
               </Button>
-              {card.imageFile && (
+              {card.imagePreview && (
                 <button
                   type="button"
                   className={styles.logoRemove}
@@ -246,23 +279,36 @@ export const WorksModal: React.FC<WorksModalProps> = ({
                     </Tag>
                   </button>
                 ))}
-                <input
-                  className={styles.technologyInput}
-                  value={card.technologyInput}
-                  disabled={isSaving}
-                  placeholder="Технология"
-                  aria-label={`Добавить технологию в работу ${index + 1}`}
-                  onChange={(event) =>
-                    updateCard(card.key, {
-                      technologyInput: event.target.value,
-                    })
-                  }
-                  onKeyDown={(event) => {
-                    if (event.key !== 'Enter') return;
-                    event.preventDefault();
-                    handleTechnologyAdd(card.key);
-                  }}
-                />
+                <div className={styles.technologyComposer}>
+                  <input
+                    className={styles.technologyInput}
+                    value={card.technologyInput}
+                    disabled={isSaving}
+                    placeholder="Технология"
+                    aria-label={`Добавить технологию в работу ${index + 1}`}
+                    onChange={(event) =>
+                      updateCard(card.key, {
+                        technologyInput: event.target.value,
+                      })
+                    }
+                    onBlur={() => handleTechnologyAdd(card.key)}
+                    onKeyDown={(event) => {
+                      if (event.key !== 'Enter') return;
+                      event.preventDefault();
+                      handleTechnologyAdd(card.key);
+                    }}
+                  />
+                  <button
+                    type="button"
+                    className={styles.technologyAdd}
+                    disabled={isSaving || !card.technologyInput.trim()}
+                    aria-label={`Добавить введённую технологию в работу ${index + 1}`}
+                    onMouseDown={(event) => event.preventDefault()}
+                    onClick={() => handleTechnologyAdd(card.key)}
+                  >
+                    <Icon name="plus" size={20} aria-hidden="true" />
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -281,14 +327,16 @@ export const WorksModal: React.FC<WorksModalProps> = ({
         ))}
       </div>
 
-      <Button
-        className={styles.addCard}
-        iconName="plus"
-        iconSize={24}
-        disabled={isSaving}
-        aria-label="Добавить ещё одну работу"
-        onClick={handleAddCard}
-      />
+      {!initialWork && (
+        <Button
+          className={styles.addCard}
+          iconName="plus"
+          iconSize={24}
+          disabled={isSaving}
+          aria-label="Добавить ещё одну работу"
+          onClick={handleAddCard}
+        />
+      )}
 
       {isSaveDisabled && (
         <p className={styles.hint} role="status">

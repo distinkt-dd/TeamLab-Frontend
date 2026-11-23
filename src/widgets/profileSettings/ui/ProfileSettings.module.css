@@ -76,6 +76,40 @@ a.waitingTitle:focus-visible {
   gap: 12px;
 }
 
+.passwordControl {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.passwordMask {
+  font-size: 22px;
+  line-height: 1;
+  letter-spacing: 2px;
+}
+
+.passwordEdit {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--neutral-secondary-color);
+  cursor: pointer;
+}
+
+.passwordEdit:hover {
+  color: var(--accent-purple-color);
+}
+
+.passwordEdit:focus-visible {
+  outline: 2px solid var(--accent-orange-color);
+  outline-offset: 2px;
+}
+
 .buttonBlock {
   display: flex;
   justify-content: center;
@@ -93,4 +127,34 @@ a.waitingTitle:focus-visible {
 
 .optionError {
   color: var(--accent-red-color);
+}
+
+@media (max-width: 900px) {
+  .options {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .optionBlock,
+  .waitingBlock {
+    padding: 24px 20px;
+  }
+
+  .optionBlock {
+    gap: 36px;
+  }
+
+  .optionRow {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .passwordControl {
+    margin-left: auto;
+  }
+
+  .waitingContent {
+    padding-bottom: 0;
+  }
 }
