@@ -8,6 +8,7 @@ import {
   PortfolioWorkService,
   PORTFOLIO_WORKS_QUERY_KEY,
 } from '@entities/portfolioWork';
+import type { PortfolioWork } from '@entities/portfolioWork/types';
 import { SpecializationService } from '@entities/specialization';
 import {
   CURRENT_USER_QUERY_KEY,
@@ -215,7 +216,9 @@ export const EditProfilePage: React.FC = () => {
   // Модалка «Мои работы»: черновики живут внутри неё, страница создаёт
   // работы и обновляет список.
   const [isWorksModalOpen, setIsWorksModalOpen] = useState(false);
+  const [editingWork, setEditingWork] = useState<PortfolioWork | null>(null);
   const [isWorksSaving, setIsWorksSaving] = useState(false);
+  const [deletingWorkId, setDeletingWorkId] = useState<number | null>(null);
   const [worksError, setWorksError] = useState<string | null>(null);
 
   if (isPending) {
@@ -437,12 +440,20 @@ export const EditProfilePage: React.FC = () => {
 
   const handleWorksModalOpen = () => {
     setWorksError(null);
+    setEditingWork(null);
+    setIsWorksModalOpen(true);
+  };
+
+  const handleWorkEdit = (work: PortfolioWork) => {
+    setWorksError(null);
+    setEditingWork(work);
     setIsWorksModalOpen(true);
   };
 
   const handleWorksModalClose = () => {
     if (isWorksSaving) return;
     setIsWorksModalOpen(false);
+    setEditingWork(null);
     setWorksError(null);
   };
 
@@ -454,6 +465,38 @@ export const EditProfilePage: React.FC = () => {
     setWorksError(null);
     setIsWorksSaving(true);
     try {
+      if (editingWork) {
+        const draft = drafts[0];
+        if (!draft) return;
+
+        const link = draft.link.trim();
+        await portfolioWorkService.update(editingWork.id, {
+          title: draft.title.trim(),
+          task: draft.task.trim() || null,
+          solution: draft.solution.trim() || null,
+          technologies:
+            draft.technologies.length > 0 ? draft.technologies : null,
+          link: link || null,
+        });
+
+        if (draft.removeExistingImage && editingWork.image) {
+          await portfolioWorkService.deleteImage(editingWork.id);
+        } else if (draft.imageFile) {
+          await imageUploadService.uploadAndAttach({
+            kind: 'portfolio_image',
+            targetId: editingWork.id,
+            file: draft.imageFile,
+          });
+        }
+
+        setIsWorksModalOpen(false);
+        setEditingWork(null);
+        await queryClient.invalidateQueries({
+          queryKey: PORTFOLIO_WORKS_QUERY_KEY,
+        });
+        return;
+      }
+
       for (const draft of drafts) {
         const title = draft.title.trim();
         const link = draft.link.trim();
@@ -492,6 +535,28 @@ export const EditProfilePage: React.FC = () => {
       setWorksError(getActionErrorText(error, 'Не удалось сохранить работы.'));
     } finally {
       setIsWorksSaving(false);
+    }
+  };
+
+  const handleWorkDelete = async (work: PortfolioWork) => {
+    if (
+      deletingWorkId !== null ||
+      !window.confirm(`Удалить работу «${work.title}»?`)
+    ) {
+      return;
+    }
+
+    setWorksError(null);
+    setDeletingWorkId(work.id);
+    try {
+      await portfolioWorkService.delete(work.id);
+      await queryClient.invalidateQueries({
+        queryKey: PORTFOLIO_WORKS_QUERY_KEY,
+      });
+    } catch (error: unknown) {
+      setWorksError(getActionErrorText(error, 'Не удалось удалить работу.'));
+    } finally {
+      setDeletingWorkId(null);
     }
   };
 
@@ -778,6 +843,11 @@ export const EditProfilePage: React.FC = () => {
                   Не удалось загрузить работы
                 </p>
               )}
+              {worksError && !isWorksModalOpen && (
+                <p className={styles.worksError} role="alert">
+                  {worksError}
+                </p>
+              )}
               {!isWorksPending && !isWorksError && works.length === 0 && (
                 <div className={styles.worksEmpty}>
                   <p className={styles.worksEmptyText}>
@@ -816,6 +886,30 @@ export const EditProfilePage: React.FC = () => {
                         />
                       )}
                       <div className={styles.workContent}>
+                        <div
+                          className={styles.workActions}
+                          role="group"
+                          aria-label={`Действия с работой ${work.title}`}
+                        >
+                          <button
+                            type="button"
+                            className={styles.workActionButton}
+                            disabled={isWorksSaving || deletingWorkId !== null}
+                            onClick={() => handleWorkEdit(work)}
+                            aria-label={`Редактировать работу ${work.title}`}
+                          >
+                            <Icon name="editM" size={32} aria-hidden="true" />
+                          </button>
+                          <button
+                            type="button"
+                            className={styles.workActionButton}
+                            disabled={isWorksSaving || deletingWorkId !== null}
+                            onClick={() => void handleWorkDelete(work)}
+                            aria-label={`Удалить работу ${work.title}`}
+                          >
+                            <Icon name="trashM" size={32} aria-hidden="true" />
+                          </button>
+                        </div>
                         <h3 className={styles.workTitle}>{work.title}</h3>
                         {work.task && (
                           <p className={styles.workText}>{work.task}</p>
@@ -933,8 +1027,10 @@ export const EditProfilePage: React.FC = () => {
       )}
       {isWorksModalOpen && (
         <WorksModal
+          key={editingWork?.id ?? 'create'}
           isSaving={isWorksSaving}
           error={worksError}
+          initialWork={editingWork}
           onClose={handleWorksModalClose}
           onSave={handleWorksSave}
         />

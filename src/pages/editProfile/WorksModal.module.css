@@ -145,6 +145,15 @@
   color: var(--accent-purple-color);
 }
 
+/* Поле новой технологии и явная кнопка подтверждения образуют компактную
+   группу, которая переносится целиком рядом с уже добавленными тегами. */
+.technologyComposer {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+}
+
 /* Поле новой технологии: плашка с оранжевой обводкой (активный Tag03). */
 .technologyInput {
   box-sizing: border-box;
@@ -167,6 +176,37 @@
 
 .technologyInput:focus {
   outline: none;
+}
+
+.technologyAdd {
+  box-sizing: border-box;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1.5px solid var(--accent-orange-color);
+  border-radius: 50%;
+  background: var(--neutral-default-color);
+  color: var(--neutral-secondary-color);
+  cursor: pointer;
+}
+
+.technologyAdd:hover:not(:disabled) {
+  border-color: var(--accent-purple-color);
+  color: var(--accent-purple-color);
+}
+
+.technologyAdd:focus-visible {
+  outline: 2px solid var(--accent-purple-color);
+  outline-offset: 2px;
+}
+
+.technologyAdd:disabled {
+  cursor: default;
+  opacity: 0.45;
 }
 
 /* Поле ссылки из макета (Frame 207) — обычный Input на всю ширину карточки. */
@@ -209,7 +249,13 @@
     padding: 20px;
   }
 
-  .technologyInput {
+  .technologyComposer {
     width: 100%;
+  }
+
+  .technologyInput {
+    flex: 1;
+    min-width: 0;
+    width: auto;
   }
 }

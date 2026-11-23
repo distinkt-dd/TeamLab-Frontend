@@ -418,6 +418,13 @@
   color: rgba(44, 44, 46, 0.6);
 }
 
+.worksError {
+  margin: 0 0 20px;
+  font-size: 16px;
+  line-height: 150%;
+  color: var(--accent-red-color);
+}
+
 /* Сетка работ (по умолчанию) и список — карточки 604px в две колонки
    с зазором 32px либо одна колонка на всю ширину. */
 .worksGrid {
@@ -516,6 +523,39 @@
   flex-grow: 1;
   min-width: 0;
   padding: 32px 32px 32px 0;
+}
+
+.workActions {
+  display: flex;
+  align-self: flex-end;
+  gap: 8px;
+}
+
+.workActionButton {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--neutral-secondary-color);
+  cursor: pointer;
+}
+
+.workActionButton:hover:not(:disabled) {
+  color: var(--accent-purple-color);
+}
+
+.workActionButton:focus-visible {
+  outline: 2px solid var(--accent-orange-color);
+  outline-offset: 2px;
+}
+
+.workActionButton:disabled {
+  cursor: default;
+  opacity: 0.5;
 }
 
 .workTitle {

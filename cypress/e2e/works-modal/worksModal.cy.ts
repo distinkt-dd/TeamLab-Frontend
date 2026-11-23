@@ -21,6 +21,8 @@ interface PortfolioWorkCreateBody {
   link: string | null;
 }
 
+type PortfolioWorkUpdateBody = Partial<PortfolioWorkCreateBody>;
+
 const makeAccessToken = (): string => {
   const encode = (value: object) =>
     Cypress.Buffer.from(JSON.stringify(value))
@@ -103,7 +105,9 @@ const interceptWorksApi = (initialWorks: PortfolioWork[] = []) => {
   let works = [...initialWorks];
   let nextId = 7;
   let lastCreatedId = 0;
+  let imageTargetId = 0;
   const createdBodies: PortfolioWorkCreateBody[] = [];
+  const updatedBodies: PortfolioWorkUpdateBody[] = [];
 
   cy.intercept('GET', '**/api/v1/users/', {
     count: 0,
@@ -123,6 +127,7 @@ const interceptWorksApi = (initialWorks: PortfolioWork[] = []) => {
     const body = request.body as PortfolioWorkCreateBody;
     createdBodies.push(body);
     lastCreatedId = nextId++;
+    imageTargetId = lastCreatedId;
 
     const created = makeWork({
       id: lastCreatedId,
@@ -137,12 +142,46 @@ const interceptWorksApi = (initialWorks: PortfolioWork[] = []) => {
     request.alias = 'createWork';
     request.reply({ statusCode: 201, body: created });
   });
+  cy.intercept('PATCH', '**/api/v1/users/me/portfolio-works/*/', (request) => {
+    const id = Number(new URL(request.url).pathname.split('/').at(-2));
+    const body = request.body as PortfolioWorkUpdateBody;
+    updatedBodies.push(body);
+    imageTargetId = id;
+    works = works.map((work) =>
+      work.id === id
+        ? { ...work, ...body, updated_at: '2026-01-02T00:00:00Z' }
+        : work
+    );
+    request.alias = 'updateWork';
+    request.reply({
+      statusCode: 200,
+      body: works.find((work) => work.id === id),
+    });
+  });
+  cy.intercept(
+    'DELETE',
+    '**/api/v1/users/me/portfolio-works/*/image/',
+    (request) => {
+      const id = Number(new URL(request.url).pathname.split('/').at(-3));
+      works = works.map((work) =>
+        work.id === id ? { ...work, image: null } : work
+      );
+      request.alias = 'deleteWorkImage';
+      request.reply({ statusCode: 204 });
+    }
+  );
+  cy.intercept('DELETE', '**/api/v1/users/me/portfolio-works/*/', (request) => {
+    const id = Number(new URL(request.url).pathname.split('/').at(-2));
+    works = works.filter((work) => work.id !== id);
+    request.alias = 'deleteWork';
+    request.reply({ statusCode: 204 });
+  });
 
   cy.intercept('POST', '**/api/v1/image-uploads/', (request) => {
     request.alias = 'createWorkImageUpload';
     expect(request.body).to.deep.equal({
       kind: 'portfolio_image',
-      target_id: lastCreatedId,
+      target_id: imageTargetId,
       content_type: 'image/png',
       size_bytes: 4,
     });
@@ -185,8 +224,8 @@ const interceptWorksApi = (initialWorks: PortfolioWork[] = []) => {
       upload_id: uploadId,
       kind: 'portfolio_image',
       status: 'ready',
-      image_url: signedImage(lastCreatedId),
-      thumbnail_url: signedImage(lastCreatedId),
+      image_url: signedImage(imageTargetId),
+      thumbnail_url: signedImage(imageTargetId),
       error_code: null,
       error_message: '',
     });
@@ -194,7 +233,7 @@ const interceptWorksApi = (initialWorks: PortfolioWork[] = []) => {
   cy.intercept('POST', '**/api/v1/image-uploads/*/attach/', (request) => {
     const uploadId = new URL(request.url).pathname.split('/').at(-3);
     works = works.map((work) =>
-      work.id === lastCreatedId
+      work.id === imageTargetId
         ? { ...work, image: signedImage(work.id) }
         : work
     );
@@ -204,8 +243,8 @@ const interceptWorksApi = (initialWorks: PortfolioWork[] = []) => {
       upload_id: uploadId,
       kind: 'portfolio_image',
       status: 'attached',
-      image_url: signedImage(lastCreatedId),
-      thumbnail_url: signedImage(lastCreatedId),
+      image_url: signedImage(imageTargetId),
+      thumbnail_url: signedImage(imageTargetId),
       error_code: null,
       error_message: '',
     });
@@ -216,7 +255,10 @@ const interceptWorksApi = (initialWorks: PortfolioWork[] = []) => {
     { statusCode: 200, body: '' }
   );
 
-  return { getCreatedBodies: () => createdBodies };
+  return {
+    getCreatedBodies: () => createdBodies,
+    getUpdatedBodies: () => updatedBodies,
+  };
 };
 
 const visitEditProfile = (): void => {
@@ -326,6 +368,59 @@ describe('блок «Мои работы»', () => {
     cy.get('button[aria-label="Добавить работу"]').should('be.visible');
   });
 
+  it('добавляет технологии всеми доступными способами без дублей', () => {
+    const api = interceptWorksApi();
+    visitEditProfile();
+
+    cy.contains('button', 'Добавить мои работы').click();
+    dialog()
+      .find('input[placeholder="Название проекта"]')
+      .type('Работа с технологиями');
+
+    const technologyInput = () =>
+      dialog().find('input[aria-label="Добавить технологию в работу 1"]');
+
+    // Enter сохраняем; удалённую технологию можно добавить повторно.
+    technologyInput().type(' Figma {enter}');
+    dialog().find('button[aria-label="Удалить технологию Figma"]').click();
+    dialog()
+      .find('button[aria-label="Удалить технологию Figma"]')
+      .should('not.exist');
+    technologyInput().type('Figma{enter}');
+
+    // Явный плюс добавляет значение один раз, несмотря на возможный blur.
+    technologyInput().type(' React ');
+    dialog()
+      .find('button[aria-label="Добавить введённую технологию в работу 1"]')
+      .click();
+    dialog()
+      .find('button[aria-label="Удалить технологию React"]')
+      .should('have.length', 1);
+
+    // Blur не создаёт регистрозависимый дубль и очищает обработанный ввод.
+    technologyInput().type(' react ').blur().should('have.value', '');
+    dialog()
+      .find('button[aria-label="Удалить технологию React"]')
+      .should('have.length', 1);
+
+    // Незавершённый ввод также попадает в payload при сохранении формы.
+    technologyInput().type(' TypeScript ');
+    dialog().contains('button', 'Сохранить').click();
+    cy.wait('@createWork');
+
+    cy.then(() => {
+      expect(api.getCreatedBodies()).to.deep.equal([
+        {
+          title: 'Работа с технологиями',
+          task: null,
+          solution: null,
+          technologies: ['Figma', 'React', 'TypeScript'],
+          link: null,
+        },
+      ]);
+    });
+  });
+
   it('загружает логотип работы после её создания', () => {
     interceptWorksApi();
     visitEditProfile();
@@ -391,5 +486,174 @@ describe('блок «Мои работы»', () => {
     );
     // Работы есть — рядом с ними показывается плюс добавления.
     cy.get('button[aria-label="Добавить работу"]').should('be.visible');
+  });
+
+  it('редактирует существующую работу, удаляет её изображение и сохраняет актуальные данные', () => {
+    const api = interceptWorksApi([
+      makeWork({
+        id: 3,
+        title: 'Старое название',
+        task: 'Старая задача',
+        solution: 'Старое решение',
+        image: signedImage(3),
+        technologies: ['Figma'],
+        link: 'https://example.com/old',
+      }),
+    ]);
+    visitEditProfile();
+    cy.wait('@portfolioWorks');
+
+    cy.get('button[aria-label="Редактировать работу Старое название"]').click();
+    dialog().contains('Редактировать работу').should('be.visible');
+    dialog()
+      .find('input[placeholder="Название проекта"]')
+      .should('have.value', 'Старое название')
+      .clear()
+      .type('Новое название');
+    dialog()
+      .find('input[placeholder="Какая задача ставилась?"]')
+      .should('have.value', 'Старая задача')
+      .clear()
+      .type('Новая задача');
+    dialog()
+      .find('input[aria-label="Добавить технологию в работу 1"]')
+      .type('TypeScript');
+    dialog().contains('button', 'Удалить логотип').click();
+    dialog().contains('button', 'Сохранить').click();
+
+    cy.wait('@updateWork');
+    cy.wait('@deleteWorkImage');
+    cy.wait('@portfolioWorks');
+    dialog().should('not.exist');
+    cy.then(() => {
+      expect(api.getUpdatedBodies()).to.deep.equal([
+        {
+          title: 'Новое название',
+          task: 'Новая задача',
+          solution: 'Старое решение',
+          technologies: ['Figma', 'TypeScript'],
+          link: 'https://example.com/old',
+        },
+      ]);
+    });
+    cy.contains('h3', 'Новое название').should('be.visible');
+    cy.get('[role="img"][aria-label="Изображение работы по умолчанию"]').should(
+      'be.visible'
+    );
+
+    // Повторное открытие читает уже обновлённые данные; отмена их не меняет.
+    cy.get('button[aria-label="Редактировать работу Новое название"]').click();
+    dialog()
+      .find('input[placeholder="Название проекта"]')
+      .should('have.value', 'Новое название')
+      .clear()
+      .type('Несохранённое название');
+    dialog().contains('button', 'Отменить').click();
+    cy.contains('h3', 'Новое название').should('be.visible');
+    cy.contains('h3', 'Несохранённое название').should('not.exist');
+  });
+
+  it('удаляет работу только после подтверждения', () => {
+    interceptWorksApi([makeWork({ id: 4, title: 'Работа на удаление' })]);
+    visitEditProfile();
+    cy.wait('@portfolioWorks');
+
+    cy.window().then((window) => {
+      cy.stub(window, 'confirm')
+        .onFirstCall()
+        .returns(false)
+        .onSecondCall()
+        .returns(true)
+        .as('deleteConfirm');
+    });
+    cy.get('button[aria-label="Удалить работу Работа на удаление"]').click();
+    cy.get('@deleteConfirm').should('have.been.calledOnce');
+    cy.contains('h3', 'Работа на удаление').should('be.visible');
+
+    cy.get('button[aria-label="Удалить работу Работа на удаление"]').click();
+    cy.get('@deleteConfirm').should('have.been.calledTwice');
+    cy.wait('@deleteWork');
+    cy.wait('@portfolioWorks');
+    cy.contains('h3', 'Работа на удаление').should('not.exist');
+    cy.contains('Готовых работ нет').should('be.visible');
+  });
+
+  it('заменяет изображение существующей работы через image lifecycle', () => {
+    interceptWorksApi([makeWork({ id: 6, title: 'Работа без изображения' })]);
+    visitEditProfile();
+    cy.wait('@portfolioWorks');
+
+    cy.get(
+      'button[aria-label="Редактировать работу Работа без изображения"]'
+    ).click();
+    dialog()
+      .find('input[aria-label="Выбрать логотип работы 1"]')
+      .selectFile(
+        {
+          contents: Cypress.Buffer.from('test'),
+          fileName: 'updated-logo.png',
+          mimeType: 'image/png',
+        },
+        { force: true }
+      );
+    dialog().contains('button', 'Сохранить').click();
+
+    cy.wait('@updateWork');
+    cy.wait('@createWorkImageUpload');
+    cy.wait('@workStorageUpload');
+    cy.wait('@attachWorkImageUpload');
+    cy.wait('@portfolioWorks');
+    cy.get('img[alt="Логотип работы Работа без изображения"]').should(
+      'have.attr',
+      'src',
+      signedImage(6)
+    );
+  });
+
+  it('сохраняет карточку при ошибке удаления', () => {
+    interceptWorksApi([makeWork({ id: 8, title: 'Неудаляемая работа' })]);
+    cy.intercept('DELETE', '**/api/v1/users/me/portfolio-works/8/', {
+      statusCode: 500,
+      body: { detail: 'Не удалось удалить работу' },
+    }).as('deleteWorkError');
+    visitEditProfile();
+    cy.wait('@portfolioWorks');
+    cy.window().then((window) => cy.stub(window, 'confirm').returns(true));
+
+    cy.get('button[aria-label="Удалить работу Неудаляемая работа"]').click();
+    cy.wait('@deleteWorkError');
+    cy.contains('Не удалось удалить работу').should('be.visible');
+    cy.contains('h3', 'Неудаляемая работа').should('be.visible');
+  });
+
+  it('сохраняет введённые данные при ошибке обновления', () => {
+    interceptWorksApi([makeWork({ id: 5, title: 'Работа с ошибкой' })]);
+    cy.intercept('PATCH', '**/api/v1/users/me/portfolio-works/5/', {
+      statusCode: 400,
+      body: { title: ['Не удалось сохранить название'] },
+    }).as('updateWorkError');
+    visitEditProfile();
+    cy.wait('@portfolioWorks');
+
+    cy.get(
+      'button[aria-label="Редактировать работу Работа с ошибкой"]'
+    ).click();
+    dialog()
+      .find('input[placeholder="Название проекта"]')
+      .clear()
+      .type('Введённое название');
+    dialog()
+      .find('input[aria-label="Добавить технологию в работу 1"]')
+      .type('Несохранённая технология');
+    dialog().contains('button', 'Сохранить').click();
+    cy.wait('@updateWorkError');
+
+    dialog().contains('Не удалось сохранить название').should('be.visible');
+    dialog()
+      .find('input[placeholder="Название проекта"]')
+      .should('have.value', 'Введённое название');
+    dialog()
+      .find('button[aria-label="Удалить технологию Несохранённая технология"]')
+      .should('be.visible');
   });
 });

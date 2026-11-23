@@ -41,4 +41,9 @@ export class PortfolioWorkService {
     const path = `${PORTFOLIO_WORKS_PATH}${portfolioWorkId}/`;
     return this.api.delete<void>(path);
   }
+
+  deleteImage(portfolioWorkId: number): Promise<void> {
+    const path = `${PORTFOLIO_WORKS_PATH}${portfolioWorkId}/image/`;
+    return this.api.delete<void>(path);
+  }
 }
