@@ -48,14 +48,10 @@ export interface ProjectCardItem {
   name: string;
   image?: string;
   tags: ProjectCardTag[];
-  // Строки «роль → участник» для карточки проекта владельца.
   members?: ProjectCardMember[];
 }
 
-// Участник проекта: активное участие в одной из ролей.
-// Отвечает поле `members` в `GET /projects/{id}/` (см. `.clinerules.api`, §5.4):
-// заполняется только для владельца проекта, остальным приходит пустой массив.
-// `display_name` может быть пустой строкой, тогда показываем `username`.
+// Участник проекта
 export interface ProjectMemberCard {
   user_id: number;
   username: string;
@@ -151,9 +147,6 @@ export interface ProjectDetail {
   status: ProjectStatus;
   is_favorited: boolean;
   roles: ProjectRole[];
-  // Активные участники проекта — только в ответе владельцу, остальным `[]`
-  // (`left`/`removed` и pending-заявки в состав не попадают).
-  // Опционально: поле отсутствует в ответах списка и в старом кэше запросов.
   members?: ProjectMemberCard[];
   matching_role_id: number | null;
   matching_role_name: string | null;
