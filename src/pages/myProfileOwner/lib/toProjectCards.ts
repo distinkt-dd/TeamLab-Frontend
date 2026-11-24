@@ -6,13 +6,9 @@ import type {
   ProjectRole,
 } from '@entities/project/types';
 
-// Имя участника: в интерфейсе показываем display_name, а если он не заполнен —
-// username, под которым пользователь входит в систему.
 const getParticipantName = (member: ProjectMemberCard): string =>
   member.display_name || member.username;
 
-// Строка карточки по роли: роли с активным участием получают имена участников,
-// роли без участия остаются свободными вакансиями.
 const toProjectMember = (
   role: ProjectRole,
   members: ProjectMemberCard[]
@@ -31,12 +27,6 @@ const toProjectMember = (
   ),
 });
 
-// Приводит проекты владельца из GET /projects/{id}/ к виду, который ожидает
-// виджет списка проектов. Роли проекта становятся строками «роль → участник»,
-// поэтому специализации в тегах не дублируются.
-//
-// Участники берутся из `project.members`, которое бэкенд отдаёт только владельцу;
-// роль без активных участников остаётся свободной вакансией.
 export const toProjectCards = (projects: ProjectDetail[]): ProjectCardItem[] =>
   projects.map((project) => {
     const members = project.members ?? [];
