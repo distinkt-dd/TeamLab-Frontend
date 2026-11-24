@@ -4,7 +4,65 @@
   backdrop-filter: blur(10px);
   padding: 20px 40px;
   display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
   justify-content: space-between;
+  gap: 24px;
+}
+
+/* Список «профессия → участники» занимает место между названием и кнопками:
+   две общие колонки, чтобы плашки и имена стояли рядом и были выровнены по строкам. */
+.members {
+  display: grid;
+  flex: 1 1 auto;
+  grid-template-columns: max-content minmax(0, 1fr);
+  align-items: baseline;
+  column-gap: 16px;
+  row-gap: 10px;
+  min-width: 0;
+  margin: 0;
+  justify-items: center;
+}
+
+/* Профессия участника (специализация роли) — плашка Tag вместо простого текста. */
+.memberRole {
+  display: flex;
+  align-items: flex-start;
+}
+
+.memberRoleTag {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.memberParticipants {
+  margin: 0;
+  font-size: 16px;
+  line-height: 130%;
+  color: var(--neutral-secondary-color);
+}
+
+.memberLink {
+  border-radius: 4px;
+  transition: color var(--transition-duration);
+}
+
+.memberLink:hover {
+  color: var(--accent-purple-color);
+}
+
+.memberLink:focus-visible {
+  outline: 2px solid var(--accent-purple-color);
+  outline-offset: 3px;
+}
+
+.memberVacancy {
+  color: var(--accent-purple-color);
 }
 
 .left {
@@ -106,7 +164,7 @@
 }
 
 @media (max-width: 900px) {
-  .item {
+  .row {
     flex-direction: column;
     gap: 24px;
   }
@@ -124,9 +182,12 @@
 
 @media (max-width: 600px) {
   .item {
+    padding: 20px;
+  }
+
+  .row {
     flex-direction: column;
     gap: 24px;
-    padding: 20px;
   }
 
   .left {
@@ -156,6 +217,10 @@
 
   .tags {
     max-width: none;
+  }
+
+  .members {
+    grid-template-columns: 1fr;
   }
 
   .button {

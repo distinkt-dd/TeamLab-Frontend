@@ -22,6 +22,7 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({
             name={proj.name}
             image={proj.image}
             tags={proj.tags}
+            members={proj.members}
             showProjectActions={showProjectActions}
             key={proj.id}
           />

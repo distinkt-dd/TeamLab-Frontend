@@ -8,7 +8,6 @@ import {
   ParticipantsPage,
   ParticipantPublicProfilePage,
   PolicyPage,
-  ProfilePage,
   ProjectCardPage,
   ProjectsPage,
   QuestionsPage,
@@ -42,7 +41,6 @@ export function App() {
         <Route path="questions" element={<QuestionsPage />} />
         {/* Защищённые маршруты */}
         <Route element={<ProtectedRoute />}>
-          <Route path="profile/:id" element={<ProfilePage />} />
           <Route path="my-profile" element={<MyProfileRoute />} />
           <Route path="edit-profile" element={<EditProfilePage />} />
           <Route path="edit-project" element={<EditProjectPage />} />

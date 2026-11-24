@@ -377,7 +377,7 @@ export const RequestsPage: React.FC = () => {
                       <Button
                         variant="tertiary"
                         className={styles.profileButton}
-                        onClick={() => navigate(`/profile/${user.id}`)}
+                        onClick={() => navigate(`/participants/${user.id}`)}
                       >
                         В профиль
                       </Button>
