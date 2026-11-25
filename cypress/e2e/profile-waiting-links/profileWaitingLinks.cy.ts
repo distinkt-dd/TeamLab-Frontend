@@ -62,7 +62,11 @@ const currentUser = (
   owned_project_ids: ownedProjectIds,
 });
 
-const projectDetail = (id: number, title: string) => ({
+const projectDetail = (
+  id: number,
+  title: string,
+  overrides: Record<string, unknown> = {}
+) => ({
   id,
   owner_id: 1,
   field_id: 1,
@@ -82,6 +86,7 @@ const projectDetail = (id: number, title: string) => ({
   my_membership_status: null,
   created_at: '2026-01-01T00:00:00Z',
   updated_at: '2026-01-01T00:00:00Z',
+  ...overrides,
 });
 
 describe('ссылки в блоке ожидания личного кабинета', () => {
@@ -114,12 +119,46 @@ describe('ссылки в блоке ожидания личного кабин�
     cy.intercept(
       'GET',
       '**/api/v1/projects/42/',
-      projectDetail(42, 'Демо-проект TeamLab')
+      projectDetail(42, 'Демо-проект TeamLab', {
+        roles: [
+          {
+            id: 31,
+            specialization_name: 'Backend-разработчик',
+          },
+          {
+            id: 32,
+            specialization_name: 'UX/UI-дизайнер',
+          },
+        ],
+        members: [
+          {
+            user_id: 17,
+            username: 'team_backend_one',
+            display_name: 'Первый участник',
+            project_role_id: 31,
+            project_role_name: 'Backend-разработчик',
+          },
+          {
+            user_id: 18,
+            username: 'very_long_team_backend_username',
+            display_name: 'Второй участник',
+            project_role_id: 31,
+            project_role_name: 'Backend-разработчик',
+          },
+        ],
+      })
     );
     cy.intercept(
       'GET',
       '**/api/v1/projects/43/',
-      projectDetail(43, 'Второй проект')
+      projectDetail(43, 'Второй проект', {
+        roles: [
+          {
+            id: 33,
+            specialization_name: 'Очень длинное название роли без участника',
+          },
+        ],
+      })
     );
     cy.intercept('GET', '**/api/v1/projects/42/invitations/**', {
       count: 2,
@@ -181,6 +220,27 @@ describe('ссылки в блоке ожидания личного кабин�
     });
     cy.contains('incoming_applicant').should('not.exist');
     cy.contains('accepted_participant').should('not.exist');
+    cy.contains('li', 'Демо-проект TeamLab').within(() => {
+      cy.contains('h3', 'Команда по ролям').should('be.visible');
+      cy.get('[data-project-role-id="31"]').within(() => {
+        cy.contains('dt', 'Backend-разработчик').should('be.visible');
+        cy.get('a[href="/participants/17"]')
+          .should('have.text', 'team_backend_one')
+          .focus()
+          .should('be.focused');
+        cy.get('a[href="/participants/18"]').should(
+          'have.text',
+          'very_long_team_backend_username'
+        );
+      });
+      cy.get('[data-project-role-id="32"]').should(
+        'contain.text',
+        'Пока нет участников'
+      );
+    });
+    cy.contains('li', 'Второй проект')
+      .find('[data-project-role-id="33"]')
+      .should('contain.text', 'Пока нет участников');
     cy.contains('a', 'demo_designer').should('be.visible');
     cy.contains('Второй проект · UX/UI-дизайнер').should('be.visible');
     cy.get('button[aria-label="Заявки, новых: 1"]')

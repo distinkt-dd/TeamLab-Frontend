@@ -6,9 +6,6 @@ import type {
   ProjectRole,
 } from '@entities/project/types';
 
-const getParticipantName = (member: ProjectMemberCard): string =>
-  member.display_name || member.username;
-
 const toProjectMember = (
   role: ProjectRole,
   members: ProjectMemberCard[]
@@ -21,7 +18,7 @@ const toProjectMember = (
         .filter((member) => member.project_role_id === role.id)
         .map((member) => [
           member.user_id,
-          { id: member.user_id, name: getParticipantName(member) },
+          { id: member.user_id, name: member.username },
         ])
     ).values()
   ),

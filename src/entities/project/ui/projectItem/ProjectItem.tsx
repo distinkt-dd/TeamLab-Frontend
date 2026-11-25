@@ -1,4 +1,3 @@
-import { Fragment } from 'react';
 import { Button, Tag } from '@shared/ui';
 import { Link, useNavigate } from 'react-router-dom';
 import type { ProjectCardMember, ProjectCardTag } from '../../types';
@@ -49,34 +48,40 @@ export const ProjectItem: React.FC<ProjectItemProps> = ({
           )}
         </div>
         {hasMembers && (
-          <dl className={styles.members}>
-            {memberRows.map((member) => (
-              <Fragment key={member.roleId}>
-                <dt className={styles.memberRole}>
-                  <Tag className={styles.memberRoleTag}>{member.roleName}</Tag>
-                </dt>
-                <dd className={styles.memberParticipants}>
-                  {member.participants.length > 0 ? (
-                    member.participants.map((participant, index) => (
-                      <Fragment key={participant.id}>
-                        {index > 0 && ', '}
+          <section
+            className={styles.team}
+            aria-label={`Команда проекта «${name}» по ролям`}
+          >
+            <h3 className={styles.teamTitle}>Команда по ролям</h3>
+            <dl className={styles.members}>
+              {memberRows.map((member) => (
+                <div
+                  className={styles.memberRow}
+                  data-project-role-id={member.roleId}
+                  key={member.roleId}
+                >
+                  <dt className={styles.memberRole}>{member.roleName}</dt>
+                  <dd className={styles.memberParticipants}>
+                    {member.participants.length > 0 ? (
+                      member.participants.map((participant) => (
                         <Link
                           className={styles.memberLink}
                           to={`/participants/${participant.id}`}
+                          key={participant.id}
                         >
                           {participant.name}
                         </Link>
-                      </Fragment>
-                    ))
-                  ) : (
-                    <span className={styles.memberVacancy}>
-                      Вакансия свободна
-                    </span>
-                  )}
-                </dd>
-              </Fragment>
-            ))}
-          </dl>
+                      ))
+                    ) : (
+                      <span className={styles.memberVacancy}>
+                        Пока нет участников
+                      </span>
+                    )}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </section>
         )}
         <div className={styles.right}>
           {tags && tags.length > 0 && (
