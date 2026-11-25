@@ -436,16 +436,7 @@
   list-style: none;
 }
 
-.worksList {
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-/* Шапка секции: H2 слева, переключатель вида справа (в макете 1240x64). */
+/* Шапка секции «Мои работы». */
 .sectionHeader {
   display: flex;
   justify-content: space-between;
@@ -456,31 +447,6 @@
 
 .worksTitle {
   text-transform: uppercase;
-}
-
-.viewSwitcher {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-/* Кнопка переключения вида: 44x44, у активной — подложка Acent/Lable pink. */
-.viewButton {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  border: none;
-  border-radius: 4px;
-  background: transparent;
-  color: var(--neutral-secondary-color);
-  cursor: pointer;
-}
-
-.viewButtonActive {
-  background: var(--lable-pink-color);
 }
 
 /* Карточка работы: логотип 180px слева, текст и ссылка справа. */

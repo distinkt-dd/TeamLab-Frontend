@@ -346,6 +346,12 @@ describe('подробная карточка проекта', () => {
       my_membership_status: 'active',
     });
 
+    cy.on('window:confirm', (message) => {
+      expect(message).to.contain(
+        'После выхода вы не сможете повторно присоединиться'
+      );
+      return true;
+    });
     cy.contains('button', 'Прекратить участие').click();
     cy.wait('@leaveMembership');
     cy.contains('h2', 'Мы ищем').should('be.visible');

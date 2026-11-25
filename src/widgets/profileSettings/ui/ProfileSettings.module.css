@@ -115,12 +115,10 @@ a.waitingTitle:focus-visible {
   justify-content: center;
 }
 
-.optionRow .notificationSelect,
 .optionRow .visibilitySelect {
   border: none;
 }
 
-.optionRow .notificationSelect:focus-visible,
 .optionRow .visibilitySelect:focus-visible {
   outline: 1px solid var(--accent-orange-color);
 }

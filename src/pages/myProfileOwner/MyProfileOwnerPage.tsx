@@ -21,9 +21,6 @@ export const MyProfileOwnerPage: React.FC = () => {
     pendingRequestsCount,
     isWaitingPending,
     isWaitingError,
-    updateNotifications,
-    isNotificationUpdating,
-    isNotificationUpdateError,
   } = useMyProfileOwner();
 
   const visibleProjects = projectCards.slice(0, visibleCount);
@@ -115,10 +112,6 @@ export const MyProfileOwnerPage: React.FC = () => {
           </div>
         </section>
         <ProfileSettings
-          notificationEnabled={user?.notification_enabled}
-          isNotificationUpdating={isNotificationUpdating}
-          isNotificationUpdateError={isNotificationUpdateError}
-          onNotificationChange={updateNotifications}
           onLogout={handleLogout}
           profileEmail={user?.email}
           waitingItems={waitingItems}
