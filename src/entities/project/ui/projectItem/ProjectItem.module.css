@@ -15,37 +15,62 @@
   gap: 24px;
 }
 
-.members {
-  display: grid;
+.team {
+  display: flex;
   flex: 1 1 auto;
-  grid-template-columns: max-content minmax(0, 1fr);
-  align-items: baseline;
-  column-gap: 16px;
-  row-gap: 10px;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  max-width: 560px;
+}
+
+.teamTitle {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 130%;
+  color: var(--neutral-secondary-color);
+}
+
+.members {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   min-width: 0;
   margin: 0;
-  justify-items: center;
+}
+
+.memberRow {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.8fr) minmax(0, 1.2fr);
+  align-items: baseline;
+  gap: 16px;
+  min-width: 0;
 }
 
 .memberRole {
-  display: flex;
-  align-items: flex-start;
-}
-
-.memberRoleTag {
-  max-width: 100%;
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 130%;
   overflow-wrap: anywhere;
 }
 
 .memberParticipants {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  min-width: 0;
   margin: 0;
-  font-size: 16px;
+  font-size: 14px;
   line-height: 130%;
   color: var(--neutral-secondary-color);
 }
 
 .memberLink {
+  min-width: 0;
   border-radius: 4px;
+  overflow-wrap: anywhere;
   transition: color var(--transition-duration);
 }
 
@@ -59,7 +84,7 @@
 }
 
 .memberVacancy {
-  color: var(--accent-purple-color);
+  color: rgba(44, 44, 46, 0.6);
 }
 
 .left {
@@ -172,6 +197,11 @@
     justify-content: space-between;
   }
 
+  .team {
+    width: 100%;
+    max-width: none;
+  }
+
   .tags {
     max-width: min(100%, 500px);
   }
@@ -216,8 +246,9 @@
     max-width: none;
   }
 
-  .members {
+  .memberRow {
     grid-template-columns: 1fr;
+    gap: 4px;
   }
 
   .button {
