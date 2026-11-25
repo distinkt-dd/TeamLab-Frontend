@@ -73,13 +73,6 @@ export const useMyProfileParticipant = () => {
     [applications]
   );
 
-  // Включение/выключение уведомлений: PATCH /users/me/.
-  const updateNotifications = useOptimisticUserUpdate(
-    userService,
-    queryClient,
-    (enabled: boolean) => ({ notification_enabled: enabled })
-  );
-
   // Видимость профиля: PATCH /users/me/.
   const updateVisibility = useOptimisticUserUpdate(
     userService,
@@ -97,9 +90,6 @@ export const useMyProfileParticipant = () => {
     waitingItems,
     isWaitingPending,
     isWaitingError,
-    updateNotifications: updateNotifications.mutate,
-    isNotificationUpdating: updateNotifications.isPending,
-    isNotificationUpdateError: updateNotifications.isError,
     updateVisibility: updateVisibility.mutate,
     isVisibilityUpdating: updateVisibility.isPending,
     isVisibilityUpdateError: updateVisibility.isError,

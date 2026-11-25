@@ -152,7 +152,7 @@ const getCtaState = (
     return {
       label: 'Вы покинули проект',
       canApply: false,
-      hint: membershipHint,
+      hint: `${membershipHint} Повторное вступление в этот проект недоступно.`,
     };
   }
 
@@ -407,6 +407,14 @@ export const ProjectCardPage: React.FC = () => {
       !hasActiveMembership(project) ||
       project.my_membership_id === null ||
       leaveMembershipMutation.isPending
+    ) {
+      return;
+    }
+
+    if (
+      !window.confirm(
+        'Прекратить участие? После выхода вы не сможете повторно присоединиться к этому проекту.'
+      )
     ) {
       return;
     }

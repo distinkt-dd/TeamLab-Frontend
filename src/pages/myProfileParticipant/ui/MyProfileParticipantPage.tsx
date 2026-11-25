@@ -19,9 +19,6 @@ export const MyProfileParticipantPage: React.FC = () => {
     waitingItems,
     isWaitingPending,
     isWaitingError,
-    updateNotifications,
-    isNotificationUpdating,
-    isNotificationUpdateError,
     updateVisibility,
     isVisibilityUpdating,
     isVisibilityUpdateError,
@@ -50,10 +47,6 @@ export const MyProfileParticipantPage: React.FC = () => {
           onEdit={() => navigate('/edit-profile')}
         />
         <ProfileSettings
-          notificationEnabled={user?.notification_enabled}
-          isNotificationUpdating={isNotificationUpdating}
-          isNotificationUpdateError={isNotificationUpdateError}
-          onNotificationChange={updateNotifications}
           profileVisibility={user?.profile_visibility}
           isVisibilityUpdating={isVisibilityUpdating}
           isVisibilityUpdateError={isVisibilityUpdateError}

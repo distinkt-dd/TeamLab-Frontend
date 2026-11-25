@@ -96,9 +96,6 @@ const socialLinkLabels: Record<keyof SocialLinks, string> = {
 const toOptions = (labels: Record<string, string>) =>
   Object.entries(labels).map(([value, label]) => ({ value, label }));
 
-// Вид отображения работ в секции «Мои работы»: по макету активна сетка.
-type WorksView = 'list' | 'grid';
-
 // Модалки блока «Мои навыки»: выбор навыков и распределение по уровням.
 type SkillsModalName = 'skills' | 'levels';
 
@@ -198,8 +195,6 @@ export const EditProfilePage: React.FC = () => {
   });
 
   const [draft, setDraft] = useState<WorkFieldsDraft | null>(null);
-  // Переключатель вида в разметке сейчас скрыт, поэтому вид работ фиксирован.
-  const [worksView] = useState<WorksView>('grid');
   const [isAvatarUpdating, setIsAvatarUpdating] = useState(false);
   const [isAvatarDeleting, setIsAvatarDeleting] = useState(false);
   const [avatarActionError, setAvatarActionError] = useState<string | null>(
@@ -811,26 +806,6 @@ export const EditProfilePage: React.FC = () => {
         <section>
           <div className={styles.sectionHeader}>
             <h2 className={styles.worksTitle}>Мои работы</h2>
-            {/* <div className={styles.viewSwitcher}>
-              <button
-                type="button"
-                className={getViewButtonClass('list')}
-                aria-label="Показывать работы списком"
-                aria-pressed={worksView === 'list'}
-                onClick={() => setWorksView('list')}
-              >
-                <Icon name="burgerM" size={44} aria-hidden="true" />
-              </button>
-              <button
-                type="button"
-                className={getViewButtonClass('grid')}
-                aria-label="Показывать работы сеткой"
-                aria-pressed={worksView === 'grid'}
-                onClick={() => setWorksView('grid')}
-              >
-                <Icon name="grid" size={44} aria-hidden="true" />
-              </button>
-            </div> */}
           </div>
 
           <div className={styles.myWorks}>
@@ -865,11 +840,7 @@ export const EditProfilePage: React.FC = () => {
                 </div>
               )}
               {works.length > 0 && (
-                <ul
-                  className={
-                    worksView === 'grid' ? styles.worksGrid : styles.worksList
-                  }
-                >
+                <ul className={styles.worksGrid}>
                   {works.map((work) => (
                     <li className={styles.workCard} key={work.id}>
                       {work.image ? (

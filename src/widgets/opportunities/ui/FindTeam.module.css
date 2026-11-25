@@ -34,6 +34,16 @@
   gap: 32px;
 }
 
+.list > li {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+}
+
+.list > li > * {
+  width: 100%;
+}
+
 .button {
   width: 286px;
   margin-top: 40px;

@@ -4,7 +4,6 @@ import { Icon } from '@shared/icons';
 import { Button, Tag } from '@shared/ui';
 import { Link } from 'react-router-dom';
 import styles from './ProfileSettings.module.css';
-import { NotificationSelect } from './NotificationSelect';
 import { PasswordChangeModal } from './PasswordChangeModal';
 import { VisibilitySelect } from './VisibilitySelect';
 
@@ -17,10 +16,6 @@ export interface ProfileWaitingItem {
 }
 
 export interface ProfileSettingsProps {
-  notificationEnabled?: boolean;
-  isNotificationUpdating?: boolean;
-  isNotificationUpdateError?: boolean;
-  onNotificationChange?: (enabled: boolean) => void;
   // Видимость профиля настраивает только участник, поэтому строки нет,
   // если обработчик не передан.
   profileVisibility?: ProfileVisibility;
@@ -38,10 +33,6 @@ export interface ProfileSettingsProps {
 }
 
 export const ProfileSettings: React.FC<ProfileSettingsProps> = ({
-  notificationEnabled,
-  isNotificationUpdating = false,
-  isNotificationUpdateError = false,
-  onNotificationChange,
   profileVisibility,
   isVisibilityUpdating = false,
   isVisibilityUpdateError = false,
@@ -63,20 +54,6 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({
         <div className={styles.optionBlock}>
           <h3>Настройки</h3>
           <div className={styles.optionOptions}>
-            <div className={styles.optionRow}>
-              <span>Уведомления</span>
-              <NotificationSelect
-                notificationEnabled={notificationEnabled}
-                disabled={isNotificationUpdating}
-                onChange={onNotificationChange}
-                className={styles.notificationSelect}
-              />
-            </div>
-            {isNotificationUpdateError && (
-              <span className={styles.optionError} role="alert">
-                Не удалось сохранить настройки уведомлений. Попробуйте ещё раз.
-              </span>
-            )}
             {onVisibilityChange && (
               <>
                 <div className={styles.optionRow}>

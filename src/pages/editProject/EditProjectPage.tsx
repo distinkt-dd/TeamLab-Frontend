@@ -746,7 +746,6 @@ export const EditProjectPage: React.FC = () => {
   const currentUserQuery = useQuery({
     queryKey: CURRENT_USER_QUERY_KEY,
     queryFn: () => userService.getCurrent(),
-    enabled: isValidProjectId,
   });
 
   const projectQuery = useQuery({
@@ -785,7 +784,20 @@ export const EditProjectPage: React.FC = () => {
       <main className={styles.page}>
         <section className={styles.stateCard}>
           <h1>Создание проекта</h1>
-          <p>Создание нового проекта будет реализовано на следующем этапе.</p>
+          {currentUserQuery.isPending ? (
+            <p role="status">Загружаем данны аккаунта…</p>
+          ) : currentUserQuery.isError ? (
+            <p className={styles.error} role="alert">
+              Не удалось определить тип аккаунта. Попробуйте
+              обновить страницу.
+            </p>
+          ) : (
+            <p>
+              {currentUser?.account_type === 'participant'
+                ? 'Чтобы создавать проекты, зарегистрируйте отдельный аккаунт автора проекта.'
+                : 'Пока создать новый проект нельзя. Мы работаем над этой возможностью — она появится в одном из следующих обновлений.'}
+            </p>
+          )}
           <Button onClick={() => navigate('/my-profile')}>
             Вернуться в личный кабинет
           </Button>

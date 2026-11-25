@@ -42,7 +42,10 @@ const visibleFooterData = {
 
 const teamMembers = [
   { role: 'Дизайнер', names: ['@Asheskali'] },
-  { role: 'Фронтенд', names: ['@Zigyoygiz', '@Grankin_Sasha', '@Hhajimeone'] },
+  {
+    role: 'Фронтенд',
+    names: ['@Zigyoygiz', '@Grankin_Sasha', '@Hhajimeone', '@Djrazzz'],
+  },
   { role: 'Бэкенд', names: ['@Ihulir'] },
 ];
 

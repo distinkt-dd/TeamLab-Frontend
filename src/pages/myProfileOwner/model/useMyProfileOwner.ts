@@ -5,10 +5,9 @@ import {
   UserService,
   currentUserNotificationsQueryKey,
   ownerPendingInvitationsQueryKey,
-  useOptimisticUserUpdate,
 } from '@entities/user';
 import type { ProjectInvitationCard } from '@entities/project/types';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { toProjectCards } from '../lib/toProjectCards';
 
@@ -20,7 +19,6 @@ interface OwnerPendingInvitation extends ProjectInvitationCard {
 // входящие заявки и отправленные приглашения, ожидающие ответа.
 export const useMyProfileOwner = () => {
   const { api } = getServices();
-  const queryClient = useQueryClient();
   const userService = useMemo(() => new UserService(api), [api]);
   const projectService = useMemo(() => new ProjectService(api), [api]);
 
@@ -138,13 +136,6 @@ export const useMyProfileOwner = () => {
     [notifications]
   );
 
-  // Включение/выключение уведомлений: PATCH /users/me/.
-  const updateNotifications = useOptimisticUserUpdate(
-    userService,
-    queryClient,
-    (enabled: boolean) => ({ notification_enabled: enabled })
-  );
-
   return {
     user,
     isUserPending,
@@ -156,8 +147,5 @@ export const useMyProfileOwner = () => {
     pendingRequestsCount,
     isWaitingPending,
     isWaitingError,
-    updateNotifications: updateNotifications.mutate,
-    isNotificationUpdating: updateNotifications.isPending,
-    isNotificationUpdateError: updateNotifications.isError,
   };
 };
