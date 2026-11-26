@@ -8,7 +8,7 @@
   inset: 0 0 auto;
   height: 480px;
   background-image: url('../editProfile/assets/78926410116964ca76324e7756826f4385279e22.png');
-  background-position: center top;
+  background-position: center 21%;
   background-repeat: no-repeat;
   background-size: 100% auto;
   transform: rotate(180deg);
@@ -21,7 +21,7 @@
   width: 100%;
   max-width: 1280px;
   margin: 0 auto;
-  padding: 32px 20px 120px;
+  padding: 60px 20px 120px;
 }
 
 .backButton {
@@ -39,15 +39,17 @@
 .summaryCard {
   box-sizing: border-box;
   border-radius: 20px;
-  background: var(--gradient-day);
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
 }
 
 .aboutCard {
   position: relative;
+  display: flex;
+  flex-direction: column;
   min-height: 390px;
   padding: 40px;
+  background: var(--gradient-day);
 }
 
 .identity {
@@ -57,17 +59,23 @@
   margin-bottom: 24px;
 }
 
-.avatar {
+.avatarWrapper {
+  position: relative;
   flex: 0 0 144px;
   width: 144px;
   height: 144px;
+}
+
+.avatar {
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
   object-fit: cover;
 }
 
 .specialization {
   max-width: 100%;
-  margin: 12px 0 0;
+  margin: 0;
   font-family: var(--font-family-base);
   font-size: clamp(24px, 3vw, 36px);
   line-height: 1.15;
@@ -75,10 +83,20 @@
   text-transform: uppercase;
 }
 
+/* Плашка статуса лежит поверх аватара, а не рядом с ним */
+.searchStatusTag {
+  position: absolute;
+  top: 14px;
+  right: -16px;
+  background-color: var(--accent-blue-color);
+  color: var(--neutral-default-color);
+  white-space: nowrap;
+}
+
 .bio {
   white-space: pre-line;
-  font-size: 18px;
-  line-height: 1.5;
+  font-size: 20px;
+  line-height: 1.32;
   overflow-wrap: anywhere;
 }
 
@@ -90,10 +108,35 @@
   mask-image: linear-gradient(to bottom, #000 70%, transparent 100%);
 }
 
-.bioButton {
-  display: block;
-  width: 260px;
-  margin: 20px auto 0;
+.showAll {
+  display: flex;
+  justify-content: center;
+  margin-top: auto;
+  padding-top: 24px;
+}
+
+.showAllFaded {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  box-sizing: border-box;
+  align-items: flex-start;
+  height: 103px;
+  padding-top: 26px;
+  border-radius: 0 0 20px 20px;
+  background: linear-gradient(
+    180deg,
+    rgba(161, 150, 197, 0.03) 0%,
+    rgba(242, 242, 247, 0.3) 27.88%,
+    rgba(255, 255, 255, 0.8) 90.87%
+  );
+}
+
+.showAllButton {
+  width: auto;
+  max-width: 100%;
+  padding-inline: 36px;
 }
 
 .summaryCard {
@@ -101,12 +144,19 @@
   flex-direction: column;
   min-width: 0;
   padding: 40px;
+  background: var(--gradient-day);
+  color: var(--neutral-secondary-color);
+}
+
+.contactsTitle {
+  margin: 0 0 20px;
+  text-transform: uppercase;
 }
 
 .displayName {
   margin: 0;
-  font-size: 28px;
-  line-height: 1.2;
+  color: var(--neutral-default-color);
+  text-transform: uppercase;
   overflow-wrap: anywhere;
 }
 
@@ -119,13 +169,13 @@
 .profileTags {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line-color);
 }
 
 .contacts {
-  margin-top: 24px;
-  padding-top: 20px;
-  border-top: 1px solid var(--line-color);
+  margin-top: 32px;
 }
 
 .contacts h3,
@@ -150,18 +200,40 @@
   line-height: 1.4;
 }
 
+.contactsPlaceholder {
+  color: var(--neutral-secondary-color);
+}
+
 .contactList {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px 16px;
+  flex-direction: column;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.contactList a {
-  color: var(--neutral-secondary-color);
-  text-underline-offset: 4px;
+.contactLink {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  font-size: 20px;
+  line-height: 1.32;
+  text-decoration: none;
+}
+
+.contactLabel,
+.contactValue {
+  overflow-wrap: anywhere;
+}
+
+.contactValue {
+  color: var(--accent-blue-color);
+  text-align: right;
+}
+
+.contactLink:hover .contactValue {
+  text-decoration: underline;
 }
 
 .inviteBlock {
@@ -201,7 +273,7 @@
 .relationActions {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .membershipBlock {
@@ -212,12 +284,23 @@
 }
 
 .membershipBlock p {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
   align-self: stretch;
   color: var(--neutral-secondary-color);
+  font-size: 18px;
+  line-height: 1.5;
 }
 
-.membershipBlock p span {
+.membershipCheck {
+  flex-shrink: 0;
   color: var(--accent-blue-color);
+}
+
+.membershipCheck path {
+  stroke: currentColor;
 }
 
 .removeButton {
@@ -328,8 +411,8 @@
 }
 
 .workImagePlaceholder {
-  background: url('../editProfile/assets/workImagePlaceholder.svg') center / cover
-    no-repeat;
+  background: url('../editProfile/assets/workImagePlaceholder.svg') center /
+    cover no-repeat;
 }
 
 .workContent {
@@ -450,10 +533,15 @@
     gap: 16px;
   }
 
-  .avatar {
+  .avatarWrapper {
     flex-basis: 96px;
     width: 96px;
     height: 96px;
+  }
+
+  .searchStatusTag {
+    top: 8px;
+    right: -8px;
   }
 
   .specialization {
@@ -464,13 +552,13 @@
     font-size: 16px;
   }
 
-  .bioButton {
-    width: 100%;
-  }
-
   .skillsSection,
   .worksSection {
     margin-top: 72px;
+  }
+
+  .showAll {
+    padding-top: 16px;
   }
 
   .skillsLayout {
@@ -501,7 +589,8 @@
     flex-direction: column;
   }
 
-  .avatar {
+  .avatarWrapper {
+    flex-basis: 112px;
     width: 112px;
     height: 112px;
   }
