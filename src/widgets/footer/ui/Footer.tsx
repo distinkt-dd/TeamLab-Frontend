@@ -96,13 +96,23 @@ export const Footer: React.FC = () => {
             КОМАНДА <br />
             ТИМЛАБ <Icon name="arrowNortheast" />
           </button>
-          <div className={styles.socials}>
-            <span className={styles.socialsIcon} aria-label="Email">
+          <div className={styles.socials} aria-label="Контакты TeamLab">
+            <a
+              className={styles.contactLink}
+              href="mailto:teamlab.project@yandex.ru"
+            >
               <Icon name="gmail" />
-            </span>
-            <span className={styles.socialsIcon} aria-label="Telegram">
+              <span>teamlab.project@yandex.ru</span>
+            </a>
+            <a
+              className={styles.contactLink}
+              href="https://t.me/teamlab_project"
+              target="_blank"
+              rel="noreferrer"
+            >
               <Icon name="telegram" />
-            </span>
+              <span>@teamlab_project</span>
+            </a>
           </div>
         </div>
       </div>
