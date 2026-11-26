@@ -1,15 +1,19 @@
 .card {
-  background: var(--gradient-day);
-  backdrop-filter: blur(10px);
-  padding: 23px 40px;
-  border-radius: 20px;
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
+  gap: 32px;
+
+  background: var(--gradient-day);
+  backdrop-filter: blur(15px);
+  padding: 20px 40px;
+  border-radius: 20px;
 }
 
 .image {
   width: 80px;
   height: 80px;
+  flex-shrink: 0;
   border-radius: 50%;
   object-fit: cover;
 }
@@ -17,34 +21,39 @@
 .userBlock {
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
   gap: 20px;
 
-  max-width: 490px;
-  width: 100%;
+  /* По макету колонка с логотипом и именем занимает 490px и не сжимается:
+     ширину строки навыков определяет оставшееся место. */
+  flex: 0 0 490px;
+  max-width: 100%;
 }
 
 .userInfo {
-  max-width: 100%;
-  width: 100%;
-
   display: flex;
-  column-gap: 53px;
-  row-gap: 18px;
-
-  padding-inline: 40px;
-
   flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+
+  width: 100%;
+  padding-inline: 40px;
 }
 
 .userSelf {
   display: flex;
   align-items: center;
   gap: 31px;
+  max-width: 100%;
 }
 
 .userSelfText {
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  min-width: 0;
 }
 
 .userLink {
@@ -67,18 +76,39 @@
 
 .skillsBlock {
   display: flex;
-  gap: 9px;
-  max-width: 100%;
-  width: 100%;
-}
+  flex-wrap: wrap;
+  align-items: flex-start;
+  align-content: flex-start;
+  gap: 8px 9px;
 
-.skillBlockTag {
-  max-height: max-content;
+  flex: 1 1 0;
+  min-width: 0;
 }
 
 .actionsBlock {
-  max-width: max-content;
-  width: 100%;
+  flex: 0 0 auto;
+  max-width: 100%;
+}
+
+/* Подпись «еще N» — плашка без фона, как в макете (Frame 76). */
+.moreSkills {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: rgba(44, 44, 46, 0.6);
+  text-decoration: underline;
+  transition: color var(--transition-duration);
+}
+
+.moreSkills:hover {
+  color: var(--accent-purple-color);
+}
+
+.moreSkills:focus-visible {
+  outline: 2px solid var(--accent-purple-color);
+  outline-offset: 3px;
 }
 
 @media (max-width: 900px) {
@@ -88,22 +118,25 @@
   }
 
   .userBlock {
-    max-width: calc(100% - 190px);
+    flex: 1 1 320px;
   }
 
+  /* На узких экранах блок навыков уходит на отдельную строку. */
   .skillsBlock {
     order: 3;
-    flex-wrap: wrap;
+    flex: 1 1 100%;
   }
 }
 
 @media (max-width: 600px) {
   .card {
-    padding: 20px;
     flex-direction: column;
+    padding: 20px;
   }
 
   .userBlock {
+    flex: 0 0 auto;
+    width: 100%;
     max-width: none;
   }
 
@@ -113,7 +146,6 @@
   }
 
   .userSelfText {
-    min-width: 0;
     overflow-wrap: anywhere;
   }
 
@@ -125,7 +157,11 @@
 
   .userInfo {
     padding-inline: 0;
-    column-gap: 24px;
+  }
+
+  .skillsBlock {
+    flex: 0 0 auto;
+    width: 100%;
   }
 
   .actionsBlock,

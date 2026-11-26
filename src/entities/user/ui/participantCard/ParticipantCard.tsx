@@ -8,6 +8,8 @@ type ParticipantProps = {
   user: UserPublic;
 };
 
+const MAX_VISIBLE_SKILLS = 8;
+
 export const ParticipantCard = ({ user }: ParticipantProps) => {
   const navigate = useNavigate();
   const hasProfileId = Number.isInteger(user.id) && user.id > 0;
@@ -19,11 +21,29 @@ export const ParticipantCard = ({ user }: ParticipantProps) => {
     !!username &&
     displayName.toLocaleLowerCase('ru-RU') !==
       username.toLocaleLowerCase('ru-RU');
+  const specialization = user.specialization_name?.trim();
+  const title = specialization || primaryName;
+  const fallbackSubtitle = shouldShowUsername ? username : null;
+  const subtitle = specialization ? primaryName : fallbackSubtitle;
   const participantName = (
     <>
-      <p className="text-l">{primaryName}</p>
-      {shouldShowUsername && <p className="text-s">{username}</p>}
+      <p className="text-l">{title}</p>
+      {subtitle && <p className="text-s">{subtitle}</p>}
     </>
+  );
+  const visibleSkills = user.skills.slice(0, MAX_VISIBLE_SKILLS);
+  const hiddenSkillsCount = user.skills.length - visibleSkills.length;
+  const moreSkillsLabel = `еще ${hiddenSkillsCount}`;
+  const moreSkills = hasProfileId ? (
+    <Link
+      to={`/participants/${user.id}`}
+      className={styles.moreSkills}
+      aria-label={`Все навыки участника ${primaryName}`}
+    >
+      {moreSkillsLabel}
+    </Link>
+  ) : (
+    <span className={styles.moreSkills}>{moreSkillsLabel}</span>
   );
 
   return (
@@ -73,11 +93,10 @@ export const ParticipantCard = ({ user }: ParticipantProps) => {
         </div>
       </div>
       <div className={styles.skillsBlock}>
-        {user.skills.map((skill) => (
-          <Tag className={styles.skillBlockTag} key={skill.id}>
-            {skill.name}
-          </Tag>
+        {visibleSkills.map((skill) => (
+          <Tag key={skill.id}>{skill.name}</Tag>
         ))}
+        {hiddenSkillsCount > 0 && moreSkills}
       </div>
       <div className={styles.actionsBlock}>
         <Button

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getServices, useAppSelector } from '@app';
 import { ProjectService } from '@entities/project';
@@ -25,8 +25,9 @@ import type {
   WorkFormat,
 } from '@entities/user/types';
 import { selectAuthUser, selectIsAuthenticated } from '@features/auth';
+import { Icon } from '@shared/icons';
 import { Button, Tag } from '@shared/ui';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import styles from './ParticipantPublicProfilePage.module.css';
 import defaultAvatar from '../editProfile/assets/logo.svg';
 
@@ -88,7 +89,6 @@ const ProfileState = ({
 
 export const ParticipantPublicProfilePage: React.FC = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const authUser = useAppSelector(selectAuthUser);
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
@@ -101,11 +101,10 @@ export const ParticipantPublicProfilePage: React.FC = () => {
     () => new RoleInterestService(api),
     [api]
   );
-  const membershipService = useMemo(
-    () => new MembershipService(api),
-    [api]
-  );
-  const [isBioExpanded, setIsBioExpanded] = useState(false);
+  const membershipService = useMemo(() => new MembershipService(api), [api]);
+  const [isContentExpanded, setIsContentExpanded] = useState(false);
+  const [isBioOverflowing, setIsBioOverflowing] = useState(false);
+  const bioRef = useRef<HTMLDivElement>(null);
   const [selectedProjectId, setSelectedProjectId] = useState('');
   const [invitationStatus, setInvitationStatus] = useState<string | null>(null);
   const [relationOverrides, setRelationOverrides] = useState<
@@ -149,12 +148,10 @@ export const ParticipantPublicProfilePage: React.FC = () => {
 
   const eligibleProjects = (() => {
     if (!participant?.specialization_id) return [];
-    return (ownedProjects ?? []).filter(
-      (project) =>
-        project.roles.some(
-          (role) =>
-            role.specialization_id === participant.specialization_id
-        )
+    return (ownedProjects ?? []).filter((project) =>
+      project.roles.some(
+        (role) => role.specialization_id === participant.specialization_id
+      )
     );
   })();
 
@@ -197,18 +194,18 @@ export const ParticipantPublicProfilePage: React.FC = () => {
   );
   const hasContextualMembership = Boolean(
     selectedProject &&
-      participant?.project_membership_id &&
-      participant.project_membership_status === 'active' &&
-      participant.matching_project_role_id &&
-      contextualRoleIds.has(participant.matching_project_role_id)
+    participant?.project_membership_id &&
+    participant.project_membership_status === 'active' &&
+    participant.matching_project_role_id &&
+    contextualRoleIds.has(participant.matching_project_role_id)
   );
   const hasContextualClosedInterest = Boolean(
     selectedProject &&
-      participant?.project_interest_id &&
-      participant.project_interest_status &&
-      participant.project_interest_status !== 'pending' &&
-      participant.matching_project_role_id &&
-      contextualRoleIds.has(participant.matching_project_role_id)
+    participant?.project_interest_id &&
+    participant.project_interest_status &&
+    participant.project_interest_status !== 'pending' &&
+    participant.matching_project_role_id &&
+    contextualRoleIds.has(participant.matching_project_role_id)
   );
   const serverRelation: ProjectRelation = hasContextualMembership
     ? {
@@ -231,7 +228,7 @@ export const ParticipantPublicProfilePage: React.FC = () => {
             }
           : { kind: 'none' };
   const projectRelation = selectedProject
-    ? relationOverrides[selectedProject.id] ?? serverRelation
+    ? (relationOverrides[selectedProject.id] ?? serverRelation)
     : ({ kind: 'none' } satisfies ProjectRelation);
 
   const invitationMutation = useMutation({
@@ -290,18 +287,19 @@ export const ParticipantPublicProfilePage: React.FC = () => {
             result.project_id,
           ],
         }),
-        queryClient.invalidateQueries({ queryKey: ['currentUserNotifications'] }),
+        queryClient.invalidateQueries({
+          queryKey: ['currentUserNotifications'],
+        }),
       ]);
     },
     onError: (error) => {
-      setInvitationStatus(
-        getErrorText(error, 'Не удалось обработать заявку.')
-      );
+      setInvitationStatus(getErrorText(error, 'Не удалось обработать заявку.'));
     },
   });
 
   const membershipMutation = useMutation({
-    mutationFn: (membershipId: number) => membershipService.remove(membershipId),
+    mutationFn: (membershipId: number) =>
+      membershipService.remove(membershipId),
     onSuccess: async (membership) => {
       setInvitationStatus('Участник исключён из команды.');
       setRelationOverrides((current) => ({
@@ -320,8 +318,25 @@ export const ParticipantPublicProfilePage: React.FC = () => {
     },
   });
 
+  useEffect(() => {
+    const element = bioRef.current;
+    if (!element || isContentExpanded) {
+      setIsBioOverflowing(false);
+      return;
+    }
+    const checkOverflow = () => {
+      setIsBioOverflowing(element.scrollHeight > element.clientHeight + 1);
+    };
+    checkOverflow();
+    const observer = new ResizeObserver(checkOverflow);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [isContentExpanded, participant]);
+
   if (!isValidId) {
-    return <ProfileState isError>Некорректный идентификатор участника.</ProfileState>;
+    return (
+      <ProfileState isError>Некорректный идентификатор участника.</ProfileState>
+    );
   }
 
   if (isPending) {
@@ -341,8 +356,8 @@ export const ParticipantPublicProfilePage: React.FC = () => {
 
   if (!participant) return null;
 
-  const bio = participant.bio?.trim() || 'Участник пока ничего не рассказал о себе.';
-  const canCollapseBio = bio.length > 320;
+  const bio =
+    participant.bio?.trim() || 'Участник пока ничего не рассказал о себе.';
   const skillGroups = skillLevelOrder.map((level) => ({
     level,
     skills: participant.skills.filter((skill) => skill.level === level),
@@ -351,6 +366,10 @@ export const ParticipantPublicProfilePage: React.FC = () => {
     (entry): entry is [keyof SocialLinks, string] => Boolean(entry[1])
   );
   const isOwner = authUser?.account_type === 'owner';
+
+  const showContacts = isOwner
+    ? projectRelation.kind === 'membership' && participant.contacts_visible
+    : participant.contacts_visible;
   const inviteDisabled =
     invitationMutation.isPending ||
     interestMutation.isPending ||
@@ -371,7 +390,10 @@ export const ParticipantPublicProfilePage: React.FC = () => {
       return;
     }
     setInvitationStatus(null);
-    interestMutation.mutate({ action, interestId: projectRelation.interest.id });
+    interestMutation.mutate({
+      action,
+      interestId: projectRelation.interest.id,
+    });
   };
 
   const handleRemove = () => {
@@ -387,60 +409,64 @@ export const ParticipantPublicProfilePage: React.FC = () => {
     <main className={styles.page}>
       <div className={styles.heroBg} aria-hidden="true" />
       <div className={styles.container}>
-        <Button
-          className={styles.backButton}
-          type="button"
-          variant="back"
-          onClick={() => navigate('/participants')}
-        >
-          Все участники
-        </Button>
-
         <section className={styles.heroSection}>
           <article className={styles.aboutCard}>
             <div className={styles.identity}>
-              <img
-                className={styles.avatar}
-                src={participant.avatar ?? defaultAvatar}
-                alt={`Аватар ${participant.display_name}`}
-              />
-              <div>
-                <Tag bgColor="blue">
+              <div className={styles.avatarWrapper}>
+                <img
+                  className={styles.avatar}
+                  src={participant.avatar ?? defaultAvatar}
+                  alt={`Аватар ${participant.display_name}`}
+                />
+                <Tag bgColor="blue" className={styles.searchStatusTag}>
                   {participant.search_status
                     ? searchStatusLabels[participant.search_status]
                     : 'Статус не указан'}
                 </Tag>
-                <h1 className={styles.specialization}>
-                  {participant.specialization_name ?? 'Специализация не указана'}
-                </h1>
               </div>
+              <h1 className={styles.specialization}>
+                {participant.specialization_name ?? 'Специализация не указана'}
+              </h1>
             </div>
+
             <div
+              ref={bioRef}
               className={`${styles.bio} ${
-                canCollapseBio && !isBioExpanded ? styles.bioCollapsed : ''
+                isContentExpanded ? '' : styles.bioCollapsed
               }`}
             >
               {bio}
             </div>
-            {canCollapseBio && (
-              <Button
-                className={styles.bioButton}
-                variant="secondary"
-                aria-expanded={isBioExpanded}
-                onClick={() => setIsBioExpanded((value) => !value)}
+
+            {!isContentExpanded && (
+              <div
+                className={`${styles.showAll} ${
+                  isBioOverflowing ? styles.showAllFaded : ''
+                }`}
               >
-                {isBioExpanded ? 'Скрыть' : 'Показать полностью'}
-              </Button>
+                <Button
+                  className={styles.showAllButton}
+                  variant="secondary"
+                  aria-expanded={isContentExpanded}
+                  onClick={() => setIsContentExpanded(true)}
+                >
+                  Показать полностью
+                </Button>
+              </div>
             )}
           </article>
 
           <aside className={styles.summaryCard}>
+            {/* <h2 className={styles.contactsTitle}>Контакты</h2> */}
             <h2 className={styles.displayName}>{participant.display_name}</h2>
-            <p className={styles.username}>@{participant.username}</p>
             <div className={styles.profileTags}>
-              {participant.city && <Tag bgColor="turquoise">{participant.city}</Tag>}
+              {participant.city && (
+                <Tag bgColor="turquoise">{participant.city}</Tag>
+              )}
               {participant.workload_hours_per_week && (
-                <Tag bgColor="pink">{participant.workload_hours_per_week} ч/нед</Tag>
+                <Tag bgColor="pink">
+                  {participant.workload_hours_per_week} ч/нед
+                </Tag>
               )}
               {participant.level && (
                 <Tag bgColor="green">{UserLevelMapped[participant.level]}</Tag>
@@ -458,25 +484,30 @@ export const ParticipantPublicProfilePage: React.FC = () => {
             </div>
 
             <div className={styles.contacts}>
-              <h3>Контакты</h3>
-              {participant.contacts_visible && socialLinks.length > 0 ? (
+              {showContacts && socialLinks.length > 0 ? (
                 <ul className={styles.contactList}>
                   {socialLinks.map(([key, value]) => (
                     <li key={key}>
                       <a
+                        className={styles.contactLink}
                         href={getContactHref(value)}
                         target="_blank"
                         rel="noreferrer"
                       >
-                        {socialLinkLabels[key]}
+                        <span className={styles.contactLabel}>
+                          {socialLinkLabels[key]}
+                        </span>
+                        <span className={styles.contactValue}>{value}</span>
                       </a>
                     </li>
                   ))}
                 </ul>
-              ) : participant.contacts_visible ? (
+              ) : showContacts ? (
                 <p>Участник не указал контакты.</p>
               ) : (
-                <p>Контакты станут доступны при разрешённом уровне доступа.</p>
+                <p className={styles.contactsPlaceholder}>
+                  Здесь появятся контакты после метча
+                </p>
               )}
             </div>
 
@@ -485,30 +516,35 @@ export const ParticipantPublicProfilePage: React.FC = () => {
                 {areProjectsPending ? (
                   <p>Загружаем ваши проекты…</p>
                 ) : isCurrentUserError || areProjectsError ? (
-                  <p role="alert">Не удалось загрузить проекты для приглашения.</p>
+                  <p role="alert">
+                    Не удалось загрузить проекты для приглашения.
+                  </p>
                 ) : eligibleProjects.length > 0 ? (
                   <>
-                    <label htmlFor="invite-project">Проект</label>
-                    <select
-                      id="invite-project"
-                      className={styles.projectSelect}
-                      value={effectiveProjectId}
-                      disabled={invitationMutation.isPending}
-                      onChange={(event) => {
-                        setSelectedProjectId(event.target.value);
-                        setInvitationStatus(null);
-                      }}
-                    >
-                      {eligibleProjects.length > 1 && (
-                        <option value="">Выберите проект</option>
-                      )}
-                      {eligibleProjects.map((project) => (
-                        <option key={project.id} value={project.id}>
-                          {project.title}
-                          {project.status === 'closed' ? ' — закрыт' : ''}
-                        </option>
-                      ))}
-                    </select>
+                    {/* Выбор нужен только когда подходящих проектов больше одного */}
+                    {eligibleProjects.length > 1 && (
+                      <>
+                        <label htmlFor="invite-project">Проект</label>
+                        <select
+                          id="invite-project"
+                          className={styles.projectSelect}
+                          value={effectiveProjectId}
+                          disabled={invitationMutation.isPending}
+                          onChange={(event) => {
+                            setSelectedProjectId(event.target.value);
+                            setInvitationStatus(null);
+                          }}
+                        >
+                          <option value="">Выберите проект</option>
+                          {eligibleProjects.map((project) => (
+                            <option key={project.id} value={project.id}>
+                              {project.title}
+                              {project.status === 'closed' ? ' — закрыт' : ''}
+                            </option>
+                          ))}
+                        </select>
+                      </>
+                    )}
                     {selectedProject && isRelationPending ? (
                       <p>Проверяем состояние участника…</p>
                     ) : isRelationError ? (
@@ -519,6 +555,7 @@ export const ParticipantPublicProfilePage: React.FC = () => {
                       <div className={styles.relationActions}>
                         <Button
                           className={styles.invitationButton}
+                          variant="secondary"
                           disabled={interestMutation.isPending}
                           onClick={() => handleInterest('accept')}
                         >
@@ -528,7 +565,6 @@ export const ParticipantPublicProfilePage: React.FC = () => {
                         </Button>
                         <Button
                           className={styles.invitationButton}
-                          variant="secondary"
                           disabled={interestMutation.isPending}
                           onClick={() => handleInterest('reject')}
                         >
@@ -536,18 +572,19 @@ export const ParticipantPublicProfilePage: React.FC = () => {
                         </Button>
                       </div>
                     ) : projectRelation.kind === 'invitation' ? (
-                      <Button
-                        className={styles.invitationButton}
-                        variant="secondary"
-                        disabled
-                      >
+                      <Button className={styles.invitationButton} disabled>
                         Приглашение отправлено
                       </Button>
                     ) : projectRelation.kind === 'membership' ? (
                       <div className={styles.membershipBlock}>
                         <p>
-                          {participant.display_name} в вашей команде{' '}
-                          <span aria-hidden="true">✓</span>
+                          {participant.display_name} в вашей команде
+                          <Icon
+                            name="check"
+                            size={24}
+                            className={styles.membershipCheck}
+                            aria-hidden="true"
+                          />
                         </p>
                         <Button
                           className={styles.removeButton}
@@ -561,16 +598,17 @@ export const ParticipantPublicProfilePage: React.FC = () => {
                         </Button>
                       </div>
                     ) : projectRelation.kind === 'closed' ? (
-                      <Button
-                        className={styles.invitationButton}
-                        variant="secondary"
-                        disabled
-                      >
+                      <Button className={styles.invitationButton} disabled>
                         {projectRelation.label}
                       </Button>
                     ) : (
                       <Button
                         className={styles.invitationButton}
+                        variant={
+                          selectedProject?.status === 'closed'
+                            ? 'primary'
+                            : 'secondary'
+                        }
                         disabled={inviteDisabled}
                         onClick={handleInvite}
                       >
@@ -585,7 +623,9 @@ export const ParticipantPublicProfilePage: React.FC = () => {
                 ) : (
                   <p>
                     Нет открытого проекта с ролью «
-                    {participant.specialization_name ?? 'специализация не указана'}».
+                    {participant.specialization_name ??
+                      'специализация не указана'}
+                    ».
                   </p>
                 )}
                 {invitationStatus && (
@@ -605,91 +645,101 @@ export const ParticipantPublicProfilePage: React.FC = () => {
           </aside>
         </section>
 
-        <section className={styles.skillsSection}>
-          <h2 className={styles.sectionTitle}>Мои навыки</h2>
-          <div className={styles.skillsLayout}>
-            <div className={styles.skillsDecoration} aria-hidden="true" />
-            <div className={styles.skillsGroups}>
-              {participant.skills.length > 0 ? (
-                skillGroups.map(({ level, skills }) => (
-                  <div className={styles.skillGroup} key={level}>
-                    <p className={styles.skillLevel}>{SkillLevelMapped[level]}</p>
-                    {skills.length > 0 ? (
-                      <ul className={styles.skillList}>
-                        {skills.map((skill) => (
-                          <li key={skill.skill_id}>{skill.name}</li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className={styles.emptyLevel}>Навыки не указаны</p>
-                    )}
-                  </div>
-                ))
-              ) : (
-                <p className={styles.emptySection}>Участник пока не указал навыки.</p>
-              )}
-            </div>
-          </div>
-        </section>
-
-        <section className={styles.worksSection}>
-          <h2 className={styles.sectionTitle}>Мои работы</h2>
-          {participant.portfolio_works.length > 0 ? (
-            <ul className={styles.worksGrid}>
-              {participant.portfolio_works.map((work) => (
-                <li className={styles.workCard} key={work.id}>
-                  {work.image ? (
-                    <img
-                      className={styles.workImage}
-                      src={work.image}
-                      alt={`Изображение работы ${work.title}`}
-                    />
+        {isContentExpanded && (
+          <>
+            <section className={styles.skillsSection}>
+              <h2 className={styles.sectionTitle}>Мои навыки</h2>
+              <div className={styles.skillsLayout}>
+                <div className={styles.skillsDecoration} aria-hidden="true" />
+                <div className={styles.skillsGroups}>
+                  {participant.skills.length > 0 ? (
+                    skillGroups.map(({ level, skills }) => (
+                      <div className={styles.skillGroup} key={level}>
+                        <p className={styles.skillLevel}>
+                          {SkillLevelMapped[level]}
+                        </p>
+                        {skills.length > 0 ? (
+                          <ul className={styles.skillList}>
+                            {skills.map((skill) => (
+                              <li key={skill.skill_id}>{skill.name}</li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p className={styles.emptyLevel}>Навыки не указаны</p>
+                        )}
+                      </div>
+                    ))
                   ) : (
-                    <div
-                      className={`${styles.workImage} ${styles.workImagePlaceholder}`}
-                      role="img"
-                      aria-label="Изображение работы не добавлено"
-                    />
+                    <p className={styles.emptySection}>
+                      Участник пока не указал навыки.
+                    </p>
                   )}
-                  <div className={styles.workContent}>
-                    <h3>{work.title}</h3>
-                    {work.task && (
-                      <div>
-                        <span className={styles.workLabel}>Задача</span>
-                        <p>{work.task}</p>
+                </div>
+              </div>
+            </section>
+
+            <section className={styles.worksSection}>
+              <h2 className={styles.sectionTitle}>Мои работы</h2>
+              {participant.portfolio_works.length > 0 ? (
+                <ul className={styles.worksGrid}>
+                  {participant.portfolio_works.map((work) => (
+                    <li className={styles.workCard} key={work.id}>
+                      {work.image ? (
+                        <img
+                          className={styles.workImage}
+                          src={work.image}
+                          alt={`Изображение работы ${work.title}`}
+                        />
+                      ) : (
+                        <div
+                          className={`${styles.workImage} ${styles.workImagePlaceholder}`}
+                          role="img"
+                          aria-label="Изображение работы не добавлено"
+                        />
+                      )}
+                      <div className={styles.workContent}>
+                        <h3>{work.title}</h3>
+                        {work.task && (
+                          <div>
+                            <span className={styles.workLabel}>Задача</span>
+                            <p>{work.task}</p>
+                          </div>
+                        )}
+                        {work.solution && (
+                          <div>
+                            <span className={styles.workLabel}>Решение</span>
+                            <p>{work.solution}</p>
+                          </div>
+                        )}
+                        {work.technologies && work.technologies.length > 0 && (
+                          <div className={styles.technologies}>
+                            {work.technologies.map((technology) => (
+                              <Tag key={technology}>{technology}</Tag>
+                            ))}
+                          </div>
+                        )}
+                        {work.link && (
+                          <a
+                            className={styles.workLink}
+                            href={work.link}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            Узнать больше ↗
+                          </a>
+                        )}
                       </div>
-                    )}
-                    {work.solution && (
-                      <div>
-                        <span className={styles.workLabel}>Решение</span>
-                        <p>{work.solution}</p>
-                      </div>
-                    )}
-                    {work.technologies && work.technologies.length > 0 && (
-                      <div className={styles.technologies}>
-                        {work.technologies.map((technology) => (
-                          <Tag key={technology}>{technology}</Tag>
-                        ))}
-                      </div>
-                    )}
-                    {work.link && (
-                      <a
-                        className={styles.workLink}
-                        href={work.link}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        Узнать больше ↗
-                      </a>
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className={styles.emptySection}>Участник пока не добавил работы.</p>
-          )}
-        </section>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className={styles.emptySection}>
+                  Участник пока не добавил работы.
+                </p>
+              )}
+            </section>
+          </>
+        )}
       </div>
     </main>
   );

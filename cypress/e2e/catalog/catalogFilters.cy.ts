@@ -167,10 +167,7 @@ describe('фильтры каталогов', () => {
 
         request.alias = 'projectsPage1';
         request.reply(
-          paginated(
-            [project(1, 'Первый проект')],
-            '/api/v1/projects/?page=2'
-          )
+          paginated([project(1, 'Первый проект')], '/api/v1/projects/?page=2')
         );
       }
     );
@@ -229,10 +226,7 @@ describe('фильтры каталогов', () => {
     cy.visit('http://localhost:5173/projects');
     cy.wait('@coloredProjects');
 
-    for (const specialization of [
-      'Графический дизайнер',
-      'UX/UI-дизайнер',
-    ]) {
+    for (const specialization of ['Графический дизайнер', 'UX/UI-дизайнер']) {
       cy.contains('span', specialization).should(
         'have.css',
         'background-color',
@@ -294,9 +288,7 @@ describe('фильтры каталогов', () => {
     cy.contains('[role="option"]', 'Разработка').trigger('mousedown');
     cy.get('body').click(0, 0);
     cy.contains('button', 'Специализации').click();
-    cy.contains('[role="option"]', 'Frontend-разработчик').trigger(
-      'mousedown'
-    );
+    cy.contains('[role="option"]', 'Frontend-разработчик').trigger('mousedown');
     cy.get('body').click(0, 0);
     cy.contains('button', 'Навыки').click();
     cy.contains('[role="option"]', 'React').trigger('mousedown');
@@ -317,37 +309,31 @@ describe('фильтры каталогов', () => {
   });
 
   it('передаёт множественные фильтры участников при каждой странице', () => {
-    cy.intercept(
-      { method: 'GET', pathname: '/api/v1/users/' },
-      (request) => {
-        expectFilters(request.url);
-        const params = new URL(request.url).searchParams;
-        expect(params.get('account_type')).to.equal('participant');
+    cy.intercept({ method: 'GET', pathname: '/api/v1/users/' }, (request) => {
+      expectFilters(request.url);
+      const params = new URL(request.url).searchParams;
+      expect(params.get('account_type')).to.equal('participant');
 
-        if (params.get('page') === '2') {
-          request.alias = 'participantsPage2';
-          request.reply(paginated([participant(2, 'participant-2')]));
-          return;
-        }
-
-        request.alias = 'participantsPage1';
-        request.reply(
-          paginated(
-            [participant(1, 'participant-1')],
-            '/api/v1/users/?page=2'
-          )
-        );
+      if (params.get('page') === '2') {
+        request.alias = 'participantsPage2';
+        request.reply(paginated([participant(2, 'participant-2')]));
+        return;
       }
-    );
+
+      request.alias = 'participantsPage1';
+      request.reply(
+        paginated([participant(1, 'participant-1')], '/api/v1/users/?page=2')
+      );
+    });
 
     cy.visit(
       'http://localhost:5173/participants?field_ids=1,2&specialization_ids=10&skill_ids=20'
     );
     cy.wait('@participantsPage1');
-    cy.contains('participant-1').should('be.visible');
+    cy.get('a[aria-label="Открыть профиль Участник 1"]').should('be.visible');
     cy.contains('button', 'Показать еще').click();
     cy.wait('@participantsPage2');
-    cy.contains('participant-2').should('be.visible');
+    cy.get('a[aria-label="Открыть профиль Участник 2"]').should('be.visible');
   });
 
   for (const [width, height] of [
@@ -392,7 +378,7 @@ describe('фильтры каталогов', () => {
         );
       });
       cy.visit('http://localhost:5173/participants');
-      cy.contains('participant-1').should('be.visible');
+      cy.get('a[aria-label="Открыть профиль Участник 1"]').should('be.visible');
       cy.document().then((document) => {
         expect(document.documentElement.scrollWidth).to.equal(
           document.documentElement.clientWidth

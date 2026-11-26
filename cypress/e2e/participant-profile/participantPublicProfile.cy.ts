@@ -184,6 +184,12 @@ const visitProfile = (
   }
 ) => {
   cy.intercept('GET', '**/api/v1/users/7/', body).as('profile');
+  cy.intercept('GET', '**/api/v1/users/me/notifications/**', {
+    count: 0,
+    next: null,
+    previous: null,
+    results: [],
+  }).as('notifications');
   if (options?.owner) {
     cy.intercept('POST', '**/api/v1/auth/token/refresh/', {
       access: makeAccessToken(),
@@ -250,8 +256,11 @@ describe('публичный профиль участника', () => {
     cy.contains('Александра Дизайнер').should('be.visible');
     cy.contains('button', 'Показать полностью')
       .should('have.attr', 'aria-expanded', 'false')
-      .click()
-      .should('have.attr', 'aria-expanded', 'true');
+      .parent()
+      .should('have.css', 'background-image')
+      .and('contain', 'linear-gradient');
+    cy.contains('button', 'Показать полностью').click();
+    cy.contains('button', 'Показать полностью').should('not.exist');
     cy.contains('Продвинутый уровень').should('be.visible');
     cy.contains('Figma').should('be.visible');
     cy.contains('Сервис для дизайнеров').should('be.visible');
@@ -261,7 +270,7 @@ describe('публичный профиль участника', () => {
       'href',
       'https://example.com/work'
     );
-    cy.contains('Контакты станут доступны').should('be.visible');
+    cy.contains('Здесь появятся контакты после метча').should('be.visible');
     cy.contains('Приглашения доступны владельцам проектов').should(
       'be.visible'
     );
@@ -282,6 +291,10 @@ describe('публичный профиль участника', () => {
       'href',
       'https://t.me/designer'
     );
+    cy.contains('button', 'Показать полностью')
+      .parent()
+      .should('have.css', 'background-image', 'none');
+    cy.contains('button', 'Показать полностью').click();
     cy.contains('Участник пока не указал навыки.').should('be.visible');
     cy.contains('Участник пока не добавил работы.').should('be.visible');
   });
