@@ -119,6 +119,11 @@ describe('главная страница', () => {
         'href',
         '/policy'
       );
+      cy.contains('a', 'Пользовательское соглашение').should(
+        'have.attr',
+        'href',
+        '/terms'
+      );
     });
   });
 

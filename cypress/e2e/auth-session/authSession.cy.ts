@@ -784,6 +784,7 @@ describe('безопасное управление JWT-сессией', () => {
     cy.get('input[type="email"]').type('registered@example.com');
     cy.get('input[type="text"]').type('registered-user');
     cy.get('input[type="password"]').type('Password123!');
+    cy.get('input[name="termsAccepted"]').check();
     cy.contains('button', 'Зарегистрироваться').click();
     cy.wrap(null).should(() => expect(registrationRequests).to.equal(1));
 

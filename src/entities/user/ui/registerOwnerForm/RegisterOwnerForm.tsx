@@ -1,9 +1,9 @@
 import { Button, Input } from '@shared/ui';
 import styles from './RegisterOwnerForm.module.css';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { EyeM, EyeMSlash } from '@shared/icons';
 import type { RegisterFormData } from '../../lib/registration';
+import { RegistrationLegalNotice } from '../registrationLegalNotice/RegistrationLegalNotice';
 
 interface RegisterOwnerFormProps {
   role: string;
@@ -25,6 +25,7 @@ export const RegisterOwnerForm: React.FC<RegisterOwnerFormProps> = ({
   const [login, setLogin] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
   // Изменение полей сбрасывает ошибки прошлого запроса и локальной проверки.
@@ -48,8 +49,18 @@ export const RegisterOwnerForm: React.FC<RegisterOwnerFormProps> = ({
     setPassword(e.target.value);
   };
 
+  const handleTermsAcceptedChange = (accepted: boolean) => {
+    resetErrors();
+    setTermsAccepted(accepted);
+  };
+
   const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
+
+    if (!termsAccepted) {
+      setFormError('Примите Пользовательское соглашение.');
+      return;
+    }
 
     setFormError(null);
     onSubmit({
@@ -94,17 +105,10 @@ export const RegisterOwnerForm: React.FC<RegisterOwnerFormProps> = ({
           rightIcon={showPassword ? <EyeM /> : <EyeMSlash />}
           onRightIconClick={() => setShowPassword((prev) => !prev)}
         />
-        <p className={styles.policyText}>
-          Нажимая «Зарегистрироваться», я даю согласие на обработку моих
-          персональных данных <br /> и принимаю условия{' '}
-          <Link to={'/policy'} className={styles.link}>
-            Пользовательского соглашения
-          </Link>{' '}
-          и{' '}
-          <Link to={'/policy'} className={styles.link}>
-            Политики конфиденциальности
-          </Link>
-        </p>
+        <RegistrationLegalNotice
+          accepted={termsAccepted}
+          onChange={handleTermsAcceptedChange}
+        />
         {visibleError && <p className={styles.errorText}>{visibleError}</p>}
       </div>
       <Button

@@ -13,6 +13,7 @@ import {
   QuestionsPage,
   RegisterPage,
   RequestsPage,
+  TermsPage,
 } from '@pages';
 import { MainLayout } from '@shared/ui/layout/main/MainLayout';
 import { Route, Routes } from 'react-router-dom';
@@ -28,6 +29,7 @@ export function App() {
         {/* Публичные маршруты */}
         <Route index element={<MainPage />} />
         <Route path="policy" element={<PolicyPage />} />
+        <Route path="terms" element={<TermsPage />} />
         <Route path="projects" element={<ProjectsPage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />

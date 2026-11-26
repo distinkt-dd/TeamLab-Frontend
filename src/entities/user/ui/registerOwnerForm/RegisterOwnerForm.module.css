@@ -16,17 +16,6 @@
   gap: 20px;
 }
 
-.policyText {
-  font-size: 16px;
-  letter-spacing: 0.3px;
-}
-
-.link {
-  display: inline;
-  text-decoration: none;
-  color: var(--accent-blue-color);
-}
-
 .errorText {
   color: var(--accent-red-color, rgba(251, 76, 71, 1));
   font-size: 16px;
