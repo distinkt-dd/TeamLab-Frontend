@@ -14,3 +14,4 @@ export { ProjectsPage } from './projects';
 export { QuestionsPage } from './QuestionsPage/QuestionPage';
 export { RegisterPage } from './register';
 export { RequestsPage } from './requests';
+export { TermsPage } from './terms';

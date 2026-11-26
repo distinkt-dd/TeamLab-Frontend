@@ -1,0 +1,47 @@
+.legalNotice {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 16px;
+  line-height: 1.4;
+  letter-spacing: 0.3px;
+}
+
+.agreementRow {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+}
+
+.checkbox {
+  width: 22px;
+  height: 22px;
+  margin: 1px 0 0;
+  accent-color: var(--accent-pink-color);
+  cursor: pointer;
+}
+
+.agreementRow label {
+  cursor: pointer;
+}
+
+.link {
+  color: var(--accent-blue-color);
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.link:focus-visible,
+.checkbox:focus-visible {
+  border-radius: 3px;
+  outline: 2px solid var(--accent-purple-color);
+  outline-offset: 3px;
+}
+
+.privacyNotice {
+  font-size: 14px;
+}

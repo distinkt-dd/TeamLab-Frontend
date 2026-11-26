@@ -1,11 +1,11 @@
 import { Button, Input } from '@shared/ui';
 import styles from './RegisterParticipantForm.module.css';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { EyeM, EyeMSlash } from '@shared/icons';
 import { Select } from '@shared/ui/select';
 import { REGISTRATION_DIRECTIONS } from '../../lib/registration';
 import type { RegisterFormData } from '../../lib/registration';
+import { RegistrationLegalNotice } from '../registrationLegalNotice/RegistrationLegalNotice';
 
 interface RegisterParticipantFormProps {
   role: string;
@@ -24,6 +24,7 @@ export const RegisterParticipantForm: React.FC<
   const [password, setPassword] = useState<string>('');
   const [specialization, setSpecialization] = useState<string>('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
   // Изменение полей сбрасывает ошибки прошлого запроса и локальной проверки.
@@ -52,8 +53,18 @@ export const RegisterParticipantForm: React.FC<
     setSpecialization(value);
   };
 
+  const handleTermsAcceptedChange = (accepted: boolean) => {
+    resetErrors();
+    setTermsAccepted(accepted);
+  };
+
   const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
+
+    if (!termsAccepted) {
+      setFormError('Примите Пользовательское соглашение.');
+      return;
+    }
 
     if (!specialization) {
       setFormError('Выберите специализацию из списка.');
@@ -111,17 +122,10 @@ export const RegisterParticipantForm: React.FC<
           fullWidth
           options={REGISTRATION_DIRECTIONS}
         />
-        <p className={styles.policyText}>
-          Нажимая «Зарегистрироваться», я даю согласие на обработку моих
-          персональных данных <br /> и принимаю условия{' '}
-          <Link to={'/policy'} className={styles.link}>
-            Пользовательского соглашения
-          </Link>{' '}
-          и{' '}
-          <Link to={'/policy'} className={styles.link}>
-            Политики конфиденциальности
-          </Link>
-        </p>
+        <RegistrationLegalNotice
+          accepted={termsAccepted}
+          onChange={handleTermsAcceptedChange}
+        />
         {visibleError && <p className={styles.errorText}>{visibleError}</p>}
       </div>
       <Button

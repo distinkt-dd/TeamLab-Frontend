@@ -25,12 +25,18 @@ const footerData = {
     { id: 2, text: 'Инвесторам', enabled: false },
     {
       id: 3,
+      text: 'Пользовательское соглашение',
+      url: '/terms',
+      enabled: true,
+    },
+    {
+      id: 4,
       text: 'Персональные данные',
       url: '/policy',
       enabled: true,
     },
-    { id: 4, text: 'ТИМЛАБ API', enabled: false },
-    { id: 5, text: 'Помощь', url: '/questions', enabled: false },
+    { id: 5, text: 'ТИМЛАБ API', enabled: false },
+    { id: 6, text: 'Помощь', url: '/questions', enabled: false },
   ],
 };
 
